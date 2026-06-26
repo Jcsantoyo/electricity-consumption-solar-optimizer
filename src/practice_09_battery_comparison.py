@@ -39,6 +39,7 @@ battery_results = simulate_battery(
     max_discharge_power_kw=max_discharge_power_kw,
     initial_battery_state_kwh=initial_battery_state_kwh
 )
+
 grid_import_with_battery = battery_results["grid_import_kwh"]
 solar_surplus_with_battery = battery_results["solar_surplus_kwh"]
 battery_state_kwh = battery_results["battery_state_kwh"]
