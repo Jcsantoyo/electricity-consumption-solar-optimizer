@@ -18,6 +18,10 @@ daily_hourly_consumption_kwh = [
 
 peak_power_kw = 1.0
 battery_capacity_kwh = 2.0
+battery_efficiency = 0.7
+max_charge_power_kw = 1.0
+max_discharge_power_kw = 1.0
+initial_battery_state_kwh = 0.0
 
 daily_solar_generation_kwh = generate_daily_solar_profile(peak_power_kw)
 
@@ -26,8 +30,15 @@ self_consumed_no_battery, grid_import_no_battery, solar_surplus_no_battery = sim
     daily_solar_generation_kwh
 )
 
-battery_results = simulate_battery(daily_hourly_consumption_kwh, daily_solar_generation_kwh, battery_capacity_kwh)
-
+battery_results = simulate_battery(
+    daily_hourly_consumption_kwh,
+    daily_solar_generation_kwh,
+    battery_capacity_kwh,
+    battery_efficiency=battery_efficiency,
+    max_charge_power_kw=max_charge_power_kw,
+    max_discharge_power_kw=max_discharge_power_kw,
+    initial_battery_state_kwh=initial_battery_state_kwh
+)
 grid_import_with_battery = battery_results["grid_import_kwh"]
 solar_surplus_with_battery = battery_results["solar_surplus_kwh"]
 battery_state_kwh = battery_results["battery_state_kwh"]

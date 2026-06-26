@@ -13,13 +13,21 @@ daily_hourly_consumption_kwh = [
 
 peak_power_kw = 1.0
 battery_capacity_kwh = 2.0
+battery_efficiency = 0.90
+max_charge_power_kw = 1.0
+max_discharge_power_kw = 1.0
+initial_battery_state_kwh = 0.0
 
 daily_solar_generation_kwh = generate_daily_solar_profile(peak_power_kw)
 
 battery_results = simulate_battery(
     daily_hourly_consumption_kwh,
     daily_solar_generation_kwh,
-    battery_capacity_kwh
+    battery_capacity_kwh,
+    battery_efficiency=battery_efficiency,
+    max_charge_power_kw=max_charge_power_kw,
+    max_discharge_power_kw=max_discharge_power_kw,
+    initial_battery_state_kwh=initial_battery_state_kwh
 )
 
 df = pd.DataFrame({
@@ -33,6 +41,9 @@ df = pd.DataFrame({
     "solar_surplus_kwh": battery_results["solar_surplus_kwh"],
     "battery_state_kwh": battery_results["battery_state_kwh"]
 })
+
+print("Max battery state:", df["battery_state_kwh"].max())
+print("Min battery state:", df["battery_state_kwh"].min())
 
 total_consumption = df["consumption_kwh"].sum()
 total_solar_generation = df["solar_generation_kwh"].sum()
@@ -70,6 +81,10 @@ print(f"Total grid import: {total_grid_import:.2f} kWh")
 print(f"Total solar surplus: {total_solar_surplus:.2f} kWh")
 print(f"Self-consumption ratio: {self_consumption_ratio:.2%}")
 print(f"Self-sufficiency ratio: {self_sufficiency_ratio:.2%}")
+print(f"Battery efficiency: {battery_efficiency:.2%}")
+print(f"Max charge power: {max_charge_power_kw:.2f} kW")
+print(f"Max discharge power: {max_discharge_power_kw:.2f} kW")
+print(f"Initial battery state: {initial_battery_state_kwh:.2f} kWh")
 
 plt.figure(figsize=(10, 5))
 
