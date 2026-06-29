@@ -26,3 +26,6 @@ data/simulated/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !data/simulated/.gitkeep
+
+# Keep sample datasets
+!data/raw/consumption_sample.csv
