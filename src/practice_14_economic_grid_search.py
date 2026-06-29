@@ -145,3 +145,26 @@ plt.grid(True)
 plt.legend()
 
 plt.savefig("images/payback_grid_search.png", dpi=300, bbox_inches="tight")
+
+best_self_sufficiency_index = df["self_sufficiency"].idxmax()
+best_self_sufficiency_scenario = df.loc[best_self_sufficiency_index]
+
+print("\nBest scenario by self-sufficiency:")
+print(f"Solar peak power: {best_self_sufficiency_scenario['solar_peak_power_kw']:.2f} kW")
+print(f"Battery capacity: {best_self_sufficiency_scenario['battery_capacity_kwh']:.2f} kWh")
+print(f"Investment cost: {best_self_sufficiency_scenario['investment_cost_eur']:.2f} EUR")
+print(f"Annual savings: {best_self_sufficiency_scenario['annual_savings_eur']:.2f} EUR/year")
+print(f"Payback: {best_self_sufficiency_scenario['payback_years']:.2f} years")
+print(f"Self-sufficiency: {best_self_sufficiency_scenario['self_sufficiency']:.2%}")
+print(f"Grid import: {best_self_sufficiency_scenario['grid_import_kwh']:.2f} kWh")
+print(f"Solar surplus: {best_self_sufficiency_scenario['solar_surplus_kwh']:.2f} kWh")
+
+print(
+    f"Best payback: {best_payback_scenario['solar_peak_power_kw']:.2f} kW solar, "
+    f"{best_payback_scenario['battery_capacity_kwh']:.2f} kWh battery"
+)
+
+print(
+    f"Best self-sufficiency: {best_self_sufficiency_scenario['solar_peak_power_kw']:.2f} kW solar, "
+    f"{best_self_sufficiency_scenario['battery_capacity_kwh']:.2f} kWh battery"
+)
