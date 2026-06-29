@@ -6,7 +6,8 @@ from scenarios import compare_battery_scenario
 from economics import (
     calculate_total_installation_cost,
     calculate_daily_grid_cost,
-    calculate_simple_payback_years
+    calculate_simple_payback_years,
+    calculate_daily_net_cost
 )
 
 daily_hourly_consumption_kwh = [
@@ -25,6 +26,7 @@ max_discharge_power_kw = 1.0
 initial_battery_state_kwh = 0.0
 
 electricity_price_eur_per_kwh = 0.20
+surplus_compensation_eur_per_kwh = 0.07
 
 fixed_installation_cost = 800.0
 solar_cost_per_kw = 900.0
@@ -54,9 +56,11 @@ for peak_power_kw in solar_peak_powers_kw:
             initial_battery_state_kwh=initial_battery_state_kwh
         )
 
-        scenario_daily_cost = calculate_daily_grid_cost(
+        scenario_daily_cost = calculate_daily_net_cost(
             summary["grid_import_with_battery_kwh"],
-            electricity_price_eur_per_kwh
+            summary["solar_surplus_with_battery_kwh"],
+            electricity_price_eur_per_kwh,
+            surplus_compensation_eur_per_kwh
         )
 
         scenario_annual_cost = scenario_daily_cost * days_per_year
@@ -88,13 +92,15 @@ for peak_power_kw in solar_peak_powers_kw:
             "payback_years": payback_years,
             "grid_import_kwh": summary["grid_import_with_battery_kwh"],
             "solar_surplus_kwh": summary["solar_surplus_with_battery_kwh"],
-            "self_sufficiency": summary["self_sufficiency_with_battery"]
+            "self_sufficiency": summary["self_sufficiency_with_battery"],
+            "potential_surplus_compensation_eur": summary["solar_surplus_with_battery_kwh"] * surplus_compensation_eur_per_kwh
         })
 
 df = pd.DataFrame(results)
 
 print("\nEconomic assumptions:")
 print(f"Electricity price: {electricity_price_eur_per_kwh:.2f} EUR/kWh")
+print(f"Surplus compensation: {surplus_compensation_eur_per_kwh:.2f} EUR/kWh")
 print(f"Fixed installation cost: {fixed_installation_cost:.2f} EUR")
 print(f"Solar installation cost: {solar_cost_per_kw:.2f} EUR/kW")
 print(f"Battery installation cost: {battery_cost_per_kwh:.2f} EUR/kWh")

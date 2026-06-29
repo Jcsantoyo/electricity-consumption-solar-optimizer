@@ -41,3 +41,17 @@ def calculate_simple_payback_years(
         return None
     
     return investment_cost_eur / annual_savings_eur
+
+def calculate_daily_net_cost(
+        grid_import_kwh: float,
+        solar_surplus_kwh: float,
+        electricity_price_eur_per_kwh: float,
+        surplus_compensation_eur_per_kwh: float
+
+) -> float:
+    grid_cost = grid_import_kwh * electricity_price_eur_per_kwh
+    surplus_compensation = solar_surplus_kwh * surplus_compensation_eur_per_kwh
+
+    net_cost = grid_cost - surplus_compensation
+
+    return max(net_cost, 0.0)
