@@ -79,6 +79,12 @@ electricity-consumption-solar-optimizer/
 ├── images/
 ├── reports/
 ├── notebooks/
+├── scripts/
+│   └── generate_synthetic_consumption.py
+│
+├── archive/
+│   └── practices/
+│
 ├── src/
 │   ├── battery.py
 │   ├── data_loader.py
