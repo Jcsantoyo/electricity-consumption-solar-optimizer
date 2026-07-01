@@ -152,7 +152,7 @@ pip install -r requirements.txt
 ## How to run
 
 ``` bash
-python src/practice_18_generate_synthetic_consumption.py
+python scripts/generate_synthetic_consumption.py
 python src/main.py
 ```
 
