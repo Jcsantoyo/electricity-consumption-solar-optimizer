@@ -26,7 +26,7 @@ def calculate_total_installation_cost(
     return solar_cost + battery_cost + fixed_installation_cost
 
 
-def calculate_daily_grid_cost(
+def calculate_grid_cost(
         grid_import_kwh: float,
         electricity_price_eur_per_kwh: float
 ) -> float:
@@ -42,7 +42,7 @@ def calculate_simple_payback_years(
     
     return investment_cost_eur / annual_savings_eur
 
-def calculate_daily_net_cost(
+def calculate_net_cost(
         grid_import_kwh: float,
         solar_surplus_kwh: float,
         electricity_price_eur_per_kwh: float,

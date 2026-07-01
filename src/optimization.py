@@ -4,8 +4,8 @@ from solar import generate_solar_profile_for_timestamps
 from scenarios import compare_battery_scenario
 from economics import (
     calculate_total_installation_cost,
-    calculate_daily_grid_cost,
-    calculate_daily_net_cost,
+    calculate_grid_cost,
+    calculate_net_cost,
     calculate_simple_payback_years
 )
 
@@ -29,7 +29,7 @@ def run_economic_grid_search(
 
     total_consumption = sum(consumption_kwh)
 
-    baseline_period_cost = calculate_daily_grid_cost(
+    baseline_period_cost = calculate_grid_cost(
         total_consumption,
         electricity_price_eur_per_kwh
     )
@@ -57,7 +57,7 @@ def run_economic_grid_search(
                 initial_battery_state_kwh=initial_battery_state_kwh
             )
 
-            scenario_period_cost = calculate_daily_net_cost(
+            scenario_period_cost = calculate_net_cost(
                 summary["grid_import_with_battery_kwh"],
                 summary["solar_surplus_with_battery_kwh"],
                 electricity_price_eur_per_kwh,
