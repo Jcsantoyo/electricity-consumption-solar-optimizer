@@ -53,6 +53,10 @@ def main() -> None:
         days_per_year=days_per_year
     )
 
+    results_output_path = "reports/grid_search_results.csv"
+    results_df.to_csv(results_output_path, index=False)
+
+
     best_payback_scenario = get_best_scenario_by_payback(results_df)
     best_self_sufficiency_scenario = get_best_scenario_by_self_sufficiency(
         results_df
@@ -61,6 +65,7 @@ def main() -> None:
     print("\nElectricity Consumption Solar Optimizer")
     print(f"Input file: {file_path}")
     print(f"Number of hours: {len(df_consumption)}")
+    print(f"Results saved to: {results_output_path}")
 
     print_scenario_summary(
         "Best scenario by payback",
