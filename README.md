@@ -157,9 +157,20 @@ pip install -r requirements.txt
 
 ## How to run
 
+First, generate the synthetic 30-day consumption dataset:
+
 ``` bash
 python scripts/generate_synthetic_consumption.py
+```
+Then run the main optimizer:
+
+``` bash
 python src/main.py
+```
+The program prints the best scenarios, generates output plots in the images/ folder, and saves the full grid search results to:
+
+``` bash
+reports/grid_search_results.csv
 ```
 
 ------------------------------------------------------------------------
