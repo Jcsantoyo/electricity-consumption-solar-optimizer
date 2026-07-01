@@ -1,3 +1,5 @@
+import os
+
 import config
 
 from data_loader import load_consumption_data
@@ -11,8 +13,14 @@ from optimization import (
 )
 from visualization import plot_payback_by_solar_and_battery
 
+def ensure_output_directories() -> None:
+    os.makedirs("reports", exist_ok=True)
+    os.makedirs("images", exist_ok=True)
 
 def main() -> None:
+
+    ensure_output_directories()
+    
     file_path = config.CONSUMPTION_DATA_PATH
 
     df_consumption = load_consumption_data(file_path)

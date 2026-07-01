@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import os
 
 start_date = "2025-01-01"
 num_days = 30
@@ -47,6 +48,8 @@ df = pd.DataFrame({
     "datetime": date_range,
     "consumption_kwh": consumption_values
 })
+
+os.makedirs("data/simulated", exist_ok=True)
 
 output_path = "data/simulated/synthetic_consumption_30_days.csv"
 
