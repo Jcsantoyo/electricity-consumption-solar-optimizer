@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+from visualization import plot_payback_by_solar_and_battery
 
 from data_loader import load_consumption_data
 from optimization import (
@@ -70,22 +70,8 @@ print(f"Battery capacity: {best_self_sufficiency_scenario['battery_capacity_kwh'
 print(f"Payback: {best_self_sufficiency_scenario['payback_years']:.2f} years")
 print(f"Self-sufficiency: {best_self_sufficiency_scenario['self_sufficiency']:.2%}")
 
-plt.figure(figsize=(10, 5))
-
-for battery_capacity_kwh in battery_capacities_kwh:
-    battery_df = df[df["battery_capacity_kwh"] == battery_capacity_kwh]
-
-    plt.plot(
-        battery_df["solar_peak_power_kw"],
-        battery_df["payback_years"],
-        marker="o",
-        label=f"{battery_capacity_kwh} kWh battery"
-    )
-
-plt.title("Reusable Grid Search: Payback by Solar Power and Battery Capacity")
-plt.xlabel("Solar Peak Power (kW)")
-plt.ylabel("Payback Period (years)")
-plt.grid(True)
-plt.legend()
-
-plt.savefig("images/reusable_grid_search_payback.png", dpi=300, bbox_inches="tight")
+plot_payback_by_solar_and_battery(
+    df,
+    battery_capacities_kwh,
+    "images/reusable_grid_search_payback.png"
+)
