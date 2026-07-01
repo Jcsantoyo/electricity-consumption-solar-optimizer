@@ -1,3 +1,5 @@
+import config
+
 from data_loader import load_consumption_data
 from optimization import (
     run_economic_grid_search,
@@ -11,30 +13,30 @@ from visualization import plot_payback_by_solar_and_battery
 
 
 def main() -> None:
-    file_path = "data/simulated/synthetic_consumption_30_days.csv"
+    file_path = config.CONSUMPTION_DATA_PATH
 
     df_consumption = load_consumption_data(file_path)
 
     consumption_kwh = df_consumption["consumption_kwh"].tolist()
     timestamps = df_consumption["datetime"]
 
-    solar_peak_powers_kw = [0.5, 1.0, 1.5, 2.0, 3.0]
-    battery_capacities_kwh = [0, 0.5, 1.0, 2.0, 3.0, 5.0]
+    solar_peak_powers_kw = config.SOLAR_PEAK_POWERS_KW
+    battery_capacities_kwh = config.BATTERY_CAPACITIES_KWH
 
-    battery_efficiency = 0.90
-    max_charge_power_kw = 1.0
-    max_discharge_power_kw = 1.0
-    initial_battery_state_kwh = 0.0
+    battery_efficiency = config.BATTERY_EFFICIENCY
+    max_charge_power_kw = config.MAX_CHARGE_POWER_KW
+    max_discharge_power_kw = config.MAX_DISCHARGE_POWER_KW
+    initial_battery_state_kwh = config.INITIAL_BATTERY_STATE_KWH
 
-    electricity_price_eur_per_kwh = 0.20
-    surplus_compensation_eur_per_kwh = 0.07
+    electricity_price_eur_per_kwh = config.ELECTRICITY_PRICE_EUR_PER_KWH
+    surplus_compensation_eur_per_kwh = config.SURPLUS_COMPENSATION_EUR_PER_KWH
 
-    fixed_installation_cost = 800.0
-    solar_cost_per_kw = 900.0
-    battery_cost_per_kwh = 500.0
+    fixed_installation_cost = config.FIXED_INSTALLATION_COST_EUR
+    solar_cost_per_kw = config.SOLAR_COST_EUR_PER_KW
+    battery_cost_per_kwh = config.BATTERY_COST_EUR_PER_KWH
 
-    simulation_days = 30
-    days_per_year = 365
+    simulation_days = config.SIMULATION_DAYS
+    days_per_year = config.DAYS_PER_YEAR
 
     results_df = run_economic_grid_search(
         consumption_kwh,
@@ -54,7 +56,7 @@ def main() -> None:
         days_per_year=days_per_year
     )
 
-    results_output_path = "reports/grid_search_results.csv"
+    results_output_path = config.GRID_SEARCH_RESULTS_PATH
     results_df.to_csv(results_output_path, index=False)
 
 
@@ -66,7 +68,7 @@ def main() -> None:
         best_self_sufficiency_scenario
     )
 
-    summary_output_path = "reports/summary.txt"
+    summary_output_path = config.SUMMARY_REPORT_PATH
 
     with open(summary_output_path, "w", encoding="utf-8") as file:
         file.write(summary_text)
@@ -97,7 +99,7 @@ def main() -> None:
     plot_payback_by_solar_and_battery(
         results_df,
         battery_capacities_kwh,
-        "images/main_payback_grid_search.png"
+        config.PAYBACK_PLOT_PATH    
     )
 
 
