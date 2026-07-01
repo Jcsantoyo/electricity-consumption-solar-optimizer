@@ -20,10 +20,16 @@ def ensure_output_directories() -> None:
 def main() -> None:
 
     ensure_output_directories()
-    
+
     file_path = config.CONSUMPTION_DATA_PATH
 
-    df_consumption = load_consumption_data(file_path)
+    try:
+        df_consumption = load_consumption_data(file_path)
+    except FileNotFoundError:
+        print(f"\nInput data file not found: {file_path}")
+        print("Please generate the synthetic dataset first by running:")
+        print("python scripts/generate_synthetic_consumption.py")
+        return
 
     consumption_kwh = df_consumption["consumption_kwh"].tolist()
     timestamps = df_consumption["datetime"]
