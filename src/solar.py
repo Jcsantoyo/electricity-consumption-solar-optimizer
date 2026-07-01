@@ -39,3 +39,19 @@ def simulate_self_consumption(consumption_kwh: list[float], solar_generation_kwh
         solar_surplus_kwh.append(solar_surplus)
 
     return self_consumed_kwh, grid_import_kwh, solar_surplus_kwh
+
+
+def generate_solar_profile_for_timestamps(
+        timestamps,
+        peak_power_kw: float
+) -> list[float]:
+    solar_generation_kwh = []
+    
+    for timestamp in timestamps:
+        hour = timestamp.hour
+
+        solar_generation = get_solar_generation_for_hour(hour, peak_power_kw)
+
+        solar_generation_kwh.append(solar_generation)
+
+    return solar_generation_kwh
