@@ -164,3 +164,47 @@ def print_scenario_comparison(
             "The economically optimal scenario and the energy optimal scenario "
             "are different."
         )
+
+def build_scenario_summary_text(
+    best_payback_scenario: pd.Series,
+    best_self_sufficiency_scenario: pd.Series
+) -> str:
+    text = ""
+
+    text += "Electricity Consumption Solar Optimizer\n"
+    text += "======================================\n\n"
+
+    text += "Best scenario by payback:\n"
+    text += f"Solar peak power: {best_payback_scenario['solar_peak_power_kw']:.2f} kW\n"
+    text += f"Battery capacity: {best_payback_scenario['battery_capacity_kwh']:.2f} kWh\n"
+    text += f"Investment cost: {best_payback_scenario['investment_cost_eur']:.2f} EUR\n"
+    text += f"Annual savings: {best_payback_scenario['annual_savings_eur']:.2f} EUR/year\n"
+    text += f"Payback: {best_payback_scenario['payback_years']:.2f} years\n"
+    text += f"Self-sufficiency: {best_payback_scenario['self_sufficiency']:.2%}\n"
+    text += f"Grid import: {best_payback_scenario['grid_import_kwh']:.2f} kWh\n"
+    text += f"Solar surplus: {best_payback_scenario['solar_surplus_kwh']:.2f} kWh\n\n"
+
+    text += "Best scenario by self-sufficiency:\n"
+    text += f"Solar peak power: {best_self_sufficiency_scenario['solar_peak_power_kw']:.2f} kW\n"
+    text += f"Battery capacity: {best_self_sufficiency_scenario['battery_capacity_kwh']:.2f} kWh\n"
+    text += f"Investment cost: {best_self_sufficiency_scenario['investment_cost_eur']:.2f} EUR\n"
+    text += f"Annual savings: {best_self_sufficiency_scenario['annual_savings_eur']:.2f} EUR/year\n"
+    text += f"Payback: {best_self_sufficiency_scenario['payback_years']:.2f} years\n"
+    text += f"Self-sufficiency: {best_self_sufficiency_scenario['self_sufficiency']:.2%}\n"
+    text += f"Grid import: {best_self_sufficiency_scenario['grid_import_kwh']:.2f} kWh\n"
+    text += f"Solar surplus: {best_self_sufficiency_scenario['solar_surplus_kwh']:.2f} kWh\n\n"
+
+    if (
+        best_payback_scenario["solar_peak_power_kw"]
+        == best_self_sufficiency_scenario["solar_peak_power_kw"]
+        and best_payback_scenario["battery_capacity_kwh"]
+        == best_self_sufficiency_scenario["battery_capacity_kwh"]
+    ):
+        text += "Both criteria select the same scenario.\n"
+    else:
+        text += (
+            "The economically optimal scenario and the energy optimal "
+            "scenario are different.\n"
+        )
+
+    return text

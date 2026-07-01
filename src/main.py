@@ -4,7 +4,8 @@ from optimization import (
     get_best_scenario_by_payback,
     get_best_scenario_by_self_sufficiency,
     print_scenario_summary,
-    print_scenario_comparison
+    print_scenario_comparison,
+    build_scenario_summary_text
 )
 from visualization import plot_payback_by_solar_and_battery
 
@@ -58,14 +59,25 @@ def main() -> None:
 
 
     best_payback_scenario = get_best_scenario_by_payback(results_df)
-    best_self_sufficiency_scenario = get_best_scenario_by_self_sufficiency(
-        results_df
+    best_self_sufficiency_scenario = get_best_scenario_by_self_sufficiency(results_df)
+
+    summary_text = build_scenario_summary_text(
+        best_payback_scenario,
+        best_self_sufficiency_scenario
     )
+
+    summary_output_path = "reports/summary.txt"
+
+    with open(summary_output_path, "w", encoding="utf-8") as file:
+        file.write(summary_text)
+
 
     print("\nElectricity Consumption Solar Optimizer")
     print(f"Input file: {file_path}")
     print(f"Number of hours: {len(df_consumption)}")
     print(f"Results saved to: {results_output_path}")
+    print(f"Results saved to: {results_output_path}")
+    print(f"Summary saved to: {summary_output_path}")
 
     print_scenario_summary(
         "Best scenario by payback",
