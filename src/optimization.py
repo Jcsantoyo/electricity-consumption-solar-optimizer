@@ -119,3 +119,48 @@ def get_best_scenario_by_self_sufficiency(df: pd.DataFrame) -> pd.Series:
     best_index = df["self_sufficiency"].idxmax()
 
     return df.loc[best_index]
+
+def print_scenario_summary(
+    title: str,
+    scenario: pd.Series
+) -> None:
+    print(f"\n{title}:")
+    print(f"Solar peak power: {scenario['solar_peak_power_kw']:.2f} kW")
+    print(f"Battery capacity: {scenario['battery_capacity_kwh']:.2f} kWh")
+    print(f"Investment cost: {scenario['investment_cost_eur']:.2f} EUR")
+    print(f"Annual savings: {scenario['annual_savings_eur']:.2f} EUR/year")
+    print(f"Payback: {scenario['payback_years']:.2f} years")
+    print(f"Self-sufficiency: {scenario['self_sufficiency']:.2%}")
+    print(f"Grid import: {scenario['grid_import_kwh']:.2f} kWh")
+    print(f"Solar surplus: {scenario['solar_surplus_kwh']:.2f} kWh")
+
+def print_scenario_comparison(
+    best_payback_scenario: pd.Series,
+    best_self_sufficiency_scenario: pd.Series
+) -> None:
+    print("\nComparison:")
+
+    print(
+        f"Best payback scenario: "
+        f"{best_payback_scenario['solar_peak_power_kw']:.2f} kW solar, "
+        f"{best_payback_scenario['battery_capacity_kwh']:.2f} kWh battery"
+    )
+
+    print(
+        f"Best self-sufficiency scenario: "
+        f"{best_self_sufficiency_scenario['solar_peak_power_kw']:.2f} kW solar, "
+        f"{best_self_sufficiency_scenario['battery_capacity_kwh']:.2f} kWh battery"
+    )
+
+    if (
+        best_payback_scenario["solar_peak_power_kw"]
+        == best_self_sufficiency_scenario["solar_peak_power_kw"]
+        and best_payback_scenario["battery_capacity_kwh"]
+        == best_self_sufficiency_scenario["battery_capacity_kwh"]
+    ):
+        print("Both criteria select the same scenario.")
+    else:
+        print(
+            "The economically optimal scenario and the energy optimal scenario "
+            "are different."
+        )

@@ -1,10 +1,13 @@
 from visualization import plot_payback_by_solar_and_battery
 
 from data_loader import load_consumption_data
+
 from optimization import (
     run_economic_grid_search,
     get_best_scenario_by_payback,
-    get_best_scenario_by_self_sufficiency
+    get_best_scenario_by_self_sufficiency,
+    print_scenario_summary,
+    print_scenario_comparison
 )
 
 
@@ -58,17 +61,20 @@ print(df.to_string(index=False))
 best_payback_scenario = get_best_scenario_by_payback(df)
 best_self_sufficiency_scenario = get_best_scenario_by_self_sufficiency(df)
 
-print("\nBest scenario by payback:")
-print(f"Solar peak power: {best_payback_scenario['solar_peak_power_kw']:.2f} kW")
-print(f"Battery capacity: {best_payback_scenario['battery_capacity_kwh']:.2f} kWh")
-print(f"Payback: {best_payback_scenario['payback_years']:.2f} years")
-print(f"Self-sufficiency: {best_payback_scenario['self_sufficiency']:.2%}")
+print_scenario_summary(
+    "Best scenario by payback",
+    best_payback_scenario
+)
 
-print("\nBest scenario by self-sufficiency:")
-print(f"Solar peak power: {best_self_sufficiency_scenario['solar_peak_power_kw']:.2f} kW")
-print(f"Battery capacity: {best_self_sufficiency_scenario['battery_capacity_kwh']:.2f} kWh")
-print(f"Payback: {best_self_sufficiency_scenario['payback_years']:.2f} years")
-print(f"Self-sufficiency: {best_self_sufficiency_scenario['self_sufficiency']:.2%}")
+print_scenario_summary(
+    "Best scenario by self-sufficiency",
+    best_self_sufficiency_scenario
+)
+
+print_scenario_comparison(
+    best_payback_scenario,
+    best_self_sufficiency_scenario
+)
 
 plot_payback_by_solar_and_battery(
     df,
