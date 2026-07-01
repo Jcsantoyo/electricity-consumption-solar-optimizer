@@ -1,7 +1,11 @@
 import matplotlib.pyplot as plt
 
 from data_loader import load_consumption_data
-from optimization import run_economic_grid_search
+from optimization import (
+    run_economic_grid_search,
+    get_best_scenario_by_payback,
+    get_best_scenario_by_self_sufficiency
+)
 
 
 file_path = "data/simulated/synthetic_consumption_30_days.csv"
@@ -51,13 +55,8 @@ print("\nReusable economic grid search:")
 print(f"Input file: {file_path}")
 print(df.to_string(index=False))
 
-valid_payback_df = df.dropna(subset=["payback_years"])
-
-best_payback_index = valid_payback_df["payback_years"].idxmin()
-best_payback_scenario = valid_payback_df.loc[best_payback_index]
-
-best_self_sufficiency_index = df["self_sufficiency"].idxmax()
-best_self_sufficiency_scenario = df.loc[best_self_sufficiency_index]
+best_payback_scenario = get_best_scenario_by_payback(df)
+best_self_sufficiency_scenario = get_best_scenario_by_self_sufficiency(df)
 
 print("\nBest scenario by payback:")
 print(f"Solar peak power: {best_payback_scenario['solar_peak_power_kw']:.2f} kW")

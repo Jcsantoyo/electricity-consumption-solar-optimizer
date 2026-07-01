@@ -103,3 +103,19 @@ def run_economic_grid_search(
             })
 
     return pd.DataFrame(results)
+
+def get_best_scenario_by_payback(df: pd.DataFrame) -> pd.Series:
+    valid_payback_df = df.dropna(subset=["payback_years"])
+
+    if valid_payback_df.empty:
+        raise ValueError("No valid payback values found.")
+
+    best_index = valid_payback_df["payback_years"].idxmin()
+
+    return valid_payback_df.loc[best_index]
+
+
+def get_best_scenario_by_self_sufficiency(df: pd.DataFrame) -> pd.Series:
+    best_index = df["self_sufficiency"].idxmax()
+
+    return df.loc[best_index]
