@@ -11,6 +11,7 @@ SELF_SUFFICIENCY_PLOT_PATH = "images/main_self_sufficency_grid_search.png"
 BEST_SCENARIOS_COMPARISON_PLOT_PATH = "images/best_scenarios_comparison.png"
 BEST_SCENARIO_TIMESERIES_PLOT_PATH = "images/best_scenario_timeseries.png"
 BEST_SCENARIO_TIMESERIES_PATH = "reports/best_scenario_timeseries.csv"
+BEST_SCENARIO_BATTERY_STATE_PLOT_PATH = "images/best_scenario_battery_state.png"
 
 # Simulation settings
 SIMULATION_DAYS = 30

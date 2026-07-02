@@ -16,7 +16,8 @@ from visualization import (
     plot_payback_by_solar_and_battery,
     plot_self_sufficiency_by_solar_and_battery,
     plot_best_scenarios_comparison,
-    plot_best_scenario_timeseries
+    plot_best_scenario_timeseries,
+    plot_battery_state_over_time
 )
 
 from solar import generate_solar_profile_for_timestamps
@@ -157,6 +158,12 @@ def main() -> None:
     )
     print(f"Best scenario timeseries saved to: {best_timeseries_output_path}")
 
+    print(
+        "Best scenario battery state plot saved to: "
+        f"{config.BEST_SCENARIO_BATTERY_STATE_PLOT_PATH}"
+    )
+
+    
     print_scenario_summary(
         "Best scenario by payback",
         best_payback_scenario
@@ -192,6 +199,11 @@ def main() -> None:
     plot_best_scenario_timeseries(
         best_timeseries_df,
         config.BEST_SCENARIO_TIMESERIES_PLOT_PATH
+    )
+
+    plot_battery_state_over_time(
+        best_timeseries_df,
+        config.BEST_SCENARIO_BATTERY_STATE_PLOT_PATH
     )
 
   

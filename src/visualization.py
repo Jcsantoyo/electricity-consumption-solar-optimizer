@@ -75,7 +75,7 @@ def plot_best_scenarios_comparison(
     plt.grid(axis="y")
 
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
-    plt.show()
+    
 
     print("\nBest scenarios comparison data:")
     for index, row in best_scenarios_df.iterrows():
@@ -116,3 +116,24 @@ def plot_best_scenario_timeseries(
     plt.legend()
 
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
+
+def plot_battery_state_over_time(
+    df: pd.DataFrame,
+    output_path: str
+) -> None:
+    plt.figure(figsize=(12, 5))
+
+    plt.plot(
+        df["datetime"],
+        df["battery_state_kwh"],
+        label="Battery state"
+    )
+
+    plt.title("Battery State of Charge Over Time")
+    plt.xlabel("Datetime")
+    plt.ylabel("Battery State (kWh)")
+    plt.grid(True)
+    plt.legend()
+
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    
