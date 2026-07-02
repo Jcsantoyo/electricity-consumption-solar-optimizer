@@ -3,6 +3,7 @@ CONSUMPTION_DATA_PATH = "data/simulated/synthetic_consumption_30_days.csv"
 
 # Output files
 GRID_SEARCH_RESULTS_PATH = "reports/grid_search_results.csv"
+BEST_SCENARIOS_PATH = "reports/best_scenarios.csv"
 SUMMARY_REPORT_PATH = "reports/summary.txt"
 PAYBACK_PLOT_PATH = "images/main_payback_grid_search.png"
 

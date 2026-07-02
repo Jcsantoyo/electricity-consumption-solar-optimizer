@@ -208,3 +208,34 @@ def build_scenario_summary_text(
         )
 
     return text
+
+def build_best_scenarios_dataframe(
+    best_payback_scenario: pd.Series,
+    best_self_sufficiency_scenario: pd.Series
+) -> pd.DataFrame:
+    rows = [
+        {
+            "criterion": "best_payback",
+            "solar_peak_power_kw": best_payback_scenario["solar_peak_power_kw"],
+            "battery_capacity_kwh": best_payback_scenario["battery_capacity_kwh"],
+            "investment_cost_eur": best_payback_scenario["investment_cost_eur"],
+            "annual_savings_eur": best_payback_scenario["annual_savings_eur"],
+            "payback_years": best_payback_scenario["payback_years"],
+            "self_sufficiency": best_payback_scenario["self_sufficiency"],
+            "grid_import_kwh": best_payback_scenario["grid_import_kwh"],
+            "solar_surplus_kwh": best_payback_scenario["solar_surplus_kwh"]
+        },
+        {
+            "criterion": "best_self_sufficiency",
+            "solar_peak_power_kw": best_self_sufficiency_scenario["solar_peak_power_kw"],
+            "battery_capacity_kwh": best_self_sufficiency_scenario["battery_capacity_kwh"],
+            "investment_cost_eur": best_self_sufficiency_scenario["investment_cost_eur"],
+            "annual_savings_eur": best_self_sufficiency_scenario["annual_savings_eur"],
+            "payback_years": best_self_sufficiency_scenario["payback_years"],
+            "self_sufficiency": best_self_sufficiency_scenario["self_sufficiency"],
+            "grid_import_kwh": best_self_sufficiency_scenario["grid_import_kwh"],
+            "solar_surplus_kwh": best_self_sufficiency_scenario["solar_surplus_kwh"]
+        }
+    ]
+
+    return pd.DataFrame(rows)

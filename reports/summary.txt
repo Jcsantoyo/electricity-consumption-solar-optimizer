@@ -5,20 +5,20 @@ Best scenario by payback:
 Solar peak power: 1.50 kW
 Battery capacity: 0.00 kWh
 Investment cost: 2150.00 EUR
-Annual savings: 431.57 EUR/year
-Payback: 4.98 years
-Self-sufficiency: 48.99%
-Grid import: 117.58 kWh
-Solar surplus: 184.06 kWh
+Annual savings: 433.49 EUR/year
+Payback: 4.96 years
+Self-sufficiency: 49.32%
+Grid import: 117.29 kWh
+Solar surplus: 182.85 kWh
 
 Best scenario by self-sufficiency:
-Solar peak power: 1.50 kW
+Solar peak power: 2.00 kW
 Battery capacity: 5.00 kWh
-Investment cost: 4650.00 EUR
-Annual savings: 560.91 EUR/year
-Payback: 8.29 years
-Self-sufficiency: 99.35%
-Grid import: 1.50 kWh
-Solar surplus: 52.24 kWh
+Investment cost: 5100.00 EUR
+Annual savings: 563.17 EUR/year
+Payback: 9.06 years
+Self-sufficiency: 99.45%
+Grid import: 1.27 kWh
+Solar surplus: 150.36 kWh
 
 The economically optimal scenario and the energy optimal scenario are different.

@@ -9,8 +9,10 @@ from optimization import (
     get_best_scenario_by_self_sufficiency,
     print_scenario_summary,
     print_scenario_comparison,
-    build_scenario_summary_text
+    build_scenario_summary_text,
+    build_best_scenarios_dataframe
 )
+
 from visualization import plot_payback_by_solar_and_battery
 
 def ensure_output_directories() -> None:
@@ -29,6 +31,10 @@ def main() -> None:
         print(f"\nInput data file not found: {file_path}")
         print("Please generate the synthetic dataset first by running:")
         print("python scripts/generate_synthetic_consumption.py")
+        return
+    except ValueError as error:
+        print(f"\nInvalid input data file: {file_path}")
+        print(error)
         return
 
     consumption_kwh = df_consumption["consumption_kwh"].tolist()
@@ -87,6 +93,10 @@ def main() -> None:
     with open(summary_output_path, "w", encoding="utf-8") as file:
         file.write(summary_text)
 
+    best_scenarios_df = build_best_scenarios_dataframe(best_payback_scenario, best_self_sufficiency_scenario)
+
+    best_scenarios_output_path = config.BEST_SCENARIOS_PATH
+    best_scenarios_df.to_csv(best_scenarios_output_path, index=False)
 
     print("\nElectricity Consumption Solar Optimizer")
     print(f"Input file: {file_path}")
@@ -94,6 +104,7 @@ def main() -> None:
     print(f"Results saved to: {results_output_path}")
     print(f"Results saved to: {results_output_path}")
     print(f"Summary saved to: {summary_output_path}")
+    print(f"Best scenarios saved to: {best_scenarios_output_path}")
 
     print_scenario_summary(
         "Best scenario by payback",
