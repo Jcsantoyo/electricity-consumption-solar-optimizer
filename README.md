@@ -19,20 +19,20 @@ The project uses Python, pandas, NumPy and matplotlib.
 This project models a residential electricity system with:
 
 - Hourly electricity consumption data
-- Synthetic solar generation profiles
+- Synthetic and PVGIS-based solar generation profiles
 - Self-consumption without battery
 - Battery storage simulation
 - Economic analysis
 - Grid search over solar power and battery capacity
 - Visualization of payback and energy performance
 
-The current version uses a synthetic 30-day consumption dataset and extrapolates the results to estimate annual savings.
+The current version uses a synthetic 30-day consumption dataset combined with PVGIS solar generation data for Linares, Spain, and extrapolates the results to estimate annual savings.
 
 ---
 
 ## Main result
 
-For the current synthetic 30-day dataset, the optimizer compares multiple combinations of solar peak power and battery capacity.
+For the current synthetic 30-day dataset and PVGIS solar generation data, the optimizer compares multiple combinations of solar peak power and battery capacity.
 
 Example output:
 
@@ -107,8 +107,10 @@ electricity-consumption-solar-optimizer/
 │
 ├── data/
 │   ├── raw/
+│   │   └── pvgis_hourly_linares_1kw_2020.csv
 │   ├── processed/
 │   └── simulated/
+│       └── synthetic_consumption_30_days.csv
 │
 ├── images/
 │
@@ -120,7 +122,10 @@ electricity-consumption-solar-optimizer/
 │   └── 03_optimization_analysis.ipynb
 │
 ├── scripts/
-│   └── generate_synthetic_consumption.py
+│   ├── download_pvgis_data.py
+│   ├── generate_synthetic_consumption.py
+│   ├── test_pvgis_generation_match.py
+│   └── test_pvgis_loader.py
 │
 ├── archive/
 │   └── practices/
@@ -134,6 +139,7 @@ electricity-consumption-solar-optimizer/
 │   ├── optimization.py
 │   ├── scenarios.py
 │   ├── solar.py
+│   ├── solar_data_loader.py
 │   ├── tariff.py
 │   └── visualization.py
 │
@@ -153,6 +159,10 @@ Loads electricity consumption data from CSV files and prepares useful time-based
 ### `solar.py`
 
 Generates simplified hourly solar production profiles and simulates direct solar self-consumption.
+
+### `solar_data_loader.py`
+
+Loads PVGIS hourly solar generation data, converts PVGIS timestamps to pandas datetimes, converts photovoltaic power from W to kWh, and matches PVGIS generation profiles to the consumption timestamps.
 
 ### `battery.py`
 
@@ -182,7 +192,7 @@ Generates reusable plots for scenario comparison and time-series analysis.
 
 ### `config.py`
 
-Stores input paths, output paths, simulation parameters, battery assumptions and economic assumptions.
+Stores input paths, output paths, simulation parameters, battery assumptions, PVGIS configuration and economic assumptions.
 
 ### `main.py`
 
@@ -233,6 +243,12 @@ First, generate the synthetic 30-day consumption dataset:
 python scripts/generate_synthetic_consumption.py
 ```
 
+Then download PVGIS hourly solar generation data:
+
+```bash
+python scripts/download_pvgis_data.py
+```
+
 Then run the main optimizer:
 
 ```bash
@@ -240,6 +256,28 @@ python src/main.py
 ```
 
 The program prints the best scenarios, generates output plots in the `images/` folder and saves report files in the `reports/` folder.
+
+---
+
+## Solar data source
+
+The project can use either a synthetic solar profile or PVGIS-based solar generation data.
+
+The current configuration uses PVGIS solar data for Linares, Spain:
+
+```text
+data/raw/pvgis_hourly_linares_1kw_2020.csv
+```
+
+The PVGIS dataset is downloaded for a reference 1 kW photovoltaic system. The model then scales this 1 kW generation profile to simulate different photovoltaic system sizes in the grid search.
+
+For example:
+
+```text
+0.5 kW system -> PVGIS 1 kW generation × 0.5
+1.5 kW system -> PVGIS 1 kW generation × 1.5
+3.0 kW system -> PVGIS 1 kW generation × 3.0
+```
 
 ---
 
@@ -285,6 +323,17 @@ datetime,consumption_kwh
 
 The `datetime` column is parsed as a timestamp, and `consumption_kwh` represents the electricity consumed during each hour.
 
+PVGIS solar data is expected with at least the following columns:
+
+```csv
+time,P
+20200101:0010,0.0
+20200101:0110,0.0
+20200101:1210,704.33
+```
+
+The `time` column is converted to a pandas datetime, and the `P` column is converted from W to kWh for each hourly interval.
+
 ---
 
 ## Current assumptions
@@ -292,7 +341,8 @@ The `datetime` column is parsed as a timestamp, and `consumption_kwh` represents
 The current model is intentionally simplified. It assumes:
 
 - Synthetic hourly household consumption
-- Repeated daily solar generation pattern
+- PVGIS-based solar generation for a reference 1 kW photovoltaic system
+- Linear scaling of PVGIS production for different PV system sizes
 - Constant electricity price
 - Constant surplus compensation price
 - No fixed electricity bill terms
@@ -311,8 +361,8 @@ These assumptions make the model easy to understand and extend.
 Planned improvements include:
 
 - Use real household electricity consumption data
-- Use PVGIS solar generation data for a real location
-- Add seasonal and weather variation
+- Extend PVGIS integration to multiple locations and orientations
+- Add seasonal and weather variation analysis
 - Add Spanish electricity tariff structures
 - Add battery degradation
 - Add maintenance costs
@@ -330,5 +380,6 @@ Planned improvements include:
 - pandas
 - NumPy
 - matplotlib
+- requests
 - scikit-learn
 - Jupyter

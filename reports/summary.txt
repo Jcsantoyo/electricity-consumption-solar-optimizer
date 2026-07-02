@@ -1,6 +1,8 @@
 Electricity Consumption Solar Optimizer
 ======================================
 
+Solar data source: PVGIS solar data (data/raw/pvgis_hourly_linares_1kw_2020.csv)
+
 Best scenario by payback:
 Solar peak power: 2.00 kW
 Battery capacity: 0.00 kWh

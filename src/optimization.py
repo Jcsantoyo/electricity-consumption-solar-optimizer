@@ -173,13 +173,15 @@ def print_scenario_comparison(
 
 def build_scenario_summary_text(
     best_payback_scenario: pd.Series,
-    best_self_sufficiency_scenario: pd.Series
+    best_self_sufficiency_scenario: pd.Series,
+    solar_data_source: str
 ) -> str:
     text = ""
 
     text += "Electricity Consumption Solar Optimizer\n"
     text += "======================================\n\n"
 
+    text += f"Solar data source: {solar_data_source}\n\n"
     text += "Best scenario by payback:\n"
     text += f"Solar peak power: {best_payback_scenario['solar_peak_power_kw']:.2f} kW\n"
     text += f"Battery capacity: {best_payback_scenario['battery_capacity_kwh']:.2f} kWh\n"
@@ -246,11 +248,12 @@ def build_best_scenarios_dataframe(
 
     return pd.DataFrame(rows)
 
-def build_outputs_index_text() -> str:
+def build_outputs_index_text(solar_data_source: str) -> str:
     text = ""
 
     text += "# Project outputs\n\n"
 
+    text += f"Solar data source: {solar_data_source}\n\n"
     text += "This folder contains the generated reports from the electricity "
     text += "consumption solar optimizer.\n\n"
 

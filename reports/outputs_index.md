@@ -1,5 +1,7 @@
 # Project outputs
 
+Solar data source: PVGIS solar data (data/raw/pvgis_hourly_linares_1kw_2020.csv)
+
 This folder contains the generated reports from the electricity consumption solar optimizer.
 
 ## CSV reports

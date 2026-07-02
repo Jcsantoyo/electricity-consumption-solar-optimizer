@@ -116,9 +116,15 @@ def main() -> None:
         results_df
     )
 
+    if pvgis_df is None:
+        solar_data_source = "Synthetic solar profile"
+    else:
+        solar_data_source = f"PVGIS solar data ({config.PVGIS_SOLAR_DATA_PATH})"
+
     summary_text = build_scenario_summary_text(
         best_payback_scenario,
-        best_self_sufficiency_scenario
+        best_self_sufficiency_scenario,
+        solar_data_source
     )
 
     summary_output_path = config.SUMMARY_REPORT_PATH
@@ -169,7 +175,7 @@ def main() -> None:
     best_timeseries_output_path = config.BEST_SCENARIO_TIMESERIES_PATH
     best_timeseries_df.to_csv(best_timeseries_output_path, index=False)
 
-    outputs_index_text = build_outputs_index_text()
+    outputs_index_text = build_outputs_index_text(solar_data_source)
 
     outputs_index_path = config.OUTPUTS_INDEX_PATH
 
