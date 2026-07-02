@@ -132,6 +132,9 @@ def main() -> None:
     best_timeseries_df["solar_surplus_kwh"] = best_battery_results["solar_surplus_kwh"]
     best_timeseries_df["battery_state_kwh"] = best_battery_results["battery_state_kwh"]
 
+    best_timeseries_output_path = config.BEST_SCENARIO_TIMESERIES_PATH
+    best_timeseries_df.to_csv(best_timeseries_output_path, index=False)
+
 
     best_scenarios_output_path = config.BEST_SCENARIOS_PATH
     best_scenarios_df.to_csv(best_scenarios_output_path, index=False)
@@ -152,6 +155,7 @@ def main() -> None:
         "Best scenario timeseries plot saved to: "
         f"{config.BEST_SCENARIO_TIMESERIES_PLOT_PATH}"
     )
+    print(f"Best scenario timeseries saved to: {best_timeseries_output_path}")
 
     print_scenario_summary(
         "Best scenario by payback",
