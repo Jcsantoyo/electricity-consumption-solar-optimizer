@@ -10,7 +10,8 @@ from optimization import (
     print_scenario_summary,
     print_scenario_comparison,
     build_scenario_summary_text,
-    build_best_scenarios_dataframe
+    build_best_scenarios_dataframe,
+    build_outputs_index_text
 )
 from visualization import (
     plot_payback_by_solar_and_battery,
@@ -137,6 +138,12 @@ def main() -> None:
     best_timeseries_output_path = config.BEST_SCENARIO_TIMESERIES_PATH
     best_timeseries_df.to_csv(best_timeseries_output_path, index=False)
 
+    outputs_index_text = build_outputs_index_text()
+
+    outputs_index_path = config.OUTPUTS_INDEX_PATH
+
+    with open(outputs_index_path, "w", encoding="utf-8") as file:
+        file.write(outputs_index_text)
 
     best_scenarios_output_path = config.BEST_SCENARIOS_PATH
     best_scenarios_df.to_csv(best_scenarios_output_path, index=False)
@@ -168,6 +175,7 @@ def main() -> None:
         "Best scenario cumulative energy plot saved to: "
         f"{config.BEST_SCENARIO_CUMULATIVE_ENERGY_PLOT_PATH}"
     )
+    print(f"Outputs index saved to: {outputs_index_path}")
 
     print_scenario_summary(
         "Best scenario by payback",

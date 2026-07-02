@@ -239,3 +239,55 @@ def build_best_scenarios_dataframe(
     ]
 
     return pd.DataFrame(rows)
+
+def build_outputs_index_text() -> str:
+    text = ""
+
+    text += "# Project outputs\n\n"
+
+    text += "This folder contains the generated reports from the electricity "
+    text += "consumption solar optimizer.\n\n"
+
+    text += "## CSV reports\n\n"
+
+    text += "### `grid_search_results.csv`\n\n"
+    text += (
+        "Full grid search results. Each row represents one combination of "
+        "solar peak power and battery capacity, including investment cost, "
+        "annual savings, payback period, grid import, solar surplus and "
+        "self-sufficiency.\n\n"
+    )
+
+    text += "### `best_scenarios.csv`\n\n"
+    text += (
+        "Summary table with the two selected optimal scenarios: one by "
+        "minimum payback period and one by maximum self-sufficiency.\n\n"
+    )
+
+    text += "### `best_scenario_timeseries.csv`\n\n"
+    text += (
+        "Hourly energy flow table for the best economic scenario. It includes "
+        "consumption, solar generation, self-consumption, battery charge, "
+        "battery discharge, grid import, solar surplus and battery state.\n\n"
+    )
+
+    text += "## Text reports\n\n"
+
+    text += "### `summary.txt`\n\n"
+    text += (
+        "Readable summary of the best economic scenario and the best "
+        "self-sufficiency scenario.\n\n"
+    )
+
+    text += "## Generated plots\n\n"
+
+    text += "The main plots are saved in the `images/` folder:\n\n"
+
+    text += "- `main_payback_grid_search.png`: payback period by solar power and battery capacity.\n"
+    text += "- `main_self_sufficiency_grid_search.png`: self-sufficiency by solar power and battery capacity.\n"
+    text += "- `best_scenarios_comparison.png`: comparison between the economic optimum and the energy optimum.\n"
+    text += "- `best_scenario_timeseries.png`: hourly consumption, solar generation and grid import for the best economic scenario.\n"
+    text += "- `best_scenario_battery_state.png`: battery state of charge over time.\n"
+    text += "- `best_scenario_cumulative_energy.png`: cumulative consumption, solar generation, grid import and solar surplus.\n"
+
+    return text
