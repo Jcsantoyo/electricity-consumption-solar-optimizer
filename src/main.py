@@ -13,7 +13,10 @@ from optimization import (
     build_best_scenarios_dataframe
 )
 
-from visualization import plot_payback_by_solar_and_battery
+from visualization import (
+    plot_payback_by_solar_and_battery,
+    plot_self_sufficiency_by_solar_and_battery
+)
 
 def ensure_output_directories() -> None:
     os.makedirs("reports", exist_ok=True)
@@ -105,6 +108,8 @@ def main() -> None:
     print(f"Results saved to: {results_output_path}")
     print(f"Summary saved to: {summary_output_path}")
     print(f"Best scenarios saved to: {best_scenarios_output_path}")
+    print(f"Payback plot saved to: {config.PAYBACK_PLOT_PATH}")
+    print(f"Self-sufficiency plot saved to: {config.SELF_SUFFICIENCY_PLOT_PATH}")
 
     print_scenario_summary(
         "Best scenario by payback",
@@ -125,6 +130,12 @@ def main() -> None:
         results_df,
         battery_capacities_kwh,
         config.PAYBACK_PLOT_PATH    
+    )
+
+    plot_self_sufficiency_by_solar_and_battery(
+        results_df,
+        battery_capacities_kwh,
+        config.SELF_SUFFICIENCY_PLOT_PATH
     )
 
 
