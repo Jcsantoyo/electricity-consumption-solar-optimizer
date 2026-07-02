@@ -51,3 +51,36 @@ def plot_self_sufficiency_by_solar_and_battery(
     plt.legend()
 
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
+
+def plot_best_scenarios_comparison(
+    best_scenarios_df: pd.DataFrame,
+    output_path: str
+) -> None:
+    labels = best_scenarios_df["criterion"]
+
+    payback_years = best_scenarios_df["payback_years"]
+    self_sufficiency_percent = best_scenarios_df["self_sufficiency"] * 100
+    investment_cost = best_scenarios_df["investment_cost_eur"]
+
+    x = range(len(labels))
+
+    plt.figure(figsize=(8, 5))
+
+    plt.bar(x, payback_years)
+
+    plt.title("Best Scenarios Comparison: Payback")
+    plt.xlabel("Scenario")
+    plt.ylabel("Payback Period (years)")
+    plt.xticks(x, labels, rotation=15)
+    plt.grid(axis="y")
+
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    plt.show()
+
+    print("\nBest scenarios comparison data:")
+    for index, row in best_scenarios_df.iterrows():
+        print(f"\nScenario: {row['criterion']}")
+        print(f"Investment cost: {row['investment_cost_eur']:.2f} EUR")
+        print(f"Annual savings: {row['annual_savings_eur']:.2f} EUR/year")
+        print(f"Payback: {row['payback_years']:.2f} years")
+        print(f"Self-sufficiency: {row['self_sufficiency']:.2%}")

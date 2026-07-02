@@ -12,18 +12,19 @@ from optimization import (
     build_scenario_summary_text,
     build_best_scenarios_dataframe
 )
-
 from visualization import (
     plot_payback_by_solar_and_battery,
-    plot_self_sufficiency_by_solar_and_battery
+    plot_self_sufficiency_by_solar_and_battery,
+    plot_best_scenarios_comparison
 )
+
 
 def ensure_output_directories() -> None:
     os.makedirs("reports", exist_ok=True)
     os.makedirs("images", exist_ok=True)
 
-def main() -> None:
 
+def main() -> None:
     ensure_output_directories()
 
     file_path = config.CONSUMPTION_DATA_PATH
@@ -82,9 +83,10 @@ def main() -> None:
     results_output_path = config.GRID_SEARCH_RESULTS_PATH
     results_df.to_csv(results_output_path, index=False)
 
-
     best_payback_scenario = get_best_scenario_by_payback(results_df)
-    best_self_sufficiency_scenario = get_best_scenario_by_self_sufficiency(results_df)
+    best_self_sufficiency_scenario = get_best_scenario_by_self_sufficiency(
+        results_df
+    )
 
     summary_text = build_scenario_summary_text(
         best_payback_scenario,
@@ -96,7 +98,10 @@ def main() -> None:
     with open(summary_output_path, "w", encoding="utf-8") as file:
         file.write(summary_text)
 
-    best_scenarios_df = build_best_scenarios_dataframe(best_payback_scenario, best_self_sufficiency_scenario)
+    best_scenarios_df = build_best_scenarios_dataframe(
+        best_payback_scenario,
+        best_self_sufficiency_scenario
+    )
 
     best_scenarios_output_path = config.BEST_SCENARIOS_PATH
     best_scenarios_df.to_csv(best_scenarios_output_path, index=False)
@@ -105,11 +110,14 @@ def main() -> None:
     print(f"Input file: {file_path}")
     print(f"Number of hours: {len(df_consumption)}")
     print(f"Results saved to: {results_output_path}")
-    print(f"Results saved to: {results_output_path}")
     print(f"Summary saved to: {summary_output_path}")
     print(f"Best scenarios saved to: {best_scenarios_output_path}")
     print(f"Payback plot saved to: {config.PAYBACK_PLOT_PATH}")
     print(f"Self-sufficiency plot saved to: {config.SELF_SUFFICIENCY_PLOT_PATH}")
+    print(
+        "Best scenarios comparison plot saved to: "
+        f"{config.BEST_SCENARIOS_COMPARISON_PLOT_PATH}"
+    )
 
     print_scenario_summary(
         "Best scenario by payback",
@@ -129,13 +137,18 @@ def main() -> None:
     plot_payback_by_solar_and_battery(
         results_df,
         battery_capacities_kwh,
-        config.PAYBACK_PLOT_PATH    
+        config.PAYBACK_PLOT_PATH
     )
 
     plot_self_sufficiency_by_solar_and_battery(
         results_df,
         battery_capacities_kwh,
         config.SELF_SUFFICIENCY_PLOT_PATH
+    )
+
+    plot_best_scenarios_comparison(
+        best_scenarios_df,
+        config.BEST_SCENARIOS_COMPARISON_PLOT_PATH
     )
 
 
