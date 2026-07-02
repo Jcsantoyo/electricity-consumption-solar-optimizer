@@ -84,3 +84,35 @@ def plot_best_scenarios_comparison(
         print(f"Annual savings: {row['annual_savings_eur']:.2f} EUR/year")
         print(f"Payback: {row['payback_years']:.2f} years")
         print(f"Self-sufficiency: {row['self_sufficiency']:.2%}")
+
+def plot_best_scenario_timeseries(
+    df: pd.DataFrame,
+    output_path: str
+) -> None:
+    plt.figure(figsize=(12, 5))
+
+    plt.plot(
+        df["datetime"],
+        df["consumption_kwh"],
+        label="Consumption"
+    )
+
+    plt.plot(
+        df["datetime"],
+        df["solar_generation_kwh"],
+        label="Solar generation"
+    )
+
+    plt.plot(
+        df["datetime"],
+        df["grid_import_kwh"],
+        label="Grid import"
+    )
+
+    plt.title("Best Scenario Energy Flows Over Time")
+    plt.xlabel("Datetime")
+    plt.ylabel("Energy (kWh)")
+    plt.grid(True)
+    plt.legend()
+
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")

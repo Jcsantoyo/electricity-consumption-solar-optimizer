@@ -15,8 +15,12 @@ from optimization import (
 from visualization import (
     plot_payback_by_solar_and_battery,
     plot_self_sufficiency_by_solar_and_battery,
-    plot_best_scenarios_comparison
+    plot_best_scenarios_comparison,
+    plot_best_scenario_timeseries
 )
+
+from solar import generate_solar_profile_for_timestamps
+from battery import simulate_battery
 
 
 def ensure_output_directories() -> None:
@@ -103,6 +107,32 @@ def main() -> None:
         best_self_sufficiency_scenario
     )
 
+    best_peak_power_kw = best_payback_scenario["solar_peak_power_kw"]
+    best_battery_capacity_kwh = best_payback_scenario["battery_capacity_kwh"]
+
+    best_solar_generation_kwh = generate_solar_profile_for_timestamps(timestamps, best_peak_power_kw)
+
+    best_battery_results = simulate_battery(
+        consumption_kwh,
+        best_solar_generation_kwh,
+        best_battery_capacity_kwh,
+        battery_efficiency=battery_efficiency,
+        max_charge_power_kw=max_charge_power_kw,
+        max_discharge_power_kw=max_discharge_power_kw,
+        initial_battery_state_kwh=initial_battery_state_kwh
+    )
+
+    best_timeseries_df = df_consumption.copy()
+
+    best_timeseries_df["solar_generation_kwh"] = best_solar_generation_kwh
+    best_timeseries_df["self_consumed_kwh"] = best_battery_results["self_consumed_kwh"]
+    best_timeseries_df["battery_charge_kwh"] = best_battery_results["battery_charge_kwh"]
+    best_timeseries_df["battery_discharge_kwh"] = best_battery_results["battery_discharge_kwh"]
+    best_timeseries_df["grid_import_kwh"] = best_battery_results["grid_import_kwh"]
+    best_timeseries_df["solar_surplus_kwh"] = best_battery_results["solar_surplus_kwh"]
+    best_timeseries_df["battery_state_kwh"] = best_battery_results["battery_state_kwh"]
+
+
     best_scenarios_output_path = config.BEST_SCENARIOS_PATH
     best_scenarios_df.to_csv(best_scenarios_output_path, index=False)
 
@@ -117,6 +147,10 @@ def main() -> None:
     print(
         "Best scenarios comparison plot saved to: "
         f"{config.BEST_SCENARIOS_COMPARISON_PLOT_PATH}"
+    )
+    print(
+        "Best scenario timeseries plot saved to: "
+        f"{config.BEST_SCENARIO_TIMESERIES_PLOT_PATH}"
     )
 
     print_scenario_summary(
@@ -151,6 +185,11 @@ def main() -> None:
         config.BEST_SCENARIOS_COMPARISON_PLOT_PATH
     )
 
+    plot_best_scenario_timeseries(
+        best_timeseries_df,
+        config.BEST_SCENARIO_TIMESERIES_PLOT_PATH
+    )
 
+  
 if __name__ == "__main__":
     main()
