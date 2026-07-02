@@ -259,6 +259,28 @@ The program prints the best scenarios, generates output plots in the `images/` f
 
 ---
 
+## Tests
+
+The project includes unit tests for the main calculation modules:
+
+- Economic calculations
+- Battery simulation
+- PVGIS solar data loading and timestamp matching
+
+Run the full test suite with:
+
+```bash
+python -m pytest
+```
+Current test coverage includes 
+
+```bash
+tests/test_economics.py
+tests/test_battery.py
+tests/test_solar_data_loader.py
+``` 
+These tests help verify that the core simulation and optimization components behave as expected
+
 ## Solar data source
 
 The project can use either a synthetic solar profile or PVGIS-based solar generation data.
