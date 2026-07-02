@@ -9,6 +9,8 @@ from economics import (
     calculate_simple_payback_years
 )
 
+from solar_data_loader import get_pvgis_generation_for_timestamps
+
 def run_economic_grid_search(
     consumption_kwh: list[float],
     timestamps,
@@ -24,7 +26,8 @@ def run_economic_grid_search(
     solar_cost_per_kw: float,
     battery_cost_per_kwh: float,
     simulation_days: int,
-    days_per_year: int = 365
+    days_per_year: int = 365,
+    pvgis_df: pd.DataFrame | None = None
 ) -> pd.DataFrame:
 
     total_consumption = sum(consumption_kwh)
@@ -41,10 +44,13 @@ def run_economic_grid_search(
     results = []
 
     for peak_power_kw in solar_peak_powers_kw:
-        solar_generation_kwh = generate_solar_profile_for_timestamps(
-            timestamps,
-            peak_power_kw
-        )
+        if pvgis_df is None:
+            solar_generation_kwh = generate_solar_profile_for_timestamps(
+                timestamps,
+                peak_power_kw
+            )
+        else:
+            solar_generation_kwh = get_pvgis_generation_for_timestamps(pvgis_df, timestamps, peak_power_kw)
 
         for battery_capacity_kwh in battery_capacities_kwh:
             summary = compare_battery_scenario(

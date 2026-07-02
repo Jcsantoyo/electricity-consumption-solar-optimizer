@@ -25,6 +25,11 @@ from visualization import (
 from solar import generate_solar_profile_for_timestamps
 from battery import simulate_battery
 
+from solar_data_loader import(
+    load_pvgis_solar_data,
+    get_pvgis_generation_for_timestamps
+)
+
 
 def ensure_output_directories() -> None:
     os.makedirs("reports", exist_ok=True)
@@ -50,6 +55,21 @@ def main() -> None:
 
     consumption_kwh = df_consumption["consumption_kwh"].tolist()
     timestamps = df_consumption["datetime"]
+
+    pvgis_df = None
+
+    if config.USE_PVGIS_SOLAR_DATA:
+        try:
+            pvgis_df = load_pvgis_solar_data(config.PVGIS_SOLAR_DATA_PATH)
+        except FileNotFoundError:
+            print(f"\nPVGIS solar data file not found: {config.PVGIS_SOLAR_DATA_PATH}")
+            print("Please download it first by running:")
+            print("python scripts/download_pvgis_data.py")
+            return
+        except ValueError as error:
+            print(f"\nInvalid PVGIS solar data file: {config.PVGIS_SOLAR_DATA_PATH}")
+            print(error)
+            return
 
     solar_peak_powers_kw = config.SOLAR_PEAK_POWERS_KW
     battery_capacities_kwh = config.BATTERY_CAPACITIES_KWH
@@ -84,7 +104,8 @@ def main() -> None:
         solar_cost_per_kw,
         battery_cost_per_kwh,
         simulation_days,
-        days_per_year=days_per_year
+        days_per_year=days_per_year,
+        pvgis_df=pvgis_df
     )
 
     results_output_path = config.GRID_SEARCH_RESULTS_PATH
@@ -113,7 +134,17 @@ def main() -> None:
     best_peak_power_kw = best_payback_scenario["solar_peak_power_kw"]
     best_battery_capacity_kwh = best_payback_scenario["battery_capacity_kwh"]
 
-    best_solar_generation_kwh = generate_solar_profile_for_timestamps(timestamps, best_peak_power_kw)
+    if pvgis_df is None:
+        best_solar_generation_kwh = generate_solar_profile_for_timestamps(
+            timestamps,
+            best_peak_power_kw
+        )
+    else:
+        best_solar_generation_kwh = get_pvgis_generation_for_timestamps(
+            pvgis_df,
+            timestamps,
+            best_peak_power_kw
+        )
 
     best_battery_results = simulate_battery(
         consumption_kwh,
@@ -150,6 +181,10 @@ def main() -> None:
 
     print("\nElectricity Consumption Solar Optimizer")
     print(f"Input file: {file_path}")
+    if pvgis_df is None:
+        print("Solar data source: synthetic profile")
+    else:
+        print(f"Solar data source: PVGIS ({config.PVGIS_SOLAR_DATA_PATH})")
     print(f"Number of hours: {len(df_consumption)}")
     print(f"Results saved to: {results_output_path}")
     print(f"Summary saved to: {summary_output_path}")

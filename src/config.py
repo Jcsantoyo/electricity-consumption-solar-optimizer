@@ -1,6 +1,10 @@
 # Input files
 CONSUMPTION_DATA_PATH = "data/simulated/synthetic_consumption_30_days.csv"
 
+# Solar data source
+USE_PVGIS_SOLAR_DATA = True
+PVGIS_SOLAR_DATA_PATH = "data/raw/pvgis_hourly_linares_1kw_2020.csv"
+
 # Output files
 GRID_SEARCH_RESULTS_PATH = "reports/grid_search_results.csv"
 BEST_SCENARIOS_PATH = "reports/best_scenarios.csv"
@@ -36,3 +40,4 @@ SURPLUS_COMPENSATION_EUR_PER_KWH = 0.07
 FIXED_INSTALLATION_COST_EUR = 800.0
 SOLAR_COST_EUR_PER_KW = 900.0
 BATTERY_COST_EUR_PER_KWH = 500.0
+
