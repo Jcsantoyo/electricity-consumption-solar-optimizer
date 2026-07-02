@@ -136,4 +136,48 @@ def plot_battery_state_over_time(
     plt.legend()
 
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
+
+def plot_cumulative_energy_flows(
+    df: pd.DataFrame,
+    output_path: str
+) -> None:
+    cumulative_grid_import = df["grid_import_kwh"].cumsum()
+    cumulative_solar_surplus = df["solar_surplus_kwh"].cumsum()
+    cumulative_consumption = df["consumption_kwh"].cumsum()
+    cumulative_solar_generation = df["solar_generation_kwh"].cumsum()
+
+    plt.figure(figsize=(12, 5))
+
+    plt.plot(
+        df["datetime"],
+        cumulative_consumption,
+        label="Cumulative consumption"
+    )
+
+    plt.plot(
+        df["datetime"],
+        cumulative_solar_generation,
+        label="Cumulative solar generation"
+    )
+
+    plt.plot(
+        df["datetime"],
+        cumulative_grid_import,
+        label="Cumulative grid import"
+    )
+
+    plt.plot(
+        df["datetime"],
+        cumulative_solar_surplus,
+        label="Cumulative solar surplus"
+    )
+
+    plt.title("Cumulative Energy Flows Over Time")
+    plt.xlabel("Datetime")
+    plt.ylabel("Energy (kWh)")
+    plt.grid(True)
+    plt.legend()
+
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    
     
