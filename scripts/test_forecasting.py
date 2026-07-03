@@ -8,6 +8,7 @@ sys.path.append(str(SRC_PATH))
 
 from data_loader import load_consumption_data
 from forecasting import run_consumption_forecast
+from visualization import plot_forecast_actual_vs_predicted
 
 
 def main() -> None:
@@ -33,6 +34,15 @@ def main() -> None:
             ]
         ].head(20).to_string(index=False)
     )
+
+    output_path = "images/consumption_forecast_actual_vs_predicted.png"
+
+    plot_forecast_actual_vs_predicted(
+        results_df,
+        output_path
+    )
+
+    print(f"\nForecast plot saved to: {output_path}")
 
 
 if __name__ == "__main__":

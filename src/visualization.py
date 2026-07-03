@@ -180,4 +180,29 @@ def plot_cumulative_energy_flows(
 
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
     
+
+def plot_forecast_actual_vs_predicted(
+        results_df: pd.DataFrame,
+        output_path: str
+) -> None:
+    plt.figure(figsize=(12, 5))
+
+    plt.plot(
+        results_df.index,
+        results_df["actual_consumption_kwh"],
+        label="Actual Consumption"
+    )
     
+    plt.plot(
+        results_df.index,
+        results_df["predicted_consumption_kwh"],
+        label="Predicted Consumption"
+    )
+
+    plt.title("Consumption Forecast: Actual vs Predicted")
+    plt.xlabel("Test sample")
+    plt.ylabel("Consumption (kWh)")
+    plt.grid(True)
+    plt.legend()
+
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
