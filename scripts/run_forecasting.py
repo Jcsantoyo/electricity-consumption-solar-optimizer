@@ -7,7 +7,10 @@ SRC_PATH = PROJECT_ROOT / "src"
 sys.path.append(str(SRC_PATH))
 
 from data_loader import load_consumption_data
-from forecasting import run_consumption_forecast
+from forecasting import(
+    run_consumption_forecast,
+    compare_forecasting_models
+)
 from visualization import(
     plot_forecast_actual_vs_predicted,
     plot_feature_importance
@@ -41,6 +44,11 @@ def main() -> None:
 
     print("\nFeature importance:")
     print(feature_importance_df.to_string(index=False))
+
+    comparison_df = compare_forecasting_models(df)
+
+    print("\nModel comparison:")
+    print(comparison_df.to_string(index=False))
 
     output_path = "images/consumption_forecast_actual_vs_predicted.png"
 
