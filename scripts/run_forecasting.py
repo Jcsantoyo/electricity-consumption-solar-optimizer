@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 
@@ -23,11 +24,23 @@ def main() -> None:
 
     df = load_consumption_data(data_path)
 
+    os.makedirs("reports", exist_ok=True)
+    os.makedirs("images", exist_ok=True)
+
     forecast_results = run_consumption_forecast(df)
 
     metrics = forecast_results["metrics"]
     results_df = forecast_results["results_df"]
     feature_importance_df = forecast_results["feature_importance_df"]
+
+    forecast_results_output_path = "reports/forecast_results.csv"
+
+    results_df.to_csv(
+        forecast_results_output_path,
+        index=False
+    )
+
+    print(f"\nForecast results saved to: {forecast_results_output_path}")
 
     print("\nConsumption forecast results:")
     print(f"MAE: {metrics['mae']:.4f} kWh")
@@ -46,10 +59,28 @@ def main() -> None:
     print("\nFeature importance:")
     print(feature_importance_df.to_string(index=False))
 
+    feature_importance_report_path = "reports/forecast_feature_importance.csv"
+
+    feature_importance_df.to_csv(
+        feature_importance_report_path,
+        index=False
+    )
+
+    print(f"Feature importance report saved to: {feature_importance_report_path}")
+
     comparison_df = compare_forecasting_models(df)
 
     print("\nModel comparison:")
     print(comparison_df.to_string(index=False))
+
+    model_comparison_report_path = "reports/forecast_model_comparison.csv"
+
+    comparison_df.to_csv(
+        model_comparison_report_path,
+        index=False
+    )
+
+    print(f"Model comparison report saved to: {model_comparison_report_path}")
 
     model_comparison_output_path = "images/forecast_model_comparison.png"
 
