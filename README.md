@@ -213,6 +213,9 @@ electricity-consumption-solar-optimizer/
 │   ├── grid_search_results.csv
 │   ├── best_scenarios.csv
 │   ├── best_scenario_timeseries.csv
+│   ├── forecast_results.csv
+│   ├── forecast_feature_importance.csv
+│   ├── forecast_model_comparison.csv
 │   ├── summary.txt
 │   └── outputs_index.md
 │
@@ -484,7 +487,7 @@ python scripts/test_pvgis_generation_match.py
 
 ### `run_forecasting.py`
 
-Runs the consumption forecasting pipeline and generates forecast plots.
+Runs the consumption forecasting pipeline and generates forecast plots and reports.
 
 Run with:
 
@@ -498,6 +501,14 @@ Generated forecast plots:
 images/consumption_forecast_actual_vs_predicted.png
 images/forecast_feature_importance.png
 images/forecast_model_comparison.png
+```
+
+Generated forecast reports:
+
+```text
+reports/forecast_results.csv
+reports/forecast_feature_importance.csv
+reports/forecast_model_comparison.csv
 ```
 
 ---
@@ -608,6 +619,9 @@ After running `src/main.py`, the project creates:
 reports/grid_search_results.csv
 reports/best_scenarios.csv
 reports/best_scenario_timeseries.csv
+reports/forecast_results.csv
+reports/forecast_feature_importance.csv
+reports/forecast_model_comparison.csv
 reports/summary.txt
 reports/outputs_index.md
 ```
@@ -637,6 +651,35 @@ Includes:
 - Grid import
 - Solar surplus
 - Battery state of charge
+
+### `forecast_results.csv`
+
+Hourly forecasting results for the test period.
+
+Includes:
+
+- Time-based features
+- Lag-based features
+- Actual electricity consumption
+- Predicted electricity consumption
+
+### `forecast_feature_importance.csv`
+
+Feature importance table from the Random Forest forecasting model.
+
+It shows which input variables contributed most to the prediction.
+
+### `forecast_model_comparison.csv`
+
+Comparison between forecasting models.
+
+Includes:
+
+- Model name
+- MAE
+- RMSE
+
+This allows the Random Forest model to be compared against the Linear Regression baseline.
 
 ### `summary.txt`
 
@@ -738,6 +781,7 @@ GitHub Actions CI          complete
 Forecasting baseline       complete
 Model comparison           complete
 Feature importance         complete
+Forecasting reports        complete
 Real consumption data      pending
 Advanced tariffs           pending
 Dashboard / CLI            pending
