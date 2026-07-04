@@ -20,6 +20,7 @@ def main() -> None:
 
     metrics = forecast_results["metrics"]
     results_df = forecast_results["results_df"]
+    feature_importance_df = forecast_results["feature_importance_df"]
 
     print("\nConsumption forecast results:")
     print(f"MAE: {metrics['mae']:.4f} kWh")
@@ -34,6 +35,9 @@ def main() -> None:
             ]
         ].head(20).to_string(index=False)
     )
+
+    print("\nFeature importance:")
+    print(feature_importance_df.to_string(index=False))
 
     output_path = "images/consumption_forecast_actual_vs_predicted.png"
 

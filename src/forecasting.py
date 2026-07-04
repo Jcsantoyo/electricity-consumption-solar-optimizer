@@ -134,6 +134,8 @@ def run_consumption_forecast(
         y_pred
     )
 
+    feature_importance_df = get_feature_importance(model, list(X_train.columns))
+
     results_df = X_test.copy()
     results_df["actual_consumption_kwh"] = y_test.values
     results_df["predicted_consumption_kwh"] = y_pred
@@ -141,5 +143,23 @@ def run_consumption_forecast(
     return {
         "model": model,
         "metrics": metrics,
-        "results_df": results_df    
+        "results_df": results_df, 
+        "feature_importance_df": feature_importance_df
     }
+
+def get_feature_importance(
+        model: RandomForestRegressor,
+        feature_names: list[str]
+) -> pd.DataFrame:
+    
+    importance_df = pd.DataFrame({
+        "feature": feature_names,
+        "importance": model.feature_importances_
+    })
+
+    importance_df = importance_df.sort_values(
+        "importance",
+        ascending=False
+    ).reset_index(drop=True)
+
+    return importance_df
