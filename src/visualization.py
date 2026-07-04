@@ -182,8 +182,8 @@ def plot_cumulative_energy_flows(
     
 
 def plot_forecast_actual_vs_predicted(
-        results_df: pd.DataFrame,
-        output_path: str
+    results_df: pd.DataFrame,
+    output_path: str
 ) -> None:
     plt.figure(figsize=(12, 5))
 
@@ -204,5 +204,25 @@ def plot_forecast_actual_vs_predicted(
     plt.ylabel("Consumption (kWh)")
     plt.grid(True)
     plt.legend()
+
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+
+def plot_feature_importance(
+    feature_importance_df: pd.DataFrame,
+    output_path: str
+) -> None:
+    
+    plt.figure(figsize=(10,5))
+
+    plt.barh(
+        feature_importance_df["feature"],
+        feature_importance_df["importance"]
+    )
+    
+    plt.title("Forecast Feature Importance")
+    plt.xlabel("Importance")
+    plt.ylabel("Feature")
+    plt.gca().invert_yaxis()
+    plt.grid(axis="x")
 
     plt.savefig(output_path, dpi=300, bbox_inches="tight")

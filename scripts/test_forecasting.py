@@ -8,7 +8,10 @@ sys.path.append(str(SRC_PATH))
 
 from data_loader import load_consumption_data
 from forecasting import run_consumption_forecast
-from visualization import plot_forecast_actual_vs_predicted
+from visualization import(
+    plot_forecast_actual_vs_predicted,
+    plot_feature_importance
+)
 
 
 def main() -> None:
@@ -47,6 +50,12 @@ def main() -> None:
     )
 
     print(f"\nForecast plot saved to: {output_path}")
+
+    feature_importance_output_path = "images/forecast_feature_importance.png"
+
+    plot_feature_importance(feature_importance_df, feature_importance_output_path)
+
+    print(f"Feature importance plot saved to: {feature_importance_output_path}")
 
 
 if __name__ == "__main__":
