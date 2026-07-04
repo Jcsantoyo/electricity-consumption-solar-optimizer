@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-def add_time_feature(df: pd.DataFrame) -> pd.DataFrame:
+def add_time_features(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.copy()
 
@@ -39,7 +39,7 @@ def prepare_forecasting_dataset(
         target_column: str = "consumption_kwh"
 ) -> tuple[pd.DataFrame, pd.Series]:
     
-    df = add_time_feature(df)
+    df = add_time_features(df)
 
     df = add_lag_features(
         df, 
