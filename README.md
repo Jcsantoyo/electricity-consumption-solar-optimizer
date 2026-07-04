@@ -32,6 +32,7 @@ It uses:
 - Grid search optimization over multiple solar and battery sizes
 - Machine learning forecasting for hourly electricity consumption
 - Unit tests for core calculation modules
+- GitHub Actions for automatic test execution
 
 The current workflow is:
 
@@ -70,11 +71,14 @@ reports, plots and notebooks
 - Best scenario selection by economic payback
 - Best scenario selection by self-sufficiency
 - Forecasting of hourly consumption using Machine Learning
+- Linear Regression baseline model
 - Random Forest regression model
+- Forecasting model comparison
 - MAE and RMSE forecast evaluation
 - Feature importance analysis
 - Automatic report and plot generation
 - Unit tests with pytest
+- Continuous integration with GitHub Actions
 - Jupyter notebooks for analysis and presentation
 
 ---
@@ -141,31 +145,38 @@ The project distinguishes between the economically optimal scenario and the ener
 
 ![Forecast feature importance](images/forecast_feature_importance.png)
 
+### Forecast model comparison
+
+![Forecast model comparison](images/forecast_model_comparison.png)
+
 ---
 
 ## Consumption forecasting
 
-The project includes a first machine learning module for hourly electricity consumption forecasting.
+The project includes a machine learning module for hourly electricity consumption forecasting.
 
 The forecasting model uses:
 
 - Temporal features: hour, day, month, weekday and weekend indicator
 - Lag-based features: previous hour consumption and previous day same-hour consumption
-- A Random Forest regression model
 - Chronological train/test split
 - MAE and RMSE evaluation metrics
 - Feature importance analysis
 
-The goal is to estimate future household electricity consumption from historical hourly data.
+The forecasting module compares two models:
+
+- Linear Regression as a simple baseline model
+- Random Forest Regressor as a more flexible tree-based model
 
 Current example results on the synthetic 30-day dataset:
 
 ```text
-MAE: 0.0418 kWh
-RMSE: 0.0521 kWh
+model                MAE       RMSE
+Random Forest        0.0418    0.0521
+Linear Regression    0.0511    0.0640
 ```
 
-This means that the average hourly prediction error is around 42 Wh.
+The Random Forest model achieves lower MAE and RMSE, suggesting that it captures the hourly consumption pattern better than the linear baseline.
 
 The feature importance analysis shows that the model relies mainly on the previous day's consumption at the same hour and the hour of the day. This is consistent with the synthetic dataset, which contains a strong repeated daily consumption pattern.
 
@@ -175,6 +186,10 @@ The feature importance analysis shows that the model relies mainly on the previo
 
 ```text
 electricity-consumption-solar-optimizer/
+│
+├── .github/
+│   └── workflows/
+│       └── tests.yml
 │
 ├── data/
 │   ├── raw/
@@ -191,7 +206,8 @@ electricity-consumption-solar-optimizer/
 │   ├── best_scenario_battery_state.png
 │   ├── best_scenario_cumulative_energy.png
 │   ├── consumption_forecast_actual_vs_predicted.png
-│   └── forecast_feature_importance.png
+│   ├── forecast_feature_importance.png
+│   └── forecast_model_comparison.png
 │
 ├── reports/
 │   ├── grid_search_results.csv
@@ -211,12 +227,13 @@ electricity-consumption-solar-optimizer/
 │   ├── generate_synthetic_consumption.py
 │   ├── test_pvgis_generation_match.py
 │   ├── test_pvgis_loader.py
-│   └── test_forecasting.py
+│   └── run_forecasting.py
 │
 ├── tests/
 │   ├── test_economics.py
 │   ├── test_battery.py
-│   └── test_solar_data_loader.py
+│   ├── test_solar_data_loader.py
+│   └── test_forecasting.py
 │
 ├── src/
 │   ├── battery.py
@@ -336,14 +353,16 @@ It also selects:
 
 ### `forecasting.py`
 
-Creates forecasting features, trains a Random Forest model, evaluates predictions and extracts feature importance.
+Creates forecasting features, trains forecasting models, evaluates predictions and extracts feature importance.
 
 The forecasting module includes:
 
 - Time feature creation
 - Lag feature creation
 - Chronological train/test split
+- Linear Regression baseline
 - Random Forest training
+- Model comparison
 - MAE and RMSE evaluation
 - Actual vs predicted results table
 - Feature importance extraction
@@ -360,6 +379,7 @@ Generates plots for:
 - Cumulative energy flows
 - Forecast actual vs predicted
 - Forecast feature importance
+- Forecast model comparison
 
 ---
 
@@ -411,6 +431,8 @@ Includes:
 - Feature creation
 - Chronological train/test split
 - Random Forest regression model
+- Linear Regression baseline
+- Model comparison
 - MAE and RMSE metrics
 - Actual vs predicted plot
 - Feature importance analysis
@@ -460,14 +482,14 @@ Run with:
 python scripts/test_pvgis_generation_match.py
 ```
 
-### `test_forecasting.py`
+### `run_forecasting.py`
 
 Runs the consumption forecasting pipeline and generates forecast plots.
 
 Run with:
 
 ```bash
-python scripts/test_forecasting.py
+python scripts/run_forecasting.py
 ```
 
 Generated forecast plots:
@@ -475,6 +497,7 @@ Generated forecast plots:
 ```text
 images/consumption_forecast_actual_vs_predicted.png
 images/forecast_feature_importance.png
+images/forecast_model_comparison.png
 ```
 
 ---
@@ -484,7 +507,7 @@ images/forecast_feature_importance.png
 Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/electricity-consumption-solar-optimizer.git
+git clone https://github.com/Jcsantoyo/electricity-consumption-solar-optimizer.git
 cd electricity-consumption-solar-optimizer
 ```
 
@@ -525,7 +548,7 @@ images/
 To run the forecasting workflow:
 
 ```bash
-python scripts/test_forecasting.py
+python scripts/run_forecasting.py
 ```
 
 ---
@@ -537,6 +560,7 @@ The project includes unit tests for the main calculation modules:
 - Economic calculations
 - Battery simulation
 - PVGIS solar data loading and timestamp matching
+- Forecasting feature engineering and model evaluation
 
 Run the full test suite with:
 
@@ -550,9 +574,29 @@ Current test files:
 tests/test_economics.py
 tests/test_battery.py
 tests/test_solar_data_loader.py
+tests/test_forecasting.py
 ```
 
-These tests help verify that the core simulation and optimization components behave as expected.
+These tests help verify that the core simulation, optimization and forecasting components behave as expected.
+
+---
+
+## Continuous integration
+
+The repository includes a GitHub Actions workflow that automatically runs the test suite on every push and pull request to the main branch.
+
+Workflow file:
+
+```text
+.github/workflows/tests.yml
+```
+
+The workflow:
+
+- Checks out the repository
+- Sets up Python
+- Installs the project dependencies
+- Runs the full pytest suite
 
 ---
 
@@ -653,13 +697,13 @@ Possible next steps:
 - Add PV panel degradation
 - Add seasonal consumption datasets
 - Include weather variables in the forecasting model
-- Compare several forecasting models
+- Compare additional forecasting models
 - Use real future consumption forecasts inside the optimization workflow
 - Add YAML configuration files
 - Add command-line interface
 - Add Streamlit dashboard
 - Add more unit tests
-- Add CI with GitHub Actions
+- Extend GitHub Actions with linting and coverage
 
 ---
 
@@ -672,6 +716,7 @@ Possible next steps:
 - scikit-learn
 - requests
 - pytest
+- GitHub Actions
 - Jupyter Notebook
 - PVGIS API
 
@@ -689,7 +734,9 @@ Economic optimization      complete
 Report generation          complete
 Visualization outputs      complete
 Unit tests                 complete
+GitHub Actions CI          complete
 Forecasting baseline       complete
+Model comparison           complete
 Feature importance         complete
 Real consumption data      pending
 Advanced tariffs           pending
