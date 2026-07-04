@@ -226,3 +226,22 @@ def plot_feature_importance(
     plt.grid(axis="x")
 
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
+
+def plot_forecasting_model_comparison(
+    comparison_df: pd.DataFrame,
+    output_path: str
+) -> None:
+    plt.figure(figsize=(8, 5))
+
+    plt.bar(
+        comparison_df["model"],
+        comparison_df["mae"]
+    )
+
+    plt.title("Forecasting Model Comparison")
+    plt.xlabel("Model")
+    plt.ylabel("MAE (kWh)")
+    plt.grid(axis="y")
+
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    plt.show()

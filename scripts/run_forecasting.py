@@ -13,7 +13,8 @@ from forecasting import(
 )
 from visualization import(
     plot_forecast_actual_vs_predicted,
-    plot_feature_importance
+    plot_feature_importance,
+    plot_forecasting_model_comparison
 )
 
 
@@ -49,6 +50,15 @@ def main() -> None:
 
     print("\nModel comparison:")
     print(comparison_df.to_string(index=False))
+
+    model_comparison_output_path = "images/forecast_model_comparison.png"
+
+    plot_forecasting_model_comparison(
+        comparison_df,
+        model_comparison_output_path
+    )
+
+    print(f"Model comparison plot saved to: {model_comparison_output_path}")
 
     output_path = "images/consumption_forecast_actual_vs_predicted.png"
 
