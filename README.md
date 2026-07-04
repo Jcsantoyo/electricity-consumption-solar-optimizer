@@ -1,5 +1,7 @@
 # Electricity Consumption Solar Optimizer
 
+![Python tests](https://github.com/Jcsantoyo/electricity-consumption-solar-optimizer/actions/workflows/tests.yml/badge.svg)
+
 A Python-based residential energy optimization project that combines electricity consumption analysis, PVGIS solar generation data, battery simulation, economic optimization and machine learning-based consumption forecasting.
 
 The project estimates how different photovoltaic and battery configurations affect:
