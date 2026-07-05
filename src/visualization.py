@@ -244,4 +244,4 @@ def plot_forecasting_model_comparison(
     plt.grid(axis="y")
 
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
-    plt.show()
+    
