@@ -2,187 +2,180 @@
 
 ![Python tests](https://github.com/Jcsantoyo/electricity-consumption-solar-optimizer/actions/workflows/tests.yml/badge.svg)
 
-A Python-based residential energy optimization project that combines electricity consumption analysis, PVGIS solar generation data, battery simulation, economic optimization and machine learning-based consumption forecasting.
+A data science project that analyzes residential electricity consumption, photovoltaic solar generation, battery storage and economic optimization.
 
-The project estimates how different photovoltaic and battery configurations affect:
+The project combines:
 
-- Grid electricity import
-- Solar self-consumption
-- Solar surplus
-- Self-sufficiency
-- Annual savings
-- Investment cost
-- Simple payback period
-- Hourly consumption forecasting accuracy
+- Real household electricity consumption data
+- PVGIS solar generation data
+- Battery simulation
+- Economic analysis
+- Grid search optimization
+- Machine Learning consumption forecasting
+- Model comparison
+- Feature importance analysis
+- Automated reports and plots
+- Unit tests and GitHub Actions CI
 
-This repository is designed as a data science and energy analytics portfolio project.
+The goal is to estimate which solar and battery configuration provides the best trade-off between investment cost, payback period and self-sufficiency.
 
 ---
 
 ## Project overview
 
-The project simulates the energy behavior of a household with photovoltaic generation and optional battery storage.
+This project simulates how a household could reduce grid electricity consumption by installing photovoltaic solar panels and, optionally, a battery.
 
-It uses:
+The pipeline:
 
-- Hourly household electricity consumption data
-- PVGIS hourly solar generation data for Linares, Spain
-- A battery storage model with efficiency and power limits
-- Economic assumptions for electricity price, surplus compensation and installation costs
-- Grid search optimization over multiple solar and battery sizes
-- Machine learning forecasting for hourly electricity consumption
-- Unit tests for core calculation modules
-- GitHub Actions for automatic test execution
+1. Loads household electricity consumption data.
+2. Loads realistic solar generation data from PVGIS.
+3. Simulates solar self-consumption.
+4. Simulates battery charging and discharging.
+5. Computes grid import and solar surplus.
+6. Estimates investment cost, yearly savings and payback.
+7. Performs a grid search over solar and battery sizes.
+8. Selects the best scenarios.
+9. Forecasts future electricity consumption using Machine Learning.
+10. Generates reports and plots automatically.
 
-The current workflow is:
+---
 
-```text
-consumption data
-      ↓
-PVGIS solar generation
-      ↓
-solar self-consumption simulation
-      ↓
-battery simulation
-      ↓
-economic optimization
-      ↓
-best scenario selection
-      ↓
-forecasting and interpretation
-      ↓
-reports, plots and notebooks
+## Current dataset
+
+The project currently uses a public real-world residential electricity dataset:
+
+**UCI Individual Household Electric Power Consumption Dataset**
+
+This dataset contains electricity measurements from a real household with minute-level resolution over almost four years.
+
+The raw dataset is converted into hourly electricity consumption with the following format:
+
+```csv
+datetime,consumption_kwh
+2006-12-16 17:00:00,2.533733
+2006-12-16 18:00:00,3.632200
 ```
 
----
-
-## Main features
-
-- Hourly electricity consumption analysis
-- Synthetic 30-day consumption dataset generation
-- PVGIS solar data download and loading
-- Solar production scaling for different PV peak powers
-- Self-consumption and grid import simulation
-- Battery charge/discharge simulation
-- Battery efficiency and charge/discharge power limits
-- Solar surplus compensation
-- Economic grid search over solar and battery sizes
-- Payback period calculation
-- Best scenario selection by economic payback
-- Best scenario selection by self-sufficiency
-- Forecasting of hourly consumption using Machine Learning
-- Linear Regression baseline model
-- Random Forest regression model
-- Forecasting model comparison
-- MAE and RMSE forecast evaluation
-- Feature importance analysis
-- Automatic report and plot generation
-- Unit tests with pytest
-- Continuous integration with GitHub Actions
-- Jupyter notebooks for analysis and presentation
-
----
-
-## Example results
-
-The exact results can change depending on the generated synthetic consumption data and the selected economic assumptions.
-
-Example output from the optimization workflow:
+The processed dataset used by the project is:
 
 ```text
-Best scenario by payback:
-Solar peak power: 1.50 kW
+data/processed/uci_household_power_hourly.csv
+```
+
+The original synthetic dataset is still useful for testing and quick experiments, but the main pipeline now uses the public real household consumption dataset.
+
+---
+
+## Solar data
+
+Solar generation data is obtained from PVGIS for Linares, Spain.
+
+The PVGIS file used by the project is:
+
+```text
+data/raw/pvgis_hourly_linares_1kw_2020.csv
+```
+
+The PVGIS data represents hourly solar generation for a 1 kW photovoltaic system. The project scales this generation according to the tested solar peak power.
+
+Example:
+
+```text
+1 kW PVGIS generation × 3.0 = 3 kW solar installation
+```
+
+Since the consumption dataset and PVGIS data correspond to different years, the matching is performed using:
+
+```text
+month + day + hour
+```
+
+This allows the project to combine real household consumption patterns with realistic solar generation profiles.
+
+---
+
+## Main results
+
+Using the public real household consumption dataset and PVGIS solar generation, the current best scenarios are:
+
+### Best economic scenario
+
+```text
+Solar peak power: 3.00 kW
 Battery capacity: 0.00 kWh
-Investment cost: 2150.00 EUR
-Annual savings: 431.73 EUR/year
-Payback: 4.98 years
-Self-sufficiency: 48.83%
-
-Best scenario by self-sufficiency:
-Solar peak power: 1.50 kW
-Battery capacity: 5.00 kWh
-Investment cost: 4650.00 EUR
-Annual savings: 563.25 EUR/year
-Payback: 8.26 years
-Self-sufficiency: 99.46%
+Investment cost: 3500.00 EUR
+Annual savings: 736.44 EUR/year
+Payback: 4.75 years
+Self-sufficiency: 31.58%
+Grid import: 25510.35 kWh
+Solar surplus: 7925.40 kWh
 ```
 
-The project distinguishes between the economically optimal scenario and the energy optimal scenario. In many cases, the scenario with the highest self-sufficiency is not the one with the shortest payback period.
-
----
-
-## Visual results
-
-### Payback grid search
-
-![Payback grid search](images/main_payback_grid_search.png)
-
-### Self-sufficiency grid search
-
-![Self-sufficiency grid search](images/main_self_sufficiency_grid_search.png)
-
-### Best scenarios comparison
-
-![Best scenarios comparison](images/best_scenarios_comparison.png)
-
-### Best scenario energy flows
-
-![Best scenario timeseries](images/best_scenario_timeseries.png)
-
-### Battery state of charge
-
-![Battery state](images/best_scenario_battery_state.png)
-
-### Cumulative energy flows
-
-![Cumulative energy flows](images/best_scenario_cumulative_energy.png)
-
-### Consumption forecast
-
-![Consumption forecast actual vs predicted](images/consumption_forecast_actual_vs_predicted.png)
-
-### Forecast feature importance
-
-![Forecast feature importance](images/forecast_feature_importance.png)
-
-### Forecast model comparison
-
-![Forecast model comparison](images/forecast_model_comparison.png)
-
----
-
-## Consumption forecasting
-
-The project includes a machine learning module for hourly electricity consumption forecasting.
-
-The forecasting model uses:
-
-- Temporal features: hour, day, month, weekday and weekend indicator
-- Lag-based features: previous hour consumption and previous day same-hour consumption
-- Chronological train/test split
-- MAE and RMSE evaluation metrics
-- Feature importance analysis
-
-The forecasting module compares two models:
-
-- Linear Regression as a simple baseline model
-- Random Forest Regressor as a more flexible tree-based model
-
-Current example results on the synthetic 30-day dataset:
+### Best self-sufficiency scenario
 
 ```text
-model                MAE       RMSE
-Random Forest        0.0418    0.0521
-Linear Regression    0.0511    0.0640
+Solar peak power: 3.00 kW
+Battery capacity: 5.00 kWh
+Investment cost: 6000.00 EUR
+Annual savings: 879.53 EUR/year
+Payback: 6.82 years
+Self-sufficiency: 43.98%
+Grid import: 20885.34 kWh
+Solar surplus: 2786.51 kWh
 ```
 
-The Random Forest model achieves lower MAE and RMSE, suggesting that it captures the hourly consumption pattern better than the linear baseline.
+### Main conclusion
 
-The feature importance analysis shows that the model relies mainly on the previous day's consumption at the same hour and the hour of the day. This is consistent with the synthetic dataset, which contains a strong repeated daily consumption pattern.
+The economically optimal scenario is not necessarily the scenario with the highest energy self-sufficiency.
+
+In the current simulation:
+
+- The best payback is achieved with solar panels only.
+- Adding a battery improves self-sufficiency.
+- However, the battery increases the investment cost and therefore increases the payback period.
 
 ---
 
-## Project structure
+## Forecasting results
+
+The project also includes a Machine Learning module for electricity consumption forecasting.
+
+The current forecasting models are:
+
+- Linear Regression
+- Random Forest Regressor
+
+Current results using the public real household dataset:
+
+```text
+Random Forest MAE: 0.3368 kWh
+Random Forest RMSE: 0.4886 kWh
+
+Linear Regression MAE: 0.3755 kWh
+Linear Regression RMSE: 0.5241 kWh
+```
+
+The Random Forest model performs better than the Linear Regression baseline.
+
+### Feature importance
+
+Current Random Forest feature importance:
+
+```text
+consumption_kwh_lag_1      0.622855
+hour                       0.114752
+consumption_kwh_lag_24     0.111544
+day                        0.062347
+month                      0.045991
+weekday                    0.035974
+is_weekend                 0.006538
+```
+
+The most important feature is the consumption in the previous hour. This makes sense because real electricity consumption has short-term continuity, but it is less perfectly repetitive than a synthetic daily pattern.
+
+---
+
+## Repository structure
 
 ```text
 electricity-consumption-solar-optimizer/
@@ -193,8 +186,12 @@ electricity-consumption-solar-optimizer/
 │
 ├── data/
 │   ├── raw/
+│   │   ├── household_power_consumption.txt
 │   │   └── pvgis_hourly_linares_1kw_2020.csv
+│   │
 │   ├── processed/
+│   │   └── uci_household_power_hourly.csv
+│   │
 │   └── simulated/
 │       └── synthetic_consumption_30_days.csv
 │
@@ -228,15 +225,10 @@ electricity-consumption-solar-optimizer/
 ├── scripts/
 │   ├── download_pvgis_data.py
 │   ├── generate_synthetic_consumption.py
+│   ├── prepare_uci_household_power.py
+│   ├── run_forecasting.py
 │   ├── test_pvgis_generation_match.py
-│   ├── test_pvgis_loader.py
-│   └── run_forecasting.py
-│
-├── tests/
-│   ├── test_economics.py
-│   ├── test_battery.py
-│   ├── test_solar_data_loader.py
-│   └── test_forecasting.py
+│   └── test_pvgis_loader.py
 │
 ├── src/
 │   ├── battery.py
@@ -250,265 +242,18 @@ electricity-consumption-solar-optimizer/
 │   ├── solar.py
 │   ├── solar_data_loader.py
 │   ├── tariff.py
+│   ├── uci_household_loader.py
 │   └── visualization.py
+│
+├── tests/
+│   ├── test_battery.py
+│   ├── test_economics.py
+│   ├── test_forecasting.py
+│   └── test_solar_data_loader.py
 │
 ├── requirements.txt
 ├── .gitignore
 └── README.md
-```
-
----
-
-## Main modules
-
-### `data_loader.py`
-
-Loads hourly electricity consumption data from CSV files and creates basic time features.
-
-Expected consumption input format:
-
-```csv
-datetime,consumption_kwh
-2025-01-01 00:00:00,0.18
-2025-01-01 01:00:00,0.15
-```
-
-### `solar_data_loader.py`
-
-Loads PVGIS hourly photovoltaic generation data.
-
-The PVGIS file is downloaded for a reference 1 kW photovoltaic system and then scaled linearly for different PV system sizes.
-
-Important PVGIS columns:
-
-```text
-time  → timestamp from PVGIS
-P     → estimated PV power output in W
-```
-
-The project converts:
-
-```text
-P / 1000 → solar_generation_1kw_kwh
-```
-
-and matches PVGIS solar generation to the consumption timestamps by month, day and hour.
-
-### `solar.py`
-
-Contains the basic solar self-consumption logic.
-
-It computes:
-
-- Self-consumed solar energy
-- Grid import
-- Solar surplus
-
-### `battery.py`
-
-Simulates battery behavior hour by hour.
-
-The battery model includes:
-
-- Battery capacity
-- Battery efficiency
-- Maximum charge power
-- Maximum discharge power
-- Initial state of charge
-- Hourly charge/discharge behavior
-- Remaining grid import
-- Remaining solar surplus
-
-### `economics.py`
-
-Contains economic calculation functions:
-
-- Grid electricity cost
-- Net cost after surplus compensation
-- Solar installation cost
-- Battery installation cost
-- Total investment cost
-- Simple payback period
-
-### `optimization.py`
-
-Runs the economic grid search over multiple combinations of:
-
-- Solar peak power
-- Battery capacity
-
-It produces a table containing:
-
-- Investment cost
-- Period cost
-- Annual cost
-- Period savings
-- Annual savings
-- Payback period
-- Grid import
-- Solar surplus
-- Self-sufficiency
-
-It also selects:
-
-- Best scenario by minimum payback period
-- Best scenario by maximum self-sufficiency
-
-### `forecasting.py`
-
-Creates forecasting features, trains forecasting models, evaluates predictions and extracts feature importance.
-
-The forecasting module includes:
-
-- Time feature creation
-- Lag feature creation
-- Chronological train/test split
-- Linear Regression baseline
-- Random Forest training
-- Model comparison
-- MAE and RMSE evaluation
-- Actual vs predicted results table
-- Feature importance extraction
-
-### `visualization.py`
-
-Generates plots for:
-
-- Payback grid search
-- Self-sufficiency grid search
-- Best scenario comparison
-- Best scenario energy flows
-- Battery state of charge
-- Cumulative energy flows
-- Forecast actual vs predicted
-- Forecast feature importance
-- Forecast model comparison
-
----
-
-## Notebooks
-
-### `01_exploratory_analysis.ipynb`
-
-Exploratory analysis of the synthetic household consumption dataset.
-
-Includes:
-
-- Hourly consumption visualization
-- Daily consumption analysis
-- Average consumption by hour
-- Weekday/weekend patterns
-
-### `02_solar_battery_simulation.ipynb`
-
-Explains and visualizes the solar and battery simulation.
-
-Includes:
-
-- PVGIS solar generation loading
-- Solar generation matching to consumption timestamps
-- Self-consumption simulation
-- Battery simulation
-- Grid import and solar surplus visualization
-- Battery state of charge visualization
-
-### `03_optimization_analysis.ipynb`
-
-Analyzes the grid search optimization results.
-
-Includes:
-
-- Payback comparison
-- Self-sufficiency comparison
-- Best scenario by payback
-- Best scenario by self-sufficiency
-- Economic vs energy optimal scenario comparison
-
-### `04_consumption_forecasting.ipynb`
-
-Machine learning notebook for hourly consumption forecasting.
-
-Includes:
-
-- Forecasting problem definition
-- Feature creation
-- Chronological train/test split
-- Random Forest regression model
-- Linear Regression baseline
-- Model comparison
-- MAE and RMSE metrics
-- Actual vs predicted plot
-- Feature importance analysis
-- Interpretation of model behavior
-
----
-
-## Scripts
-
-### `generate_synthetic_consumption.py`
-
-Generates a synthetic 30-day hourly electricity consumption dataset.
-
-Run with:
-
-```bash
-python scripts/generate_synthetic_consumption.py
-```
-
-### `download_pvgis_data.py`
-
-Downloads hourly PVGIS solar generation data for Linares, Spain.
-
-Run with:
-
-```bash
-python scripts/download_pvgis_data.py
-```
-
-### `test_pvgis_loader.py`
-
-Loads the PVGIS CSV file and verifies the basic format and yearly generation.
-
-Run with:
-
-```bash
-python scripts/test_pvgis_loader.py
-```
-
-### `test_pvgis_generation_match.py`
-
-Matches PVGIS solar generation to the consumption timestamps.
-
-Run with:
-
-```bash
-python scripts/test_pvgis_generation_match.py
-```
-
-### `run_forecasting.py`
-
-Runs the consumption forecasting pipeline and generates forecast plots and reports.
-
-Run with:
-
-```bash
-python scripts/run_forecasting.py
-```
-
-Generated forecast plots:
-
-```text
-images/consumption_forecast_actual_vs_predicted.png
-images/forecast_feature_importance.png
-images/forecast_model_comparison.png
-```
-
-Generated forecast reports:
-
-```text
-reports/forecast_results.csv
-reports/forecast_feature_importance.csv
-reports/forecast_model_comparison.csv
 ```
 
 ---
@@ -525,7 +270,7 @@ cd electricity-consumption-solar-optimizer
 Create and activate a virtual environment:
 
 ```bash
-python3 -m venv venv
+python -m venv venv
 source venv/bin/activate
 ```
 
@@ -537,195 +282,420 @@ pip install -r requirements.txt
 
 ---
 
-## How to run
+## Preparing the public consumption dataset
 
-From the project root, run the full workflow:
+The project uses the UCI household power consumption dataset.
+
+After downloading and extracting the original dataset, place the file here:
+
+```text
+data/raw/household_power_consumption.txt
+```
+
+Then run:
 
 ```bash
-python scripts/generate_synthetic_consumption.py
-python scripts/download_pvgis_data.py
+python scripts/prepare_uci_household_power.py
+```
+
+This generates:
+
+```text
+data/processed/uci_household_power_hourly.csv
+```
+
+The conversion process:
+
+```text
+minute-level power data
+        ↓
+convert kW to kWh per minute
+        ↓
+resample by hour
+        ↓
+generate hourly consumption dataset
+```
+
+The resulting file has the standard project format:
+
+```csv
+datetime,consumption_kwh
+2006-12-16 17:00:00,2.533733
+2006-12-16 18:00:00,3.632200
+```
+
+---
+
+## Running the main optimization pipeline
+
+Run:
+
+```bash
 python src/main.py
 ```
 
 This generates:
 
 ```text
-data/simulated/synthetic_consumption_30_days.csv
-data/raw/pvgis_hourly_linares_1kw_2020.csv
-reports/
+reports/grid_search_results.csv
+reports/best_scenarios.csv
+reports/best_scenario_timeseries.csv
+reports/summary.txt
+reports/outputs_index.md
+```
+
+and plots in:
+
+```text
 images/
 ```
 
-To run the forecasting workflow:
+---
+
+## Running the forecasting pipeline
+
+Run:
 
 ```bash
 python scripts/run_forecasting.py
 ```
 
+This generates:
+
+```text
+reports/forecast_results.csv
+reports/forecast_feature_importance.csv
+reports/forecast_model_comparison.csv
+```
+
+and plots:
+
+```text
+images/consumption_forecast_actual_vs_predicted.png
+images/forecast_feature_importance.png
+images/forecast_model_comparison.png
+```
+
 ---
 
-## Tests
+## Running tests
 
-The project includes unit tests for the main calculation modules:
-
-- Economic calculations
-- Battery simulation
-- PVGIS solar data loading and timestamp matching
-- Forecasting feature engineering and model evaluation
-
-Run the full test suite with:
+Run:
 
 ```bash
 python -m pytest
 ```
 
-Current test files:
+The project includes tests for:
 
-```text
-tests/test_economics.py
-tests/test_battery.py
-tests/test_solar_data_loader.py
-tests/test_forecasting.py
-```
+- Economic calculations
+- Battery simulation
+- PVGIS solar data loading
+- Forecasting utilities
 
-These tests help verify that the core simulation, optimization and forecasting components behave as expected.
+GitHub Actions automatically runs the test suite on pushes and pull requests.
 
 ---
 
-## Continuous integration
+## Main modules
 
-The repository includes a GitHub Actions workflow that automatically runs the test suite on every push and pull request to the main branch.
+### `src/data_loader.py`
 
-Workflow file:
+Loads electricity consumption data in the standard project format:
 
-```text
-.github/workflows/tests.yml
+```csv
+datetime,consumption_kwh
 ```
 
-The workflow:
+It also adds useful time-based features such as hour, day, month and weekday.
 
-- Checks out the repository
-- Sets up Python
-- Installs the project dependencies
-- Runs the full pytest suite
+---
+
+### `src/uci_household_loader.py`
+
+Loads and converts the UCI household power consumption dataset.
+
+Main tasks:
+
+- Read the original semicolon-separated file.
+- Handle missing values.
+- Parse date and time columns.
+- Convert minute-level power values into energy.
+- Aggregate data to hourly consumption.
+
+---
+
+### `src/solar_data_loader.py`
+
+Loads PVGIS solar generation data.
+
+Main tasks:
+
+- Parse PVGIS timestamps.
+- Convert power values to hourly energy.
+- Match PVGIS generation to consumption timestamps using month, day and hour.
+- Scale 1 kW generation to any tested solar peak power.
+
+---
+
+### `src/battery.py`
+
+Simulates battery behavior hour by hour.
+
+It considers:
+
+- Battery capacity
+- Charge efficiency
+- Maximum charging power
+- Maximum discharging power
+- Battery state of charge
+- Grid import
+- Solar surplus
+
+---
+
+### `src/economics.py`
+
+Computes economic metrics:
+
+- Solar installation cost
+- Battery installation cost
+- Total investment cost
+- Grid electricity cost
+- Surplus compensation
+- Net cost
+- Annual savings
+- Simple payback period
+
+---
+
+### `src/optimization.py`
+
+Runs the grid search over solar and battery configurations.
+
+It evaluates combinations of:
+
+```text
+solar peak power
+battery capacity
+```
+
+For each scenario, it computes:
+
+- Investment cost
+- Annual savings
+- Payback
+- Self-sufficiency
+- Grid import
+- Solar surplus
+
+---
+
+### `src/forecasting.py`
+
+Contains the Machine Learning forecasting pipeline.
+
+It creates features such as:
+
+- Hour
+- Day
+- Month
+- Weekday
+- Weekend flag
+- Consumption lag 1 hour
+- Consumption lag 24 hours
+
+It trains and evaluates:
+
+- Linear Regression
+- Random Forest Regressor
+
+It also computes feature importance for the Random Forest model.
+
+---
+
+### `src/visualization.py`
+
+Generates plots for:
+
+- Payback grid search
+- Self-sufficiency grid search
+- Best scenario comparison
+- Best scenario time series
+- Battery state of charge
+- Cumulative energy balance
+- Forecast actual vs predicted
+- Forecast feature importance
+- Forecasting model comparison
 
 ---
 
 ## Generated reports
 
-After running `src/main.py`, the project creates:
+### `reports/grid_search_results.csv`
 
-```text
-reports/grid_search_results.csv
-reports/best_scenarios.csv
-reports/best_scenario_timeseries.csv
-reports/forecast_results.csv
-reports/forecast_feature_importance.csv
-reports/forecast_model_comparison.csv
-reports/summary.txt
-reports/outputs_index.md
-```
+Contains all tested solar and battery scenarios.
 
-### `grid_search_results.csv`
+### `reports/best_scenarios.csv`
 
-Full grid search results. Each row represents one combination of solar peak power and battery capacity.
+Contains the best economic scenario and the best self-sufficiency scenario.
 
-### `best_scenarios.csv`
+### `reports/best_scenario_timeseries.csv`
 
-Summary of the two selected optimal scenarios:
+Contains the hourly simulation results for the selected best scenario.
 
-- Best by payback
-- Best by self-sufficiency
+### `reports/forecast_results.csv`
 
-### `best_scenario_timeseries.csv`
+Contains actual and predicted consumption values for the forecasting test set.
 
-Hourly energy flow table for the best economic scenario.
+### `reports/forecast_feature_importance.csv`
 
-Includes:
+Contains Random Forest feature importance values.
 
-- Consumption
-- Solar generation
-- Self-consumption
-- Battery charge
-- Battery discharge
-- Grid import
-- Solar surplus
-- Battery state of charge
+### `reports/forecast_model_comparison.csv`
 
-### `forecast_results.csv`
+Compares the forecasting models using MAE and RMSE.
 
-Hourly forecasting results for the test period.
+### `reports/summary.txt`
 
-Includes:
+Text summary of the main optimization results.
 
-- Time-based features
-- Lag-based features
-- Actual electricity consumption
-- Predicted electricity consumption
+### `reports/outputs_index.md`
 
-### `forecast_feature_importance.csv`
-
-Feature importance table from the Random Forest forecasting model.
-
-It shows which input variables contributed most to the prediction.
-
-### `forecast_model_comparison.csv`
-
-Comparison between forecasting models.
-
-Includes:
-
-- Model name
-- MAE
-- RMSE
-
-This allows the Random Forest model to be compared against the Linear Regression baseline.
-
-### `summary.txt`
-
-Readable text summary of the best scenarios.
-
-### `outputs_index.md`
-
-Index describing all generated project outputs.
+Index of generated reports and plots.
 
 ---
 
-## Solar data source
+## Generated plots
 
-The solar generation data comes from PVGIS, using hourly photovoltaic generation estimates for Linares, Spain.
-
-The downloaded file represents a reference 1 kW PV system. The project scales this profile to simulate different installed PV capacities.
-
-For example:
+### Payback grid search
 
 ```text
-0.5 kW system → PVGIS 1 kW profile × 0.5
-1.5 kW system → PVGIS 1 kW profile × 1.5
-3.0 kW system → PVGIS 1 kW profile × 3.0
+images/main_payback_grid_search.png
 ```
 
-This is more realistic than a manually defined synthetic solar curve, because it uses location-specific hourly solar generation behavior.
+Shows how the payback period changes depending on solar size and battery capacity.
+
+### Self-sufficiency grid search
+
+```text
+images/main_self_sufficiency_grid_search.png
+```
+
+Shows how energy self-sufficiency changes depending on solar size and battery capacity.
+
+### Best scenarios comparison
+
+```text
+images/best_scenarios_comparison.png
+```
+
+Compares the best economic scenario and the best self-sufficiency scenario.
+
+### Best scenario time series
+
+```text
+images/best_scenario_timeseries.png
+```
+
+Shows consumption, solar generation and grid import over time.
+
+### Battery state of charge
+
+```text
+images/best_scenario_battery_state.png
+```
+
+Shows how the battery charges and discharges over time.
+
+### Cumulative energy balance
+
+```text
+images/best_scenario_cumulative_energy.png
+```
+
+Shows accumulated consumption, solar generation and grid import.
+
+### Forecast actual vs predicted
+
+```text
+images/consumption_forecast_actual_vs_predicted.png
+```
+
+Compares real consumption with Machine Learning predictions.
+
+### Forecast feature importance
+
+```text
+images/forecast_feature_importance.png
+```
+
+Shows which features are most important for the Random Forest forecast.
+
+### Forecasting model comparison
+
+```text
+images/forecast_model_comparison.png
+```
+
+Compares forecasting models using MAE.
 
 ---
 
-## Current assumptions
+## Example output
 
-The current version uses simplified assumptions:
+Example output from the main pipeline:
 
-- Synthetic household consumption dataset
-- PVGIS solar generation for a reference 1 kW PV system
-- Linear scaling of PVGIS generation for different PV sizes
-- Constant electricity import price
-- Constant surplus compensation price
-- Simple payback period
-- No panel degradation
-- No battery degradation
-- No taxes or fixed electricity bill terms
-- No seasonal consumption variation beyond the available dataset
-- Machine Learning model trained on synthetic data
+```text
+Best scenario by payback:
+Solar peak power: 3.00 kW
+Battery capacity: 0.00 kWh
+Investment cost: 3500.00 EUR
+Annual savings: 736.44 EUR/year
+Payback: 4.75 years
+Self-sufficiency: 31.58%
 
-These assumptions make the model easier to understand and extend.
+Best scenario by self-sufficiency:
+Solar peak power: 3.00 kW
+Battery capacity: 5.00 kWh
+Investment cost: 6000.00 EUR
+Annual savings: 879.53 EUR/year
+Payback: 6.82 years
+Self-sufficiency: 43.98%
+```
+
+Example output from the forecasting pipeline:
+
+```text
+Consumption forecast results:
+MAE: 0.3368 kWh
+RMSE: 0.4886 kWh
+
+Model comparison:
+Random Forest       MAE: 0.3368    RMSE: 0.4886
+Linear Regression   MAE: 0.3755    RMSE: 0.5241
+```
+
+---
+
+## Why this project is useful
+
+This project shows how data science can be applied to a real energy optimization problem.
+
+It combines:
+
+- Time series data processing
+- Real-world energy data
+- Solar generation modeling
+- Battery simulation
+- Economic optimization
+- Machine Learning forecasting
+- Model evaluation
+- Automated reporting
+- Software testing
+- Continuous integration
+
+The project can be adapted to a real household by replacing the public dataset with consumption data downloaded from a smart meter, Datadis or an electricity distributor.
 
 ---
 
@@ -733,62 +703,12 @@ These assumptions make the model easier to understand and extend.
 
 Possible next steps:
 
-- Use real household hourly consumption data
-- Add realistic Spanish electricity tariff periods
-- Include fixed power charges and taxes
-- Add battery degradation and replacement costs
-- Add PV panel degradation
-- Add seasonal consumption datasets
-- Include weather variables in the forecasting model
-- Compare additional forecasting models
-- Use real future consumption forecasts inside the optimization workflow
-- Add YAML configuration files
-- Add command-line interface
-- Add Streamlit dashboard
-- Add more unit tests
-- Extend GitHub Actions with linting and coverage
-
----
-
-## Technologies used
-
-- Python
-- pandas
-- NumPy
-- matplotlib
-- scikit-learn
-- requests
-- pytest
-- GitHub Actions
-- Jupyter Notebook
-- PVGIS API
-
----
-
-## Project status
-
-Current status:
-
-```text
-Energy simulation          complete
-Battery simulation         complete
-PVGIS integration          complete
-Economic optimization      complete
-Report generation          complete
-Visualization outputs      complete
-Unit tests                 complete
-GitHub Actions CI          complete
-Forecasting baseline       complete
-Model comparison           complete
-Feature importance         complete
-Forecasting reports        complete
-Real consumption data      pending
-Advanced tariffs           pending
-Dashboard / CLI            pending
-```
-
----
-
-## Author
-
-Developed as a data science, energy analytics and Python portfolio project.
+- Add Spanish electricity tariffs with peak, flat and off-peak periods.
+- Include fixed power terms, taxes and surplus compensation limits.
+- Use weather variables for forecasting.
+- Add more forecasting models.
+- Use forecasted consumption inside the optimization pipeline.
+- Add a YAML configuration file.
+- Add a command-line interface.
+- Add a Streamlit dashboard.
+- Compare public dataset results with real household smart meter data.
