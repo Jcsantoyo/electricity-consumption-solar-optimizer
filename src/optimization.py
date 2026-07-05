@@ -10,79 +10,109 @@ from economics import (
 )
 
 from solar_data_loader import get_pvgis_generation_for_timestamps
+from tariff import calculate_net_electricity_cost_with_tariff
+from battery import simulate_battery
 
 def run_economic_grid_search(
-    consumption_kwh: list[float],
-    timestamps,
+    consumption_df: pd.DataFrame,
     solar_peak_powers_kw: list[float],
     battery_capacities_kwh: list[float],
     battery_efficiency: float,
-    max_charge_power_kw: float | None,
-    max_discharge_power_kw: float | None,
+    max_charge_power_kw: float,
+    max_discharge_power_kw: float,
     initial_battery_state_kwh: float,
-    electricity_price_eur_per_kwh: float,
-    surplus_compensation_eur_per_kwh: float,
     fixed_installation_cost: float,
     solar_cost_per_kw: float,
     battery_cost_per_kwh: float,
+    peak_price: float,
+    flat_price: float,
+    off_peak_price: float,
+    surplus_compensation_price: float,
+    contracted_power_kw: float,
+    power_price_eur_per_kw_year: float,
     simulation_days: int,
-    days_per_year: int = 365,
     pvgis_df: pd.DataFrame | None = None
 ) -> pd.DataFrame:
-
-    total_consumption = sum(consumption_kwh)
-
-    baseline_period_cost = calculate_grid_cost(
-        total_consumption,
-        electricity_price_eur_per_kwh
-    )
-
-    baseline_annual_cost = baseline_period_cost * (
-        days_per_year / simulation_days
-    )
-
     results = []
 
-    for peak_power_kw in solar_peak_powers_kw:
+    base_cost_df = consumption_df[["datetime", "consumption_kwh"]].copy()
+    base_cost_df["grid_import_kwh"] = base_cost_df["consumption_kwh"]
+    base_cost_df["solar_surplus_kwh"] = 0.0
+
+    base_net_cost = calculate_net_electricity_cost_with_tariff(
+        base_cost_df,
+        grid_import_column="grid_import_kwh",
+        surplus_column="solar_surplus_kwh",
+        peak_price=peak_price,
+        flat_price=flat_price,
+        off_peak_price=off_peak_price,
+        surplus_compensation_price=surplus_compensation_price,
+        contracted_power_kw=contracted_power_kw,
+        power_price_eur_per_kw_year=power_price_eur_per_kw_year,
+        simulation_days=simulation_days
+    )
+
+    for solar_peak_power_kw in solar_peak_powers_kw:
         if pvgis_df is None:
             solar_generation_kwh = generate_solar_profile_for_timestamps(
-                timestamps,
-                peak_power_kw
+                consumption_df["datetime"],
+                solar_peak_power_kw
             )
         else:
-            solar_generation_kwh = get_pvgis_generation_for_timestamps(pvgis_df, timestamps, peak_power_kw)
+            solar_generation_kwh = get_pvgis_generation_for_timestamps(
+                pvgis_df,
+                consumption_df["datetime"],
+                solar_peak_power_kw
+            )
 
         for battery_capacity_kwh in battery_capacities_kwh:
-            summary = compare_battery_scenario(
-                consumption_kwh,
-                solar_generation_kwh,
-                battery_capacity_kwh,
+            simulation_results = simulate_battery(
+                consumption_kwh=consumption_df["consumption_kwh"].tolist(),
+                solar_generation_kwh=solar_generation_kwh,
+                battery_capacity_kwh=battery_capacity_kwh,
                 battery_efficiency=battery_efficiency,
                 max_charge_power_kw=max_charge_power_kw,
                 max_discharge_power_kw=max_discharge_power_kw,
                 initial_battery_state_kwh=initial_battery_state_kwh
             )
 
-            scenario_period_cost = calculate_net_cost(
-                summary["grid_import_with_battery_kwh"],
-                summary["solar_surplus_with_battery_kwh"],
-                electricity_price_eur_per_kwh,
-                surplus_compensation_eur_per_kwh
+            simulation_df = pd.DataFrame(simulation_results)
+
+            simulation_df["datetime"] = consumption_df["datetime"].reset_index(
+                drop=True
             )
 
-            scenario_annual_cost = scenario_period_cost * (
-                days_per_year / simulation_days
+            simulation_df["consumption_kwh"] = consumption_df[
+                "consumption_kwh"
+            ].reset_index(drop=True)
+
+            simulation_df["solar_generation_kwh"] = solar_generation_kwh
+
+            scenario_net_cost = calculate_net_electricity_cost_with_tariff(
+                simulation_df,
+                grid_import_column="grid_import_kwh",
+                surplus_column="solar_surplus_kwh",
+                peak_price=peak_price,
+                flat_price=flat_price,
+                off_peak_price=off_peak_price,
+                surplus_compensation_price=surplus_compensation_price,
+                contracted_power_kw=contracted_power_kw,
+                power_price_eur_per_kw_year=power_price_eur_per_kw_year,
+                simulation_days=simulation_days
             )
 
-            period_savings = baseline_period_cost - scenario_period_cost
-            annual_savings = baseline_annual_cost - scenario_annual_cost
+            period_savings = base_net_cost - scenario_net_cost
+
+            annual_savings = (
+                period_savings * 365 / simulation_days
+            )
 
             investment_cost = calculate_total_installation_cost(
-                peak_power_kw,
-                battery_capacity_kwh,
-                solar_cost_per_kw,
-                battery_cost_per_kwh,
-                fixed_installation_cost=fixed_installation_cost
+                solar_peak_power_kw=solar_peak_power_kw,
+                battery_capacity_kwh=battery_capacity_kwh,
+                fixed_installation_cost=fixed_installation_cost,
+                solar_cost_per_kw=solar_cost_per_kw,
+                battery_cost_per_kwh=battery_cost_per_kwh
             )
 
             payback_years = calculate_simple_payback_years(
@@ -90,25 +120,38 @@ def run_economic_grid_search(
                 annual_savings
             )
 
+            total_consumption_kwh = simulation_df[
+                "consumption_kwh"
+            ].sum()
+
+            total_grid_import_kwh = simulation_df[
+                "grid_import_kwh"
+            ].sum()
+
+            total_solar_surplus_kwh = simulation_df[
+                "solar_surplus_kwh"
+            ].sum()
+
+            self_sufficiency = (
+                1 - total_grid_import_kwh / total_consumption_kwh
+            ) 
+
             results.append({
-                "solar_peak_power_kw": peak_power_kw,
+                "solar_peak_power_kw": solar_peak_power_kw,
                 "battery_capacity_kwh": battery_capacity_kwh,
                 "investment_cost_eur": investment_cost,
-                "period_cost_eur": scenario_period_cost,
-                "annual_cost_eur": scenario_annual_cost,
-                "period_savings_eur": period_savings,
+                "base_net_cost_eur": base_net_cost,
+                "scenario_net_cost_eur": scenario_net_cost,
                 "annual_savings_eur": annual_savings,
                 "payback_years": payback_years,
-                "grid_import_kwh": summary["grid_import_with_battery_kwh"],
-                "solar_surplus_kwh": summary["solar_surplus_with_battery_kwh"],
-                "potential_surplus_compensation_eur": (
-                    summary["solar_surplus_with_battery_kwh"]
-                    * surplus_compensation_eur_per_kwh
-                ),
-                "self_sufficiency": summary["self_sufficiency_with_battery"]
+                "self_sufficiency": self_sufficiency,
+                "grid_import_kwh": total_grid_import_kwh,
+                "solar_surplus_kwh": total_solar_surplus_kwh
             })
 
-    return pd.DataFrame(results)
+    results_df = pd.DataFrame(results)
+
+    return results_df
 
 def get_best_scenario_by_payback(df: pd.DataFrame) -> pd.Series:
     valid_payback_df = df.dropna(subset=["payback_years"])

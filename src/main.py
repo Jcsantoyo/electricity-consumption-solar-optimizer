@@ -83,31 +83,24 @@ def main() -> None:
     max_discharge_power_kw = config.MAX_DISCHARGE_POWER_KW
     initial_battery_state_kwh = config.INITIAL_BATTERY_STATE_KWH
 
-    electricity_price_eur_per_kwh = config.ELECTRICITY_PRICE_EUR_PER_KWH
-    surplus_compensation_eur_per_kwh = config.SURPLUS_COMPENSATION_EUR_PER_KWH
-
-    fixed_installation_cost = config.FIXED_INSTALLATION_COST_EUR
-    solar_cost_per_kw = config.SOLAR_COST_EUR_PER_KW
-    battery_cost_per_kwh = config.BATTERY_COST_EUR_PER_KWH
-
-    days_per_year = config.DAYS_PER_YEAR
-
     results_df = run_economic_grid_search(
-        consumption_kwh,
-        timestamps,
-        solar_peak_powers_kw,
-        battery_capacities_kwh,
-        battery_efficiency,
-        max_charge_power_kw,
-        max_discharge_power_kw,
-        initial_battery_state_kwh,
-        electricity_price_eur_per_kwh,
-        surplus_compensation_eur_per_kwh,
-        fixed_installation_cost,
-        solar_cost_per_kw,
-        battery_cost_per_kwh,
-        simulation_days,
-        days_per_year=days_per_year,
+        consumption_df=df_consumption,
+        solar_peak_powers_kw=config.SOLAR_PEAK_POWERS_KW,
+        battery_capacities_kwh=config.BATTERY_CAPACITIES_KWH,
+        battery_efficiency=config.BATTERY_EFFICIENCY,
+        max_charge_power_kw=config.MAX_CHARGE_POWER_KW,
+        max_discharge_power_kw=config.MAX_DISCHARGE_POWER_KW,
+        initial_battery_state_kwh=config.INITIAL_BATTERY_STATE_KWH,
+        fixed_installation_cost=config.FIXED_INSTALLATION_COST_EUR,
+        solar_cost_per_kw=config.SOLAR_COST_EUR_PER_KW,
+        battery_cost_per_kwh=config.BATTERY_COST_EUR_PER_KWH,
+        peak_price=config.PEAK_PRICE_EUR_PER_KWH,
+        flat_price=config.FLAT_PRICE_EUR_PER_KWH,
+        off_peak_price=config.OFF_PEAK_PRICE_EUR_PER_KWH,
+        surplus_compensation_price=config.SURPLUS_COMPENSATION_EUR_PER_KWH,
+        contracted_power_kw=config.CONTRACTED_POWER_KW,
+        power_price_eur_per_kw_year=config.POWER_PRICE_EUR_PER_KW_YEAR,
+        simulation_days=simulation_days,
         pvgis_df=pvgis_df
     )
 
