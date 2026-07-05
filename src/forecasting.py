@@ -211,3 +211,24 @@ def compare_forecasting_models(
     comparison_df = comparison_df.sort_values("mae", ascending=True).reset_index(drop=True)
 
     return comparison_df
+
+def build_forecasted_consumption_dataframe(
+    original_df: pd.DataFrame,
+    forecast_results_df: pd.DataFrame
+) -> pd.DataFrame:
+    last_datetime = pd.to_datetime(
+        original_df["datetime"]
+    ).max()
+
+    forecast_datetimes = pd.date_range(
+        start=last_datetime + pd.Timedelta(hours=1),
+        periods=len(forecast_results_df),
+        freq="h"
+    )
+
+    forecast_df = pd.DataFrame({
+        "datetime": forecast_datetimes,
+        "consumption_kwh": forecast_results_df["predicted_consumption_kwh"].values
+    })
+
+    return forecast_df

@@ -15,7 +15,8 @@ from forecasting import (
     prepare_forecasting_dataset,
     split_train_test_by_time,
     evaluate_forecast,
-    get_feature_importance
+    get_feature_importance,
+    build_forecasted_consumption_dataframe
 )
 
 
@@ -148,3 +149,33 @@ def test_get_feature_importance_returns_sorted_dataframe() -> None:
     assert list(importance_df.columns) == ["feature", "importance"]
     assert len(importance_df) == 2
     assert importance_df["importance"].iloc[0] >= importance_df["importance"].iloc[1]
+
+def test_build_forecasted_consumption_dataframe():
+    original_df = pd.DataFrame({
+        "datetime": pd.to_datetime([
+            "2024-01-01 00:00:00",
+            "2024-01-01 01:00:00"
+        ]),
+        "consumption_kwh": [1.0, 1.2]
+    })
+
+    forecast_results_df = pd.DataFrame({
+        "predicted_consumption_kwh": [0.9, 1.1, 1.3]
+    })
+
+    forecast_df = build_forecasted_consumption_dataframe(
+        original_df,
+        forecast_results_df
+    )
+
+    assert list(forecast_df.columns) == [
+        "datetime",
+        "consumption_kwh"
+    ]
+
+    assert len(forecast_df) == 3
+    assert forecast_df.loc[0, "datetime"] == pd.Timestamp(
+        "2024-01-01 02:00:00"
+    )
+    assert forecast_df.loc[0, "consumption_kwh"] == 0.9
+    assert forecast_df.loc[2, "consumption_kwh"] == 1.3
