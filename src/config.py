@@ -1,5 +1,5 @@
 # Input files
-CONSUMPTION_DATA_PATH = "data/simulated/synthetic_consumption_30_days.csv"
+CONSUMPTION_DATA_PATH = "data/processed/uci_household_power_hourly.csv"
 
 # Solar data source
 USE_PVGIS_SOLAR_DATA = True
@@ -20,7 +20,6 @@ BEST_SCENARIO_CUMULATIVE_ENERGY_PLOT_PATH = "images/best_scenario_cumulative_ene
 OUTPUTS_INDEX_PATH = "reports/outputs_index.md"
 
 # Simulation settings
-SIMULATION_DAYS = 30
 DAYS_PER_YEAR = 365
 
 # Grid search parameters

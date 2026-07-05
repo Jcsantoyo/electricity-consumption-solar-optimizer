@@ -4,23 +4,23 @@ Electricity Consumption Solar Optimizer
 Solar data source: PVGIS solar data (data/raw/pvgis_hourly_linares_1kw_2020.csv)
 
 Best scenario by payback:
-Solar peak power: 2.00 kW
+Solar peak power: 3.00 kW
 Battery capacity: 0.00 kWh
-Investment cost: 2600.00 EUR
-Annual savings: 300.27 EUR/year
-Payback: 8.66 years
-Self-sufficiency: 30.18%
-Grid import: 160.87 kWh
-Solar surplus: 153.94 kWh
+Investment cost: 3500.00 EUR
+Annual savings: 736.44 EUR/year
+Payback: 4.75 years
+Self-sufficiency: 31.58%
+Grid import: 25510.35 kWh
+Solar surplus: 7925.40 kWh
 
 Best scenario by self-sufficiency:
 Solar peak power: 3.00 kW
 Battery capacity: 5.00 kWh
 Investment cost: 6000.00 EUR
-Annual savings: 560.63 EUR/year
-Payback: 10.70 years
-Self-sufficiency: 89.03%
-Grid import: 25.28 kWh
-Solar surplus: 113.86 kWh
+Annual savings: 879.53 EUR/year
+Payback: 6.82 years
+Self-sufficiency: 43.98%
+Grid import: 20885.34 kWh
+Solar surplus: 2786.51 kWh
 
 The economically optimal scenario and the energy optimal scenario are different.

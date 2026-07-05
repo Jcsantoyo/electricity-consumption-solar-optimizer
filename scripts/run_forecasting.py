@@ -20,7 +20,7 @@ from visualization import(
 
 
 def main() -> None:
-    data_path = "data/simulated/synthetic_consumption_30_days.csv"
+    data_path = "data/processed/uci_household_power_hourly.csv"
 
     df = load_consumption_data(data_path)
 

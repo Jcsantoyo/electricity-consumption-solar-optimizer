@@ -52,6 +52,10 @@ def main() -> None:
         print(f"\nInvalid input data file: {file_path}")
         print(error)
         return
+    
+    simulation_days = (
+        df_consumption["datetime"].max() - df_consumption["datetime"].min()
+    ).days + 1
 
     consumption_kwh = df_consumption["consumption_kwh"].tolist()
     timestamps = df_consumption["datetime"]
@@ -86,7 +90,6 @@ def main() -> None:
     solar_cost_per_kw = config.SOLAR_COST_EUR_PER_KW
     battery_cost_per_kwh = config.BATTERY_COST_EUR_PER_KWH
 
-    simulation_days = config.SIMULATION_DAYS
     days_per_year = config.DAYS_PER_YEAR
 
     results_df = run_economic_grid_search(
