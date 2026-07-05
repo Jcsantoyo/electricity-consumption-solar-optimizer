@@ -57,6 +57,8 @@ def main() -> None:
         df_consumption["datetime"].max() - df_consumption["datetime"].min()
     ).days + 1
 
+    tariff_profile = config.get_active_tariff_profile()
+
     consumption_kwh = df_consumption["consumption_kwh"].tolist()
     timestamps = df_consumption["datetime"]
 
@@ -75,7 +77,6 @@ def main() -> None:
             print(error)
             return
 
-    solar_peak_powers_kw = config.SOLAR_PEAK_POWERS_KW
     battery_capacities_kwh = config.BATTERY_CAPACITIES_KWH
 
     battery_efficiency = config.BATTERY_EFFICIENCY
@@ -94,12 +95,16 @@ def main() -> None:
         fixed_installation_cost=config.FIXED_INSTALLATION_COST_EUR,
         solar_cost_per_kw=config.SOLAR_COST_EUR_PER_KW,
         battery_cost_per_kwh=config.BATTERY_COST_EUR_PER_KWH,
-        peak_price=config.PEAK_PRICE_EUR_PER_KWH,
-        flat_price=config.FLAT_PRICE_EUR_PER_KWH,
-        off_peak_price=config.OFF_PEAK_PRICE_EUR_PER_KWH,
-        surplus_compensation_price=config.SURPLUS_COMPENSATION_EUR_PER_KWH,
-        contracted_power_kw=config.CONTRACTED_POWER_KW,
-        power_price_eur_per_kw_year=config.POWER_PRICE_EUR_PER_KW_YEAR,
+        peak_price=tariff_profile["peak_price_eur_per_kwh"],
+        flat_price=tariff_profile["flat_price_eur_per_kwh"],
+        off_peak_price=tariff_profile["off_peak_price_eur_per_kwh"],
+        surplus_compensation_price=tariff_profile[
+            "surplus_compensation_eur_per_kwh"
+        ],
+        contracted_power_kw=tariff_profile["contracted_power_kw"],
+        power_price_eur_per_kw_year=tariff_profile[
+            "power_price_eur_per_kw_year"
+        ],
         simulation_days=simulation_days,
         pvgis_df=pvgis_df
     )
@@ -187,6 +192,7 @@ def main() -> None:
         print("Solar data source: synthetic profile")
     else:
         print(f"Solar data source: PVGIS ({config.PVGIS_SOLAR_DATA_PATH})")
+    print(f"Tariff profile: {config.ACTIVE_TARIFF_PROFILE}")
     print(f"Number of hours: {len(df_consumption)}")
     print(f"Results saved to: {results_output_path}")
     print(f"Summary saved to: {summary_output_path}")

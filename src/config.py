@@ -40,13 +40,32 @@ FIXED_INSTALLATION_COST_EUR = 800.0
 SOLAR_COST_EUR_PER_KW = 900.0
 BATTERY_COST_EUR_PER_KWH = 500.0
 
-# Spanish 2.0TD tariff approximation
-PEAK_PRICE_EUR_PER_KWH = 0.25
-FLAT_PRICE_EUR_PER_KWH = 0.18
-OFF_PEAK_PRICE_EUR_PER_KWH = 0.12
+# Tariff assumptions.
+# These values are illustrative and can be replaced by prices
+# from a specific electricity contract or by PVPC hourly prices.
 
-SURPLUS_COMPENSATION_EUR_PER_KWH = 0.07
+ACTIVE_TARIFF_PROFILE = "spanish_2_0td_example"
 
-CONTRACTED_POWER_KW = 4.6
-POWER_PRICE_EUR_PER_KW_YEAR = 35.0
+TARIFF_PROFILES = {
+    "flat_price": {
+        "peak_price_eur_per_kwh": 0.20,
+        "flat_price_eur_per_kwh": 0.20,
+        "off_peak_price_eur_per_kwh": 0.20,
+        "surplus_compensation_eur_per_kwh": 0.07,
+        "contracted_power_kw": 4.6,
+        "power_price_eur_per_kw_year": 35.0
+    },
+    "spanish_2_0td_example": {
+        "peak_price_eur_per_kwh": 0.25,
+        "flat_price_eur_per_kwh": 0.18,
+        "off_peak_price_eur_per_kwh": 0.12,
+        "surplus_compensation_eur_per_kwh": 0.07,
+        "contracted_power_kw": 4.6,
+        "power_price_eur_per_kw_year": 35.0
+    }
+}
+
+
+def get_active_tariff_profile() -> dict:
+    return TARIFF_PROFILES[ACTIVE_TARIFF_PROFILE]
 
