@@ -2,22 +2,24 @@
 
 ![Python tests](https://github.com/Jcsantoyo/electricity-consumption-solar-optimizer/actions/workflows/tests.yml/badge.svg)
 
-A data science project that analyzes residential electricity consumption, photovoltaic solar generation, battery storage and economic optimization.
+A data science project that analyzes residential electricity consumption, photovoltaic solar generation, battery storage, electricity tariffs, economic optimization and Machine Learning forecasting.
 
 The project combines:
 
 - Real household electricity consumption data
 - PVGIS solar generation data
 - Battery simulation
+- Configurable electricity tariff profiles
 - Economic analysis
 - Grid search optimization
 - Machine Learning consumption forecasting
+- Forecast-based solar and battery optimization
 - Model comparison
 - Feature importance analysis
 - Automated reports and plots
 - Unit tests and GitHub Actions CI
 
-The goal is to estimate which solar and battery configuration provides the best trade-off between investment cost, payback period and self-sufficiency.
+The goal is to estimate which solar and battery configuration provides the best trade-off between investment cost, payback period and energy self-sufficiency.
 
 ---
 
@@ -25,18 +27,26 @@ The goal is to estimate which solar and battery configuration provides the best 
 
 This project simulates how a household could reduce grid electricity consumption by installing photovoltaic solar panels and, optionally, a battery.
 
-The pipeline:
+The main pipeline:
 
 1. Loads household electricity consumption data.
 2. Loads realistic solar generation data from PVGIS.
 3. Simulates solar self-consumption.
 4. Simulates battery charging and discharging.
 5. Computes grid import and solar surplus.
-6. Estimates investment cost, yearly savings and payback.
-7. Performs a grid search over solar and battery sizes.
-8. Selects the best scenarios.
-9. Forecasts future electricity consumption using Machine Learning.
+6. Applies a configurable electricity tariff model.
+7. Estimates investment cost, yearly savings and payback.
+8. Performs a grid search over solar and battery sizes.
+9. Selects the best economic and energy scenarios.
 10. Generates reports and plots automatically.
+
+The forecasting pipeline:
+
+1. Trains Machine Learning models using historical consumption.
+2. Evaluates forecast accuracy.
+3. Compares forecasting models.
+4. Computes feature importance.
+5. Uses predicted consumption as input for a forecast-based optimization pipeline.
 
 ---
 
@@ -94,31 +104,66 @@ This allows the project to combine real household consumption patterns with real
 
 ---
 
-## Main results
+## Electricity tariff model
 
-Using the public real household consumption dataset and PVGIS solar generation, the current best scenarios are:
+The project includes a simplified configurable electricity tariff model.
 
-### Best economic scenario
+The current active tariff profile is:
+
+```text
+spanish_2_0td_example
+```
+
+This profile approximates the Spanish 2.0TD structure using three energy periods:
+
+```text
+off_peak
+flat
+peak
+```
+
+The tariff model includes:
+
+- Different energy prices for peak, flat and off-peak periods.
+- Weekend off-peak behavior.
+- Surplus compensation.
+- Contracted power fixed cost.
+
+The prices are not intended to represent a specific electricity company contract. They are configurable assumptions defined in:
+
+```text
+src/config.py
+```
+
+This allows the project to compare different tariff scenarios without changing the optimization code.
+
+---
+
+## Main historical optimization results
+
+Using the public real household consumption dataset, PVGIS solar generation and the configurable Spanish 2.0TD example tariff, the current best historical scenarios are:
+
+### Best historical economic scenario
 
 ```text
 Solar peak power: 3.00 kW
 Battery capacity: 0.00 kWh
 Investment cost: 3500.00 EUR
-Annual savings: 736.44 EUR/year
-Payback: 4.75 years
+Annual savings: 684.83 EUR/year
+Payback: 5.11 years
 Self-sufficiency: 31.58%
 Grid import: 25510.35 kWh
 Solar surplus: 7925.40 kWh
 ```
 
-### Best self-sufficiency scenario
+### Best historical self-sufficiency scenario
 
 ```text
 Solar peak power: 3.00 kW
 Battery capacity: 5.00 kWh
 Investment cost: 6000.00 EUR
-Annual savings: 879.53 EUR/year
-Payback: 6.82 years
+Annual savings: 819.44 EUR/year
+Payback: 7.32 years
 Self-sufficiency: 43.98%
 Grid import: 20885.34 kWh
 Solar surplus: 2786.51 kWh
@@ -128,7 +173,7 @@ Solar surplus: 2786.51 kWh
 
 The economically optimal scenario is not necessarily the scenario with the highest energy self-sufficiency.
 
-In the current simulation:
+In the current historical simulation:
 
 - The best payback is achieved with solar panels only.
 - Adding a battery improves self-sufficiency.
@@ -175,6 +220,61 @@ The most important feature is the consumption in the previous hour. This makes s
 
 ---
 
+## Forecast-based optimization
+
+The project can also use Machine Learning predictions as input for the solar and battery optimization pipeline.
+
+Instead of optimizing only on historical consumption, the project can:
+
+1. Train a forecasting model using historical household consumption.
+2. Generate predicted future consumption.
+3. Convert the predictions into the standard project format.
+4. Run the solar and battery optimization pipeline on the forecasted consumption.
+
+This connects the forecasting module with the economic optimization module.
+
+Run:
+
+```bash
+python scripts/run_forecast_optimization.py
+```
+
+This generates:
+
+```text
+reports/forecasted_consumption_for_optimization.csv
+reports/forecast_optimization_results.csv
+reports/forecast_optimization_best_scenarios.csv
+```
+
+Current forecast-based optimization results:
+
+### Best forecast-based economic scenario
+
+```text
+Solar peak power: 2.00 kW
+Battery capacity: 0.00 kWh
+Annual savings: 551.64 EUR/year
+Payback: 4.71 years
+Self-sufficiency: 30.46%
+```
+
+### Best forecast-based self-sufficiency scenario
+
+```text
+Solar peak power: 3.00 kW
+Battery capacity: 5.00 kWh
+Annual savings: 865.36 EUR/year
+Payback: 6.93 years
+Self-sufficiency: 49.96%
+```
+
+The forecast-based optimization can produce a different best economic scenario than the historical optimization. In the current results, the historical optimization selects 3 kW solar for the best payback, while the forecast-based optimization selects 2 kW solar.
+
+This shows that the optimal solar and battery configuration may depend on whether the decision is based on past consumption or predicted future consumption.
+
+---
+
 ## Repository structure
 
 ```text
@@ -213,6 +313,9 @@ electricity-consumption-solar-optimizer/
 │   ├── forecast_results.csv
 │   ├── forecast_feature_importance.csv
 │   ├── forecast_model_comparison.csv
+│   ├── forecasted_consumption_for_optimization.csv
+│   ├── forecast_optimization_results.csv
+│   ├── forecast_optimization_best_scenarios.csv
 │   ├── summary.txt
 │   └── outputs_index.md
 │
@@ -227,6 +330,7 @@ electricity-consumption-solar-optimizer/
 │   ├── generate_synthetic_consumption.py
 │   ├── prepare_uci_household_power.py
 │   ├── run_forecasting.py
+│   ├── run_forecast_optimization.py
 │   ├── test_pvgis_generation_match.py
 │   └── test_pvgis_loader.py
 │
@@ -249,7 +353,8 @@ electricity-consumption-solar-optimizer/
 │   ├── test_battery.py
 │   ├── test_economics.py
 │   ├── test_forecasting.py
-│   └── test_solar_data_loader.py
+│   ├── test_solar_data_loader.py
+│   └── test_tariff.py
 │
 ├── requirements.txt
 ├── .gitignore
@@ -378,6 +483,26 @@ images/forecast_model_comparison.png
 
 ---
 
+## Running the forecast-based optimization pipeline
+
+Run:
+
+```bash
+python scripts/run_forecast_optimization.py
+```
+
+This generates:
+
+```text
+reports/forecasted_consumption_for_optimization.csv
+reports/forecast_optimization_results.csv
+reports/forecast_optimization_best_scenarios.csv
+```
+
+This script connects the Machine Learning forecasting module with the solar and battery optimization pipeline.
+
+---
+
 ## Running tests
 
 Run:
@@ -392,6 +517,7 @@ The project includes tests for:
 - Battery simulation
 - PVGIS solar data loading
 - Forecasting utilities
+- Tariff calculations
 
 GitHub Actions automatically runs the test suite on pushes and pull requests.
 
@@ -456,16 +582,29 @@ It considers:
 
 ### `src/economics.py`
 
-Computes economic metrics:
+Computes basic economic metrics:
 
 - Solar installation cost
 - Battery installation cost
 - Total investment cost
-- Grid electricity cost
-- Surplus compensation
-- Net cost
-- Annual savings
 - Simple payback period
+
+Earlier flat-price cost utilities are kept as simple reusable economic helpers.
+
+---
+
+### `src/tariff.py`
+
+Contains the electricity tariff logic used by the optimization pipeline.
+
+It supports:
+
+- Spanish 2.0TD period classification
+- Peak, flat and off-peak energy prices
+- Weekend off-peak behavior
+- Surplus compensation
+- Contracted power fixed cost
+- Net electricity cost calculation
 
 ---
 
@@ -489,6 +628,8 @@ For each scenario, it computes:
 - Grid import
 - Solar surplus
 
+The optimization uses the active tariff profile from the configuration.
+
 ---
 
 ### `src/forecasting.py`
@@ -510,7 +651,7 @@ It trains and evaluates:
 - Linear Regression
 - Random Forest Regressor
 
-It also computes feature importance for the Random Forest model.
+It also computes feature importance for the Random Forest model and can convert predicted consumption into a dataset compatible with the optimization pipeline.
 
 ---
 
@@ -534,15 +675,15 @@ Generates plots for:
 
 ### `reports/grid_search_results.csv`
 
-Contains all tested solar and battery scenarios.
+Contains all tested solar and battery scenarios for the historical optimization.
 
 ### `reports/best_scenarios.csv`
 
-Contains the best economic scenario and the best self-sufficiency scenario.
+Contains the best historical economic scenario and the best historical self-sufficiency scenario.
 
 ### `reports/best_scenario_timeseries.csv`
 
-Contains the hourly simulation results for the selected best scenario.
+Contains the hourly simulation results for the selected best historical scenario.
 
 ### `reports/forecast_results.csv`
 
@@ -556,9 +697,21 @@ Contains Random Forest feature importance values.
 
 Compares the forecasting models using MAE and RMSE.
 
+### `reports/forecasted_consumption_for_optimization.csv`
+
+Contains forecasted consumption converted into the standard optimization input format.
+
+### `reports/forecast_optimization_results.csv`
+
+Contains all tested solar and battery scenarios for the forecast-based optimization.
+
+### `reports/forecast_optimization_best_scenarios.csv`
+
+Contains the best economic and self-sufficiency scenarios from the forecast-based optimization.
+
 ### `reports/summary.txt`
 
-Text summary of the main optimization results.
+Text summary of the main historical optimization results.
 
 ### `reports/outputs_index.md`
 
@@ -644,23 +797,23 @@ Compares forecasting models using MAE.
 
 ## Example output
 
-Example output from the main pipeline:
+Example output from the main historical optimization pipeline:
 
 ```text
 Best scenario by payback:
 Solar peak power: 3.00 kW
 Battery capacity: 0.00 kWh
 Investment cost: 3500.00 EUR
-Annual savings: 736.44 EUR/year
-Payback: 4.75 years
+Annual savings: 684.83 EUR/year
+Payback: 5.11 years
 Self-sufficiency: 31.58%
 
 Best scenario by self-sufficiency:
 Solar peak power: 3.00 kW
 Battery capacity: 5.00 kWh
 Investment cost: 6000.00 EUR
-Annual savings: 879.53 EUR/year
-Payback: 6.82 years
+Annual savings: 819.44 EUR/year
+Payback: 7.32 years
 Self-sufficiency: 43.98%
 ```
 
@@ -676,6 +829,24 @@ Random Forest       MAE: 0.3368    RMSE: 0.4886
 Linear Regression   MAE: 0.3755    RMSE: 0.5241
 ```
 
+Example output from the forecast-based optimization pipeline:
+
+```text
+Best forecast-based scenario by payback:
+Solar peak power: 2.00 kW
+Battery capacity: 0.00 kWh
+Annual savings: 551.64 EUR/year
+Payback: 4.71 years
+Self-sufficiency: 30.46%
+
+Best forecast-based scenario by self-sufficiency:
+Solar peak power: 3.00 kW
+Battery capacity: 5.00 kWh
+Annual savings: 865.36 EUR/year
+Payback: 6.93 years
+Self-sufficiency: 49.96%
+```
+
 ---
 
 ## Why this project is useful
@@ -688,8 +859,10 @@ It combines:
 - Real-world energy data
 - Solar generation modeling
 - Battery simulation
+- Configurable electricity tariffs
 - Economic optimization
 - Machine Learning forecasting
+- Forecast-based decision making
 - Model evaluation
 - Automated reporting
 - Software testing
@@ -703,11 +876,12 @@ The project can be adapted to a real household by replacing the public dataset w
 
 Possible next steps:
 
-- Add Spanish electricity tariffs with peak, flat and off-peak periods.
-- Include fixed power terms, taxes and surplus compensation limits.
+- Add support for hourly electricity price CSV files.
+- Add optional PVPC/ESIOS hourly price downloader.
+- Include fixed taxes and additional regulated charges.
 - Use weather variables for forecasting.
 - Add more forecasting models.
-- Use forecasted consumption inside the optimization pipeline.
+- Implement recursive multi-step forecasting.
 - Add a YAML configuration file.
 - Add a command-line interface.
 - Add a Streamlit dashboard.
