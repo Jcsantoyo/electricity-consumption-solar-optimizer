@@ -245,7 +245,7 @@ def plot_forecasting_model_comparison(
 
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
 
-    
+
 def plot_historical_vs_forecast_payback(
     comparison_df: pd.DataFrame,
     output_path: str
@@ -274,3 +274,64 @@ def plot_historical_vs_forecast_payback(
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.show()
     
+
+def plot_historical_vs_forecast_savings(
+    comparison_df: pd.DataFrame,
+    output_path: str
+) -> None:
+    comparison_df = comparison_df.copy()
+
+    label_values = (
+        comparison_df["optimization_type"].astype(str)
+        + " - "
+        + comparison_df["scenario"].astype(str)
+    )
+
+    plt.figure(figsize=(10, 5))
+
+    plt.bar(
+        label_values,
+        comparison_df["annual_savings_eur"]
+    )
+
+    plt.title("Historical vs Forecast-Based Annual Savings")
+    plt.xlabel("Scenario")
+    plt.ylabel("Annual savings (EUR/year)")
+    plt.xticks(rotation=30, ha="right")
+    plt.grid(axis="y")
+
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    
+
+
+def plot_historical_vs_forecast_self_sufficiency(
+    comparison_df: pd.DataFrame,
+    output_path: str
+) -> None:
+    comparison_df = comparison_df.copy()
+
+    label_values = (
+        comparison_df["optimization_type"].astype(str)
+        + " - "
+        + comparison_df["scenario"].astype(str)
+    )
+
+    self_sufficiency_percent = (
+        comparison_df["self_sufficiency"] * 100
+    )
+
+    plt.figure(figsize=(10, 5))
+
+    plt.bar(
+        label_values,
+        self_sufficiency_percent
+    )
+
+    plt.title("Historical vs Forecast-Based Self-Sufficiency")
+    plt.xlabel("Scenario")
+    plt.ylabel("Self-sufficiency (%)")
+    plt.xticks(rotation=30, ha="right")
+    plt.grid(axis="y")
+
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+  

@@ -9,7 +9,11 @@ SRC_PATH = PROJECT_ROOT / "src"
 
 sys.path.append(str(SRC_PATH))
 
-from visualization import plot_historical_vs_forecast_payback
+from visualization import (
+    plot_historical_vs_forecast_payback,
+    plot_historical_vs_forecast_savings,
+    plot_historical_vs_forecast_self_sufficiency
+)
 
 def load_best_scenarios(
     file_path: str,
@@ -76,6 +80,10 @@ def main() -> None:
     output_path = "reports/historical_vs_forecast_optimization.csv"
     plot_output_path = "images/historical_vs_forecast_payback.png"
 
+    payback_plot_path = "images/historical_vs_forecast_payback.png"
+    savings_plot_path = "images/historical_vs_forecast_savings.png"
+    self_sufficiency_plot_path = "images/historical_vs_forecast_self_sufficiency.png"
+
     os.makedirs("reports", exist_ok=True)
     os.makedirs("images", exist_ok=True)
 
@@ -101,11 +109,20 @@ def main() -> None:
 
     plot_historical_vs_forecast_payback(comparison_df, plot_output_path)
 
+    plot_historical_vs_forecast_payback(comparison_df, payback_plot_path)
+
+    plot_historical_vs_forecast_savings(comparison_df, savings_plot_path)
+
+    plot_historical_vs_forecast_self_sufficiency(comparison_df, self_sufficiency_plot_path)
+
     print("\nHistorical vs forecast-based optimization comparison")
     print(f"Historical results: {historical_path}")
     print(f"Forecast-based results: {forecast_path}")
     print(f"Comparison saved to: {output_path}")
     print(f"Comparison plot saved to: {plot_output_path}")
+    print(f"Payback plot saved to: {payback_plot_path}")
+    print(f"Savings plot saved to: {savings_plot_path}")
+    print(f"Self-sufficiency plot saved to: {self_sufficiency_plot_path}")
 
     print("\nComparison:")
     print(comparison_df.to_string(index=False))
