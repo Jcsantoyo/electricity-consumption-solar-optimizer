@@ -81,7 +81,6 @@ def main() -> None:
     historical_path = "reports/best_scenarios.csv"
     forecast_path = "reports/forecast_optimization_best_scenarios.csv"
     output_path = "reports/historical_vs_forecast_optimization.csv"
-    plot_output_path = "images/historical_vs_forecast_payback.png"
 
     payback_plot_path = "images/historical_vs_forecast_payback.png"
     savings_plot_path = "images/historical_vs_forecast_savings.png"
@@ -113,7 +112,6 @@ def main() -> None:
         index=False
     )
 
-    plot_historical_vs_forecast_payback(comparison_df, plot_output_path)
 
     plot_historical_vs_forecast_payback(comparison_df, payback_plot_path)
 
@@ -129,10 +127,11 @@ def main() -> None:
     print(f"Historical results: {historical_path}")
     print(f"Forecast-based results: {forecast_path}")
     print(f"Comparison saved to: {output_path}")
-    print(f"Comparison plot saved to: {plot_output_path}")
     print(f"Payback plot saved to: {payback_plot_path}")
     print(f"Savings plot saved to: {savings_plot_path}")
     print(f"Self-sufficiency plot saved to: {self_sufficiency_plot_path}")
+    print(f"Investment cost plot saved to: {investment_cost_plot_path}")
+    print(f"Grid import plot saved to: {grid_import_plot_path}")
 
     print("\nComparison:")
     print(comparison_df.to_string(index=False))
