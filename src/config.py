@@ -33,9 +33,6 @@ MAX_DISCHARGE_POWER_KW = 1.0
 INITIAL_BATTERY_STATE_KWH = 0.0
 
 # Economic assumptions
-ELECTRICITY_PRICE_EUR_PER_KWH = 0.20
-SURPLUS_COMPENSATION_EUR_PER_KWH = 0.07
-
 FIXED_INSTALLATION_COST_EUR = 800.0
 SOLAR_COST_EUR_PER_KW = 900.0
 BATTERY_COST_EUR_PER_KWH = 500.0
@@ -44,6 +41,8 @@ BATTERY_COST_EUR_PER_KWH = 500.0
 # These values are illustrative and can be replaced by prices
 # from a specific electricity contract or by PVPC hourly prices.
 
+# Active tariff profile used by the optimization pipeline.
+# Available options are defined in TARIFF_PROFILES.
 ACTIVE_TARIFF_PROFILE = "spanish_2_0td_example"
 
 TARIFF_PROFILES = {
@@ -68,4 +67,3 @@ TARIFF_PROFILES = {
 
 def get_active_tariff_profile() -> dict:
     return TARIFF_PROFILES[ACTIVE_TARIFF_PROFILE]
-
