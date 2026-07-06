@@ -299,12 +299,20 @@ and generates:
 ```text
 reports/historical_vs_forecast_optimization.csv
 images/historical_vs_forecast_payback.png
+images/historical_vs_forecast_savings.png
+images/historical_vs_forecast_self_sufficiency.png
 ```
 
 This report allows direct comparison between:
 
 - Historical optimization results
 - Forecast-based optimization results
+
+The comparison includes:
+
+- Payback period
+- Annual savings
+- Self-sufficiency
 
 Example insight:
 
@@ -350,7 +358,9 @@ electricity-consumption-solar-optimizer/
 │   ├── consumption_forecast_actual_vs_predicted.png
 │   ├── forecast_feature_importance.png
 │   ├── forecast_model_comparison.png
-│   └── historical_vs_forecast_payback.png
+│   ├── historical_vs_forecast_payback.png
+│   ├── historical_vs_forecast_savings.png
+│   └── historical_vs_forecast_self_sufficiency.png
 │
 ├── reports/
 │   ├── grid_search_results.csv
@@ -565,6 +575,8 @@ This generates:
 ```text
 reports/historical_vs_forecast_optimization.csv
 images/historical_vs_forecast_payback.png
+images/historical_vs_forecast_savings.png
+images/historical_vs_forecast_self_sufficiency.png
 ```
 
 This report compares the best scenarios from historical optimization and forecast-based optimization.
@@ -737,6 +749,8 @@ Generates plots for:
 - Forecast feature importance
 - Forecasting model comparison
 - Historical vs forecast-based payback comparison
+- Historical vs forecast-based annual savings comparison
+- Historical vs forecast-based self-sufficiency comparison
 
 ---
 
@@ -874,7 +888,23 @@ images/historical_vs_forecast_payback.png
 
 Compares the payback period of the best historical optimization scenarios against the best forecast-based optimization scenarios.
 
-This plot helps visualize how the recommended solar and battery configuration can change when the optimization uses predicted future consumption instead of historical consumption.
+### Historical vs forecast-based annual savings comparison
+
+```text
+images/historical_vs_forecast_savings.png
+```
+
+Compares the estimated annual savings of the best historical optimization scenarios against the best forecast-based optimization scenarios.
+
+### Historical vs forecast-based self-sufficiency comparison
+
+```text
+images/historical_vs_forecast_self_sufficiency.png
+```
+
+Compares the self-sufficiency percentage of the best historical optimization scenarios against the best forecast-based optimization scenarios.
+
+These comparison plots help visualize how the recommended solar and battery configuration can change when the optimization uses predicted future consumption instead of historical consumption.
 
 ---
 
@@ -970,7 +1000,7 @@ The project can be adapted to a real household by replacing the public dataset w
 
 Possible next steps:
 
-- Add more comparison plots for savings, self-sufficiency and investment cost.
+- Add comparison plots for investment cost and grid import.
 - Add support for hourly electricity price CSV files.
 - Add optional PVPC/ESIOS hourly price downloader.
 - Include fixed taxes and additional regulated charges.
