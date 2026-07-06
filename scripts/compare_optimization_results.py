@@ -1,6 +1,15 @@
 import os
 import pandas as pd
 
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+SRC_PATH = PROJECT_ROOT / "src"
+
+sys.path.append(str(SRC_PATH))
+
+from visualization import plot_historical_vs_forecast_payback
 
 def load_best_scenarios(
     file_path: str,
@@ -10,6 +19,25 @@ def load_best_scenarios(
 
     df = df.copy()
     df["optimization_type"] = optimization_type
+
+    if "scenario" not in df.columns:
+        if "criterion" in df.columns:
+            df = df.rename(
+                columns={
+                    "criterion": "scenario"
+                }
+            )
+        elif "selection_criterion" in df.columns:
+            df = df.rename(
+                columns={
+                    "selection_criterion": "scenario"
+                }
+            )
+        else:
+            df["scenario"] = [
+                "best_payback",
+                "best_self_sufficiency"
+            ][:len(df)]
 
     return df
 
@@ -37,12 +65,7 @@ def build_optimization_comparison(
         "self_sufficiency"
     ]
 
-    available_columns = [
-        column for column in columns
-        if column in comparison_df.columns
-    ]
-
-    comparison_df = comparison_df[available_columns]
+    comparison_df = comparison_df[columns]
 
     return comparison_df
 
@@ -51,8 +74,10 @@ def main() -> None:
     historical_path = "reports/best_scenarios.csv"
     forecast_path = "reports/forecast_optimization_best_scenarios.csv"
     output_path = "reports/historical_vs_forecast_optimization.csv"
+    plot_output_path = "images/historical_vs_forecast_payback.png"
 
     os.makedirs("reports", exist_ok=True)
+    os.makedirs("images", exist_ok=True)
 
     historical_df = load_best_scenarios(
         historical_path,
@@ -74,10 +99,13 @@ def main() -> None:
         index=False
     )
 
+    plot_historical_vs_forecast_payback(comparison_df, plot_output_path)
+
     print("\nHistorical vs forecast-based optimization comparison")
     print(f"Historical results: {historical_path}")
     print(f"Forecast-based results: {forecast_path}")
     print(f"Comparison saved to: {output_path}")
+    print(f"Comparison plot saved to: {plot_output_path}")
 
     print("\nComparison:")
     print(comparison_df.to_string(index=False))

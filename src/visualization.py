@@ -244,4 +244,33 @@ def plot_forecasting_model_comparison(
     plt.grid(axis="y")
 
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
+
+    
+def plot_historical_vs_forecast_payback(
+    comparison_df: pd.DataFrame,
+    output_path: str
+) -> None:
+    comparison_df = comparison_df.copy()
+
+    label_values = (
+        comparison_df["optimization_type"].astype(str)
+        + " - "
+        + comparison_df["scenario"].astype(str)
+    )
+
+    plt.figure(figsize=(10, 5))
+
+    plt.bar(
+        label_values,
+        comparison_df["payback_years"]
+    )
+
+    plt.title("Historical vs Forecast-Based Optimization Payback")
+    plt.xlabel("Scenario")
+    plt.ylabel("Payback (years)")
+    plt.xticks(rotation=30, ha="right")
+    plt.grid(axis="y")
+
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    plt.show()
     
