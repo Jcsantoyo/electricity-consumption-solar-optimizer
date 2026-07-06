@@ -48,6 +48,10 @@ Comparison table between the best historical optimization scenarios and the best
 
 ## Text reports
 
+### `configuration_summary.md`
+
+Summary of the configuration used by the project pipeline, including input data paths, PVGIS settings, grid search parameters, battery model assumptions, economic assumptions and the active tariff profile.
+
 ### `summary.txt`
 
 Readable summary of the best historical economic scenario and the best historical self-sufficiency scenario.
