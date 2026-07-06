@@ -155,6 +155,7 @@ Annual savings: 684.83 EUR/year
 Payback: 5.11 years
 Self-sufficiency: 31.58%
 Grid import: 25510.35 kWh
+Annual grid import: 6464.45 kWh/year
 Solar surplus: 7925.40 kWh
 ```
 
@@ -168,6 +169,7 @@ Annual savings: 819.44 EUR/year
 Payback: 7.32 years
 Self-sufficiency: 43.98%
 Grid import: 20885.34 kWh
+Annual grid import: 5292.28 kWh/year
 Solar surplus: 2786.51 kWh
 ```
 
@@ -256,9 +258,11 @@ Current forecast-based optimization results:
 ```text
 Solar peak power: 2.00 kW
 Battery capacity: 0.00 kWh
+Investment cost: 2600.00 EUR
 Annual savings: 551.64 EUR/year
 Payback: 4.71 years
 Self-sufficiency: 30.46%
+Annual grid import: 6151.91 kWh/year
 ```
 
 ### Best forecast-based self-sufficiency scenario
@@ -266,9 +270,11 @@ Self-sufficiency: 30.46%
 ```text
 Solar peak power: 3.00 kW
 Battery capacity: 5.00 kWh
+Investment cost: 6000.00 EUR
 Annual savings: 865.36 EUR/year
 Payback: 6.93 years
 Self-sufficiency: 49.96%
+Annual grid import: 4438.78 kWh/year
 ```
 
 The forecast-based optimization can produce a different best economic scenario than the historical optimization. In the current results, the historical optimization selects 3 kW solar for the best payback, while the forecast-based optimization selects 2 kW solar.
@@ -301,6 +307,8 @@ reports/historical_vs_forecast_optimization.csv
 images/historical_vs_forecast_payback.png
 images/historical_vs_forecast_savings.png
 images/historical_vs_forecast_self_sufficiency.png
+images/historical_vs_forecast_investment_cost.png
+images/historical_vs_forecast_grid_import.png
 ```
 
 This report allows direct comparison between:
@@ -313,6 +321,8 @@ The comparison includes:
 - Payback period
 - Annual savings
 - Self-sufficiency
+- Investment cost
+- Annual grid import
 
 Example insight:
 
@@ -360,7 +370,9 @@ electricity-consumption-solar-optimizer/
 │   ├── forecast_model_comparison.png
 │   ├── historical_vs_forecast_payback.png
 │   ├── historical_vs_forecast_savings.png
-│   └── historical_vs_forecast_self_sufficiency.png
+│   ├── historical_vs_forecast_self_sufficiency.png
+│   ├── historical_vs_forecast_investment_cost.png
+│   └── historical_vs_forecast_grid_import.png
 │
 ├── reports/
 │   ├── grid_search_results.csv
@@ -577,6 +589,8 @@ reports/historical_vs_forecast_optimization.csv
 images/historical_vs_forecast_payback.png
 images/historical_vs_forecast_savings.png
 images/historical_vs_forecast_self_sufficiency.png
+images/historical_vs_forecast_investment_cost.png
+images/historical_vs_forecast_grid_import.png
 ```
 
 This report compares the best scenarios from historical optimization and forecast-based optimization.
@@ -706,6 +720,7 @@ For each scenario, it computes:
 - Payback
 - Self-sufficiency
 - Grid import
+- Annual grid import
 - Solar surplus
 
 The optimization uses the active tariff profile from the configuration.
@@ -751,6 +766,8 @@ Generates plots for:
 - Historical vs forecast-based payback comparison
 - Historical vs forecast-based annual savings comparison
 - Historical vs forecast-based self-sufficiency comparison
+- Historical vs forecast-based investment cost comparison
+- Historical vs forecast-based annual grid import comparison
 
 ---
 
@@ -904,6 +921,22 @@ images/historical_vs_forecast_self_sufficiency.png
 
 Compares the self-sufficiency percentage of the best historical optimization scenarios against the best forecast-based optimization scenarios.
 
+### Historical vs forecast-based investment cost comparison
+
+```text
+images/historical_vs_forecast_investment_cost.png
+```
+
+Compares the investment cost of the best historical optimization scenarios against the best forecast-based optimization scenarios.
+
+### Historical vs forecast-based annual grid import comparison
+
+```text
+images/historical_vs_forecast_grid_import.png
+```
+
+Compares annualized grid import of the best historical optimization scenarios against the best forecast-based optimization scenarios.
+
 These comparison plots help visualize how the recommended solar and battery configuration can change when the optimization uses predicted future consumption instead of historical consumption.
 
 ---
@@ -1000,7 +1033,6 @@ The project can be adapted to a real household by replacing the public dataset w
 
 Possible next steps:
 
-- Add comparison plots for investment cost and grid import.
 - Add support for hourly electricity price CSV files.
 - Add optional PVPC/ESIOS hourly price downloader.
 - Include fixed taxes and additional regulated charges.
