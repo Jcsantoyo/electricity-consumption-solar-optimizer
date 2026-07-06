@@ -14,6 +14,7 @@ The project combines:
 - Grid search optimization
 - Machine Learning consumption forecasting
 - Forecast-based solar and battery optimization
+- Historical vs forecast-based optimization comparison
 - Model comparison
 - Feature importance analysis
 - Automated reports and plots
@@ -47,6 +48,7 @@ The forecasting pipeline:
 3. Compares forecasting models.
 4. Computes feature importance.
 5. Uses predicted consumption as input for a forecast-based optimization pipeline.
+6. Compares historical and forecast-based optimization results.
 
 ---
 
@@ -275,6 +277,48 @@ This shows that the optimal solar and battery configuration may depend on whethe
 
 ---
 
+## Historical vs forecast-based comparison
+
+The project can compare the best scenarios obtained from historical optimization and forecast-based optimization.
+
+Run:
+
+```bash
+python scripts/compare_optimization_results.py
+```
+
+This script reads:
+
+```text
+reports/best_scenarios.csv
+reports/forecast_optimization_best_scenarios.csv
+```
+
+and generates:
+
+```text
+reports/historical_vs_forecast_optimization.csv
+```
+
+This report allows direct comparison between:
+
+- Historical optimization results
+- Forecast-based optimization results
+
+Example insight:
+
+```text
+Historical best payback:
+3.00 kW solar, 0.00 kWh battery
+
+Forecast-based best payback:
+2.00 kW solar, 0.00 kWh battery
+```
+
+This shows that the optimal solar and battery configuration may change depending on whether the decision is based on historical consumption or predicted future consumption.
+
+---
+
 ## Repository structure
 
 ```text
@@ -316,6 +360,7 @@ electricity-consumption-solar-optimizer/
 │   ├── forecasted_consumption_for_optimization.csv
 │   ├── forecast_optimization_results.csv
 │   ├── forecast_optimization_best_scenarios.csv
+│   ├── historical_vs_forecast_optimization.csv
 │   ├── summary.txt
 │   └── outputs_index.md
 │
@@ -326,6 +371,7 @@ electricity-consumption-solar-optimizer/
 │   └── 04_consumption_forecasting.ipynb
 │
 ├── scripts/
+│   ├── compare_optimization_results.py
 │   ├── download_pvgis_data.py
 │   ├── generate_synthetic_consumption.py
 │   ├── prepare_uci_household_power.py
@@ -357,6 +403,7 @@ electricity-consumption-solar-optimizer/
 │   └── test_tariff.py
 │
 ├── requirements.txt
+├── .gitattributes
 ├── .gitignore
 └── README.md
 ```
@@ -500,6 +547,24 @@ reports/forecast_optimization_best_scenarios.csv
 ```
 
 This script connects the Machine Learning forecasting module with the solar and battery optimization pipeline.
+
+---
+
+## Running the historical vs forecast comparison
+
+Run:
+
+```bash
+python scripts/compare_optimization_results.py
+```
+
+This generates:
+
+```text
+reports/historical_vs_forecast_optimization.csv
+```
+
+This report compares the best scenarios from historical optimization and forecast-based optimization.
 
 ---
 
@@ -709,6 +774,10 @@ Contains all tested solar and battery scenarios for the forecast-based optimizat
 
 Contains the best economic and self-sufficiency scenarios from the forecast-based optimization.
 
+### `reports/historical_vs_forecast_optimization.csv`
+
+Compares the best historical optimization scenarios with the best forecast-based optimization scenarios.
+
 ### `reports/summary.txt`
 
 Text summary of the main historical optimization results.
@@ -847,6 +916,16 @@ Payback: 6.93 years
 Self-sufficiency: 49.96%
 ```
 
+Example insight from the historical vs forecast-based comparison:
+
+```text
+Historical best payback:
+3.00 kW solar, 0.00 kWh battery
+
+Forecast-based best payback:
+2.00 kW solar, 0.00 kWh battery
+```
+
 ---
 
 ## Why this project is useful
@@ -863,6 +942,7 @@ It combines:
 - Economic optimization
 - Machine Learning forecasting
 - Forecast-based decision making
+- Historical vs forecast-based scenario comparison
 - Model evaluation
 - Automated reporting
 - Software testing
@@ -876,6 +956,7 @@ The project can be adapted to a real household by replacing the public dataset w
 
 Possible next steps:
 
+- Add a plot for historical vs forecast-based optimization comparison.
 - Add support for hourly electricity price CSV files.
 - Add optional PVPC/ESIOS hourly price downloader.
 - Include fixed taxes and additional regulated charges.
