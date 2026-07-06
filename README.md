@@ -10,8 +10,7 @@ The project combines:
 - PVGIS solar generation data
 - Battery simulation
 - Configurable electricity tariff profiles
-- Economic analysis
-- Grid search optimization
+- Economic grid search optimization
 - Machine Learning consumption forecasting
 - Forecast-based solar and battery optimization
 - Historical vs forecast-based optimization comparison
@@ -29,7 +28,7 @@ The goal is to estimate which solar and battery configuration provides the best 
 
 This project simulates how a household could reduce grid electricity consumption by installing photovoltaic solar panels and, optionally, a battery.
 
-The main pipeline:
+The main historical optimization pipeline:
 
 1. Loads household electricity consumption data.
 2. Loads realistic solar generation data from PVGIS.
@@ -51,7 +50,7 @@ The forecasting pipeline:
 5. Uses predicted consumption as input for a forecast-based optimization pipeline.
 6. Compares historical and forecast-based optimization results.
 
-The full pipeline runner executes all main steps in order using a single command.
+The full pipeline runner executes all main stages in order using a single command.
 
 ---
 
@@ -109,6 +108,146 @@ This allows the project to combine real household consumption patterns with real
 
 ---
 
+## Configuration
+
+The main project parameters are defined in:
+
+```text
+src/config.py
+```
+
+This file controls the input data, output paths, simulation assumptions, grid search ranges, battery model parameters, economic assumptions and tariff profiles.
+
+### Input files
+
+```python
+CONSUMPTION_DATA_PATH = "data/processed/uci_household_power_hourly.csv"
+```
+
+This is the electricity consumption dataset used by the optimization pipeline.
+
+### Solar data source
+
+```python
+USE_PVGIS_SOLAR_DATA = True
+PVGIS_SOLAR_DATA_PATH = "data/raw/pvgis_hourly_linares_1kw_2020.csv"
+```
+
+If `USE_PVGIS_SOLAR_DATA` is `True`, the project uses real PVGIS solar generation data.
+
+If it is set to `False`, the project can use the internal synthetic solar generation model.
+
+### Grid search parameters
+
+```python
+SOLAR_PEAK_POWERS_KW = [0.5, 1.0, 1.5, 2.0, 3.0]
+BATTERY_CAPACITIES_KWH = [0, 0.5, 1.0, 2.0, 3.0, 5.0]
+```
+
+These lists define the solar and battery configurations tested by the optimizer.
+
+For example, the optimizer evaluates combinations such as:
+
+```text
+0.5 kW solar + 0 kWh battery
+1.0 kW solar + 2 kWh battery
+3.0 kW solar + 5 kWh battery
+```
+
+The optimization is currently a grid search: it tests every combination and selects the best scenarios according to payback and self-sufficiency.
+
+### Battery model parameters
+
+```python
+BATTERY_EFFICIENCY = 0.90
+MAX_CHARGE_POWER_KW = 1.0
+MAX_DISCHARGE_POWER_KW = 1.0
+INITIAL_BATTERY_STATE_KWH = 0.0
+```
+
+These values define the simplified battery behavior.
+
+They control:
+
+- Round-trip efficiency approximation
+- Maximum charge power
+- Maximum discharge power
+- Initial battery state of charge
+
+### Economic assumptions
+
+```python
+FIXED_INSTALLATION_COST_EUR = 800.0
+SOLAR_COST_EUR_PER_KW = 900.0
+BATTERY_COST_EUR_PER_KWH = 500.0
+```
+
+These values are used to estimate the investment cost of each tested scenario.
+
+The investment cost is calculated from:
+
+```text
+fixed installation cost
++ solar power × solar cost per kW
++ battery capacity × battery cost per kWh
+```
+
+### Tariff profile
+
+The active tariff profile is selected with:
+
+```python
+ACTIVE_TARIFF_PROFILE = "spanish_2_0td_example"
+```
+
+Available tariff profiles are defined in:
+
+```python
+TARIFF_PROFILES = {
+    ...
+}
+```
+
+The current example profile approximates a Spanish 2.0TD-style tariff with three energy periods:
+
+```text
+peak
+flat
+off_peak
+```
+
+The values are illustrative and can be replaced by prices from a specific electricity contract or by hourly PVPC prices in a future version.
+
+Example tariff profile:
+
+```python
+"spanish_2_0td_example": {
+    "peak_price_eur_per_kwh": 0.25,
+    "flat_price_eur_per_kwh": 0.18,
+    "off_peak_price_eur_per_kwh": 0.12,
+    "surplus_compensation_eur_per_kwh": 0.07,
+    "contracted_power_kw": 4.6,
+    "power_price_eur_per_kw_year": 35.0
+}
+```
+
+### Output paths
+
+The generated reports and plots are also configured in `src/config.py`.
+
+Examples:
+
+```python
+GRID_SEARCH_RESULTS_PATH = "reports/grid_search_results.csv"
+BEST_SCENARIOS_PATH = "reports/best_scenarios.csv"
+PAYBACK_PLOT_PATH = "images/main_payback_grid_search.png"
+SELF_SUFFICIENCY_PLOT_PATH = "images/main_self_sufficiency_grid_search.png"
+```
+
+This keeps the output structure centralized and easy to modify.
+
+---
+
 ## Electricity tariff model
 
 The project includes a simplified configurable electricity tariff model.
@@ -129,10 +268,10 @@ peak
 
 The tariff model includes:
 
-- Different energy prices for peak, flat and off-peak periods.
-- Weekend off-peak behavior.
-- Surplus compensation.
-- Contracted power fixed cost.
+- Different energy prices for peak, flat and off-peak periods
+- Weekend off-peak behavior
+- Surplus compensation
+- Contracted power fixed cost
 
 The prices are not intended to represent a specific electricity company contract. They are configurable assumptions defined in:
 
@@ -158,7 +297,7 @@ Annual savings: 684.83 EUR/year
 Payback: 5.11 years
 Self-sufficiency: 31.58%
 Grid import: 25510.35 kWh
-Annual grid import: 6464.45 kWh/year
+Annual grid import: 6457.20 kWh/year
 Solar surplus: 7925.40 kWh
 ```
 
@@ -172,7 +311,7 @@ Annual savings: 819.44 EUR/year
 Payback: 7.32 years
 Self-sufficiency: 43.98%
 Grid import: 20885.34 kWh
-Annual grid import: 5292.28 kWh/year
+Annual grid import: 5286.51 kWh/year
 Solar surplus: 2786.51 kWh
 ```
 
@@ -265,7 +404,7 @@ Investment cost: 2600.00 EUR
 Annual savings: 551.64 EUR/year
 Payback: 4.71 years
 Self-sufficiency: 30.46%
-Annual grid import: 6151.91 kWh/year
+Annual grid import: 6160.30 kWh/year
 ```
 
 ### Best forecast-based self-sufficiency scenario
@@ -277,7 +416,7 @@ Investment cost: 6000.00 EUR
 Annual savings: 865.36 EUR/year
 Payback: 6.93 years
 Self-sufficiency: 49.96%
-Annual grid import: 4438.78 kWh/year
+Annual grid import: 4432.61 kWh/year
 ```
 
 The forecast-based optimization can produce a different best economic scenario than the historical optimization. In the current results, the historical optimization selects 3 kW solar for the best payback, while the forecast-based optimization selects 2 kW solar.
