@@ -516,6 +516,8 @@ Full pipeline completed successfully.
 
 This is the recommended command to regenerate all reports and plots after modifying the project.
 
+The full pipeline also generates `reports/configuration_summary.md`, which records the configuration used to produce the results.
+
 ---
 
 ## Repository structure
@@ -555,6 +557,7 @@ electricity-consumption-solar-optimizer/
 │   └── historical_vs_forecast_grid_import.png
 │
 ├── reports/
+│   ├── configuration_summary.md
 │   ├── grid_search_results.csv
 │   ├── best_scenarios.csv
 │   ├── best_scenario_timeseries.csv
@@ -997,6 +1000,10 @@ and stops with an error if any stage fails.
 ---
 
 ## Generated reports
+
+### `reports/configuration_summary.md`
+
+Contains the configuration used by the project pipeline, including input data paths, PVGIS settings, grid search parameters, battery model assumptions, economic assumptions and the active tariff profile.
 
 ### `reports/grid_search_results.csv`
 
