@@ -128,6 +128,10 @@ def run_economic_grid_search(
                 "grid_import_kwh"
             ].sum()
 
+            annual_grid_import_kwh = (
+                total_grid_import_kwh * 365 / simulation_days
+            )
+
             total_solar_surplus_kwh = simulation_df[
                 "solar_surplus_kwh"
             ].sum()
@@ -146,7 +150,8 @@ def run_economic_grid_search(
                 "payback_years": payback_years,
                 "self_sufficiency": self_sufficiency,
                 "grid_import_kwh": total_grid_import_kwh,
-                "solar_surplus_kwh": total_solar_surplus_kwh
+                "solar_surplus_kwh": total_solar_surplus_kwh,
+                "annual_grid_import_kwh": annual_grid_import_kwh
             })
 
     results_df = pd.DataFrame(results)
@@ -274,6 +279,7 @@ def build_best_scenarios_dataframe(
             "payback_years": best_payback_scenario["payback_years"],
             "self_sufficiency": best_payback_scenario["self_sufficiency"],
             "grid_import_kwh": best_payback_scenario["grid_import_kwh"],
+            "annual_grid_import_kwh": best_payback_scenario["annual_grid_import_kwh"],
             "solar_surplus_kwh": best_payback_scenario["solar_surplus_kwh"]
         },
         {
@@ -285,6 +291,7 @@ def build_best_scenarios_dataframe(
             "payback_years": best_self_sufficiency_scenario["payback_years"],
             "self_sufficiency": best_self_sufficiency_scenario["self_sufficiency"],
             "grid_import_kwh": best_self_sufficiency_scenario["grid_import_kwh"],
+            "annual_grid_import_kwh": best_self_sufficiency_scenario["annual_grid_import_kwh"],
             "solar_surplus_kwh": best_self_sufficiency_scenario["solar_surplus_kwh"]
         }
     ]

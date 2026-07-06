@@ -12,7 +12,9 @@ sys.path.append(str(SRC_PATH))
 from visualization import (
     plot_historical_vs_forecast_payback,
     plot_historical_vs_forecast_savings,
-    plot_historical_vs_forecast_self_sufficiency
+    plot_historical_vs_forecast_self_sufficiency,
+    plot_historical_vs_forecast_investment_cost,
+    plot_historical_vs_forecast_grid_import
 )
 
 def load_best_scenarios(
@@ -66,7 +68,8 @@ def build_optimization_comparison(
         "investment_cost_eur",
         "annual_savings_eur",
         "payback_years",
-        "self_sufficiency"
+        "self_sufficiency",
+        "annual_grid_import_kwh"
     ]
 
     comparison_df = comparison_df[columns]
@@ -83,6 +86,9 @@ def main() -> None:
     payback_plot_path = "images/historical_vs_forecast_payback.png"
     savings_plot_path = "images/historical_vs_forecast_savings.png"
     self_sufficiency_plot_path = "images/historical_vs_forecast_self_sufficiency.png"
+    investment_cost_plot_path = "images/historical_vs_forecast_investment_cost.png"
+    grid_import_plot_path = "images/historical_vs_forecast_grid_import.png"
+
 
     os.makedirs("reports", exist_ok=True)
     os.makedirs("images", exist_ok=True)
@@ -115,6 +121,10 @@ def main() -> None:
 
     plot_historical_vs_forecast_self_sufficiency(comparison_df, self_sufficiency_plot_path)
 
+    plot_historical_vs_forecast_investment_cost(comparison_df, investment_cost_plot_path)
+
+    plot_historical_vs_forecast_grid_import(comparison_df, grid_import_plot_path)
+        
     print("\nHistorical vs forecast-based optimization comparison")
     print(f"Historical results: {historical_path}")
     print(f"Forecast-based results: {forecast_path}")

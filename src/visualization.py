@@ -272,7 +272,7 @@ def plot_historical_vs_forecast_payback(
     plt.grid(axis="y")
 
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
-    plt.show()
+    
     
 
 def plot_historical_vs_forecast_savings(
@@ -335,3 +335,61 @@ def plot_historical_vs_forecast_self_sufficiency(
 
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
   
+
+def plot_historical_vs_forecast_investment_cost(
+    comparison_df: pd.DataFrame,
+    output_path: str
+) -> None:
+    
+    comparison_df = comparison_df.copy()
+
+    label_values = (
+        comparison_df["optimization_type"].astype(str)
+        + " - "
+        + comparison_df["scenario"].astype(str)
+    )
+
+    plt.figure(figsize=(10,5))
+
+    plt.bar(
+        label_values,
+        comparison_df["investment_cost_eur"]
+    )
+
+    plt.title("Historical vs Forecast-Based Investment Cost")
+    plt.xlabel("Scenario")
+    plt.ylabel("Investment cost (EUR)")
+    plt.xticks(rotation=30, ha="right")
+    plt.grid(axis="y")
+
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    
+
+
+def plot_historical_vs_forecast_grid_import(
+    comparison_df: pd.DataFrame,
+    output_path: str
+) -> None:
+    comparison_df = comparison_df.copy()
+
+    label_values = (
+        comparison_df["optimization_type"].astype(str)
+        + " - "
+        + comparison_df["scenario"].astype(str)
+    )
+
+    plt.figure(figsize=(10, 5))
+
+    plt.bar(
+        label_values,
+        comparison_df["annual_grid_import_kwh"]
+    )
+
+    plt.title("Historical vs Forecast-Based Annual Grid Import")
+    plt.xlabel("Scenario")
+    plt.ylabel("Annual Grid import (kWh/year)")
+    plt.xticks(rotation=30, ha="right")
+    plt.grid(axis="y")
+
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+ 
