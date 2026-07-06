@@ -15,6 +15,7 @@ The project combines:
 - Machine Learning consumption forecasting
 - Forecast-based solar and battery optimization
 - Historical vs forecast-based optimization comparison
+- Full pipeline execution from a single command
 - Model comparison
 - Feature importance analysis
 - Automated reports and plots
@@ -49,6 +50,8 @@ The forecasting pipeline:
 4. Computes feature importance.
 5. Uses predicted consumption as input for a forecast-based optimization pipeline.
 6. Compares historical and forecast-based optimization results.
+
+The full pipeline runner executes all main steps in order using a single command.
 
 ---
 
@@ -338,6 +341,44 @@ This shows that the optimal solar and battery configuration may change depending
 
 ---
 
+## Full pipeline runner
+
+The full project pipeline can be executed with a single command:
+
+```bash
+python scripts/run_full_pipeline.py
+```
+
+This command runs the main project stages in order:
+
+```text
+1. Historical solar and battery optimization
+2. Machine Learning consumption forecasting
+3. Forecast-based solar and battery optimization
+4. Historical vs forecast-based comparison
+```
+
+Internally, it runs:
+
+```text
+python src/main.py
+python scripts/run_forecasting.py
+python scripts/run_forecast_optimization.py
+python scripts/compare_optimization_results.py
+```
+
+The script uses the Python executable from the active environment, so it works correctly inside the project virtual environment.
+
+Expected final message:
+
+```text
+Full pipeline completed successfully.
+```
+
+This is the recommended command to regenerate all reports and plots after modifying the project.
+
+---
+
 ## Repository structure
 
 ```text
@@ -395,12 +436,14 @@ electricity-consumption-solar-optimizer/
 │   └── 04_consumption_forecasting.ipynb
 │
 ├── scripts/
+│   ├── __init__.py
 │   ├── compare_optimization_results.py
 │   ├── download_pvgis_data.py
 │   ├── generate_synthetic_consumption.py
 │   ├── prepare_uci_household_power.py
 │   ├── run_forecasting.py
 │   ├── run_forecast_optimization.py
+│   ├── run_full_pipeline.py
 │   ├── test_pvgis_generation_match.py
 │   └── test_pvgis_loader.py
 │
@@ -421,6 +464,7 @@ electricity-consumption-solar-optimizer/
 │
 ├── tests/
 │   ├── test_battery.py
+│   ├── test_compare_optimization_results.py
 │   ├── test_economics.py
 │   ├── test_forecasting.py
 │   ├── test_solar_data_loader.py
@@ -499,6 +543,29 @@ datetime,consumption_kwh
 2006-12-16 17:00:00,2.533733
 2006-12-16 18:00:00,3.632200
 ```
+
+---
+
+## Running the full pipeline
+
+Run:
+
+```bash
+python scripts/run_full_pipeline.py
+```
+
+This is the recommended way to regenerate all main project outputs.
+
+It runs:
+
+```text
+src/main.py
+scripts/run_forecasting.py
+scripts/run_forecast_optimization.py
+scripts/compare_optimization_results.py
+```
+
+and regenerates the main reports and plots.
 
 ---
 
@@ -612,6 +679,8 @@ The project includes tests for:
 - PVGIS solar data loading
 - Forecasting utilities
 - Tariff calculations
+- Optimization comparison logic
+- Comparison plot labels
 
 GitHub Actions automatically runs the test suite on pushes and pull requests.
 
@@ -768,6 +837,23 @@ Generates plots for:
 - Historical vs forecast-based self-sufficiency comparison
 - Historical vs forecast-based investment cost comparison
 - Historical vs forecast-based annual grid import comparison
+
+---
+
+### `scripts/run_full_pipeline.py`
+
+Runs the full project pipeline from one command.
+
+It executes:
+
+```text
+src/main.py
+scripts/run_forecasting.py
+scripts/run_forecast_optimization.py
+scripts/compare_optimization_results.py
+```
+
+and stops with an error if any stage fails.
 
 ---
 
@@ -1003,6 +1089,27 @@ Forecast-based best payback:
 2.00 kW solar, 0.00 kWh battery
 ```
 
+Example output from the full pipeline runner:
+
+```text
+Electricity Consumption Solar Optimizer
+Running full project pipeline...
+
+Running command:
+python src/main.py
+
+Running command:
+python scripts/run_forecasting.py
+
+Running command:
+python scripts/run_forecast_optimization.py
+
+Running command:
+python scripts/compare_optimization_results.py
+
+Full pipeline completed successfully.
+```
+
 ---
 
 ## Why this project is useful
@@ -1020,6 +1127,7 @@ It combines:
 - Machine Learning forecasting
 - Forecast-based decision making
 - Historical vs forecast-based scenario comparison
+- Full pipeline reproducibility
 - Model evaluation
 - Automated reporting
 - Software testing
