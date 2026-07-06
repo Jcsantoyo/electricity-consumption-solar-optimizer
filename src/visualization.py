@@ -246,16 +246,49 @@ def plot_forecasting_model_comparison(
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
 
 
+def build_comparison_plot_labels(
+    comparison_df: pd.DataFrame
+) -> pd.Series:
+    labels = []
+
+    for _, row in comparison_df.iterrows():
+        optimization_type = row["optimization_type"]
+        scenario = row["scenario"]
+
+        if optimization_type == "historical":
+            optimization_label = "Hist."
+        elif optimization_type == "forecast_based":
+            optimization_label = "Forecast"
+        else:
+            optimization_label = str(optimization_type)
+
+        if scenario == "best_payback":
+            scenario_label = "Payback"
+        elif scenario == "best_self_sufficiency":
+            scenario_label = "Self-suff."
+        else:
+            scenario_label = str(scenario)
+
+        labels.append(
+            f"{optimization_label} {scenario_label}"
+        )
+
+    return pd.Series(
+        labels,
+        index=comparison_df.index
+    )
+
+
+
+
 def plot_historical_vs_forecast_payback(
     comparison_df: pd.DataFrame,
     output_path: str
 ) -> None:
     comparison_df = comparison_df.copy()
 
-    label_values = (
-        comparison_df["optimization_type"].astype(str)
-        + " - "
-        + comparison_df["scenario"].astype(str)
+    label_values = build_comparison_plot_labels(
+        comparison_df
     )
 
     plt.figure(figsize=(10, 5))
@@ -268,11 +301,10 @@ def plot_historical_vs_forecast_payback(
     plt.title("Historical vs Forecast-Based Optimization Payback")
     plt.xlabel("Scenario")
     plt.ylabel("Payback (years)")
-    plt.xticks(rotation=30, ha="right")
+    plt.xticks(rotation=20, ha="right")
     plt.grid(axis="y")
 
-    plt.savefig(output_path, dpi=300, bbox_inches="tight")
-    
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")    
     
 
 def plot_historical_vs_forecast_savings(
@@ -281,10 +313,8 @@ def plot_historical_vs_forecast_savings(
 ) -> None:
     comparison_df = comparison_df.copy()
 
-    label_values = (
-        comparison_df["optimization_type"].astype(str)
-        + " - "
-        + comparison_df["scenario"].astype(str)
+    label_values = build_comparison_plot_labels(
+        comparison_df
     )
 
     plt.figure(figsize=(10, 5))
@@ -297,7 +327,7 @@ def plot_historical_vs_forecast_savings(
     plt.title("Historical vs Forecast-Based Annual Savings")
     plt.xlabel("Scenario")
     plt.ylabel("Annual savings (EUR/year)")
-    plt.xticks(rotation=30, ha="right")
+    plt.xticks(rotation=20, ha="right")
     plt.grid(axis="y")
 
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
@@ -310,10 +340,8 @@ def plot_historical_vs_forecast_self_sufficiency(
 ) -> None:
     comparison_df = comparison_df.copy()
 
-    label_values = (
-        comparison_df["optimization_type"].astype(str)
-        + " - "
-        + comparison_df["scenario"].astype(str)
+    label_values = build_comparison_plot_labels(
+        comparison_df
     )
 
     self_sufficiency_percent = (
@@ -330,7 +358,7 @@ def plot_historical_vs_forecast_self_sufficiency(
     plt.title("Historical vs Forecast-Based Self-Sufficiency")
     plt.xlabel("Scenario")
     plt.ylabel("Self-sufficiency (%)")
-    plt.xticks(rotation=30, ha="right")
+    plt.xticks(rotation=20, ha="right")
     plt.grid(axis="y")
 
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
@@ -340,16 +368,13 @@ def plot_historical_vs_forecast_investment_cost(
     comparison_df: pd.DataFrame,
     output_path: str
 ) -> None:
-    
     comparison_df = comparison_df.copy()
 
-    label_values = (
-        comparison_df["optimization_type"].astype(str)
-        + " - "
-        + comparison_df["scenario"].astype(str)
+    label_values = build_comparison_plot_labels(
+        comparison_df
     )
 
-    plt.figure(figsize=(10,5))
+    plt.figure(figsize=(10, 5))
 
     plt.bar(
         label_values,
@@ -359,12 +384,11 @@ def plot_historical_vs_forecast_investment_cost(
     plt.title("Historical vs Forecast-Based Investment Cost")
     plt.xlabel("Scenario")
     plt.ylabel("Investment cost (EUR)")
-    plt.xticks(rotation=30, ha="right")
+    plt.xticks(rotation=20, ha="right")
     plt.grid(axis="y")
 
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
     
-
 
 def plot_historical_vs_forecast_grid_import(
     comparison_df: pd.DataFrame,
@@ -372,10 +396,8 @@ def plot_historical_vs_forecast_grid_import(
 ) -> None:
     comparison_df = comparison_df.copy()
 
-    label_values = (
-        comparison_df["optimization_type"].astype(str)
-        + " - "
-        + comparison_df["scenario"].astype(str)
+    label_values = build_comparison_plot_labels(
+        comparison_df
     )
 
     plt.figure(figsize=(10, 5))
@@ -387,9 +409,8 @@ def plot_historical_vs_forecast_grid_import(
 
     plt.title("Historical vs Forecast-Based Annual Grid Import")
     plt.xlabel("Scenario")
-    plt.ylabel("Annual Grid import (kWh/year)")
-    plt.xticks(rotation=30, ha="right")
+    plt.ylabel("Annual grid import (kWh/year)")
+    plt.xticks(rotation=20, ha="right")
     plt.grid(axis="y")
 
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
- 
