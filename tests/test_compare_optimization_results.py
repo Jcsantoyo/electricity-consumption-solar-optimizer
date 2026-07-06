@@ -14,6 +14,8 @@ from scripts.compare_optimization_results import (
     build_optimization_comparison
 )
 
+from visualization import build_comparison_plot_labels
+
 
 def test_load_best_scenarios_adds_optimization_type_and_renames_criterion(
     tmp_path
@@ -194,4 +196,33 @@ def test_build_optimization_comparison_combines_historical_and_forecast_data():
     ].tolist() == [
         2.0,
         3.0
+    ]
+
+def test_build_comparison_plot_labels_creates_readable_labels():
+    comparison_df = pd.DataFrame(
+        {
+            "optimization_type": [
+                "historical",
+                "historical",
+                "forecast_based",
+                "forecast_based"
+            ],
+            "scenario": [
+                "best_payback",
+                "best_self_sufficiency",
+                "best_payback",
+                "best_self_sufficiency"
+            ]
+        }
+    )
+
+    labels = build_comparison_plot_labels(
+        comparison_df
+    )
+
+    assert labels.tolist() == [
+        "Hist. Payback",
+        "Hist. Self-suff.",
+        "Forecast Payback",
+        "Forecast Self-suff."
     ]
