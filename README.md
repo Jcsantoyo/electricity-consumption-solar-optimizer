@@ -298,6 +298,7 @@ and generates:
 
 ```text
 reports/historical_vs_forecast_optimization.csv
+images/historical_vs_forecast_payback.png
 ```
 
 This report allows direct comparison between:
@@ -348,7 +349,8 @@ electricity-consumption-solar-optimizer/
 │   ├── best_scenario_cumulative_energy.png
 │   ├── consumption_forecast_actual_vs_predicted.png
 │   ├── forecast_feature_importance.png
-│   └── forecast_model_comparison.png
+│   ├── forecast_model_comparison.png
+│   └── historical_vs_forecast_payback.png
 │
 ├── reports/
 │   ├── grid_search_results.csv
@@ -562,6 +564,7 @@ This generates:
 
 ```text
 reports/historical_vs_forecast_optimization.csv
+images/historical_vs_forecast_payback.png
 ```
 
 This report compares the best scenarios from historical optimization and forecast-based optimization.
@@ -733,6 +736,7 @@ Generates plots for:
 - Forecast actual vs predicted
 - Forecast feature importance
 - Forecasting model comparison
+- Historical vs forecast-based payback comparison
 
 ---
 
@@ -862,6 +866,16 @@ images/forecast_model_comparison.png
 
 Compares forecasting models using MAE.
 
+### Historical vs forecast-based payback comparison
+
+```text
+images/historical_vs_forecast_payback.png
+```
+
+Compares the payback period of the best historical optimization scenarios against the best forecast-based optimization scenarios.
+
+This plot helps visualize how the recommended solar and battery configuration can change when the optimization uses predicted future consumption instead of historical consumption.
+
 ---
 
 ## Example output
@@ -956,7 +970,7 @@ The project can be adapted to a real household by replacing the public dataset w
 
 Possible next steps:
 
-- Add a plot for historical vs forecast-based optimization comparison.
+- Add more comparison plots for savings, self-sufficiency and investment cost.
 - Add support for hourly electricity price CSV files.
 - Add optional PVPC/ESIOS hourly price downloader.
 - Include fixed taxes and additional regulated charges.
