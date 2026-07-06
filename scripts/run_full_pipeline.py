@@ -37,6 +37,10 @@ def main() -> None:
         [
             python_executable,
             "scripts/compare_optimization_results.py"
+        ],
+        [
+            python_executable,
+            "scripts/compare_optimization_results.py"
         ]
     ]
 
