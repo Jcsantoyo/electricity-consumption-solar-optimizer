@@ -700,6 +700,8 @@ The project includes a `Makefile` with common commands:
 ```bash
 make install
 make test
+make lint
+make format
 make pipeline
 make optimize
 make forecast
@@ -865,7 +867,41 @@ GitHub Actions automatically runs the test suite on pushes and pull requests.
 
 Pytest configuration is defined in `pyproject.toml`, including the test folder and Python import paths.
 
+Code quality checks are handled by Ruff and can be executed with `make lint`.
+
 ---
+
+## Code quality
+
+The project uses Ruff for basic Python code quality checks.
+
+Run:
+
+```bash
+make lint
+```
+
+This executes:
+
+```bash
+ruff check .
+```
+
+The current Ruff configuration is defined in `pyproject.toml`.
+
+At this stage, Ruff is configured with basic `F` checks, which detect common Python issues such as unused imports, undefined names and unused variables.
+
+The Makefile also includes:
+
+```bash
+make format
+```
+
+which runs:
+
+```bash
+ruff format .
+```
 
 ## Testing configuration
 
