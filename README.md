@@ -518,6 +518,8 @@ This is the recommended command to regenerate all reports and plots after modify
 
 The full pipeline also generates `reports/configuration_summary.md`, which records the configuration used to produce the results.
 
+The full pipeline also generates `reports/final_results_summary.md`, a readable final report with the main historical and forecast-based optimization results.
+
 ---
 
 ## Repository structure
@@ -562,6 +564,7 @@ electricity-consumption-solar-optimizer/
 │   ├── best_scenarios.csv
 │   ├── best_scenario_timeseries.csv
 │   ├── forecast_results.csv
+│   ├── final_results_summary.md
 │   ├── forecast_feature_importance.csv
 │   ├── forecast_model_comparison.csv
 │   ├── forecasted_consumption_for_optimization.csv
@@ -707,7 +710,7 @@ scripts/run_forecast_optimization.py
 scripts/compare_optimization_results.py
 ```
 
-and regenerates the main reports and plots.
+and regenerates the main reports, plots, configuration summary and final results summary.
 
 ---
 
@@ -1016,6 +1019,10 @@ Contains the best historical economic scenario and the best historical self-suff
 ### `reports/best_scenario_timeseries.csv`
 
 Contains the hourly simulation results for the selected best historical scenario.
+
+### `reports/final_results_summary.md`
+
+Readable final summary of the main results produced by the full pipeline. It compares the best historical and forecast-based optimization scenarios and highlights the main conclusion.
 
 ### `reports/forecast_results.csv`
 
