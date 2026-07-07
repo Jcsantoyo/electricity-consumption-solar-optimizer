@@ -1,11 +1,3 @@
-import sys
-from pathlib import Path
-
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-SRC_PATH = PROJECT_ROOT / "src"
-
-sys.path.append(str(SRC_PATH))
-
 from battery import simulate_battery
 
 

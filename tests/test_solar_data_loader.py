@@ -1,13 +1,6 @@
-import sys
-from pathlib import Path
-
 import pandas as pd
 import pytest
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-SRC_PATH = PROJECT_ROOT / "src"
-
-sys.path.append(str(SRC_PATH))
 
 from solar_data_loader import (
     load_pvgis_solar_data,

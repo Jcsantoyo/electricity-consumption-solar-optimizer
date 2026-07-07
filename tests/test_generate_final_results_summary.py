@@ -1,12 +1,6 @@
-import sys
-from pathlib import Path
-
 import pandas as pd
 import pytest
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-
-sys.path.append(str(PROJECT_ROOT))
 
 from scripts.generate_final_results_summary import (
     build_final_results_summary,

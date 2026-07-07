@@ -1,12 +1,3 @@
-import sys
-from pathlib import Path
-
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-SRC_PATH = PROJECT_ROOT / "src"
-
-sys.path.append(str(PROJECT_ROOT))
-sys.path.append(str(SRC_PATH))
-
 from scripts.generate_config_summary import build_configuration_summary
 import config
 

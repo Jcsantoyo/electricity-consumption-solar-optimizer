@@ -1,13 +1,5 @@
-import sys
-from pathlib import Path
-
 import pandas as pd
 
-
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-SCRIPTS_PATH = PROJECT_ROOT / "scripts"
-
-sys.path.append(str(SCRIPTS_PATH))
 
 from scripts.compare_optimization_results import (
     load_best_scenarios,

@@ -1,11 +1,3 @@
-import sys
-from pathlib import Path
-
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-SRC_PATH = PROJECT_ROOT / "src"
-
-sys.path.append(str(SRC_PATH))
-
 from economics import (
     calculate_grid_cost,
     calculate_net_cost,

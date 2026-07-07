@@ -1,13 +1,6 @@
-import sys
-from pathlib import Path
-
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-SRC_PATH = PROJECT_ROOT / "src"
-
-sys.path.append(str(SRC_PATH))
 
 from forecasting import (
     add_time_features,
