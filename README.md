@@ -615,6 +615,7 @@ electricity-consumption-solar-optimizer/
 │   ├── test_solar_data_loader.py
 │   └── test_tariff.py
 │
+├── Makefile
 ├── requirements.txt
 ├── .gitattributes
 ├── .gitignore
@@ -691,6 +692,31 @@ datetime,consumption_kwh
 
 ---
 
+## Makefile commands
+
+The project includes a `Makefile` with common commands:
+
+```bash
+make install
+make test
+make pipeline
+make optimize
+make forecast
+make forecast-optimize
+make compare
+make config-summary
+make final-summary
+make clean-reports
+```
+
+The recommended command to regenerate the full project is:
+
+```bash
+make pipeline
+```
+
+This runs the complete project pipeline and regenerates the main reports, plots, configuration summary and final results summary.
+
 ## Running the full pipeline
 
 Run:
@@ -698,6 +724,13 @@ Run:
 ```bash
 python scripts/run_full_pipeline.py
 ```
+
+Alternatively, using the Makefile:
+
+```bash
+make pipeline
+```
+
 
 This is the recommended way to regenerate all main project outputs.
 
@@ -1281,6 +1314,7 @@ It combines:
 - Forecast-based decision making
 - Historical vs forecast-based scenario comparison
 - Full pipeline reproducibility
+- Makefile commands for common tasks
 - Model evaluation
 - Automated reporting
 - Software testing
