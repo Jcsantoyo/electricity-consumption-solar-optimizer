@@ -616,6 +616,7 @@ electricity-consumption-solar-optimizer/
 │   └── test_tariff.py
 │
 ├── Makefile
+├── pyproject.toml
 ├── requirements.txt
 ├── .gitattributes
 ├── .gitignore
@@ -862,7 +863,29 @@ The project includes tests for:
 
 GitHub Actions automatically runs the test suite on pushes and pull requests.
 
+Pytest configuration is defined in `pyproject.toml`, including the test folder and Python import paths.
+
 ---
+
+## Testing configuration
+
+The project uses `pyproject.toml` to configure pytest:
+
+```toml
+[tool.pytest.ini_options]
+testpaths = [
+    "tests"
+]
+
+pythonpath = [
+    ".",
+    "src"
+]
+
+addopts = "-ra"
+```
+
+This allows tests to import modules from both the project root and the `src/` folder without manually modifying `sys.path` inside each test file.
 
 ## Main modules
 
