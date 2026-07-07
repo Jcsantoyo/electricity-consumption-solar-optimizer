@@ -9,12 +9,11 @@ def compare_battery_scenario(
     battery_efficiency: float = 0.90,
     max_charge_power_kw: float | None = None,
     max_discharge_power_kw: float | None = None,
-    initial_battery_state_kwh: float = 0.0
+    initial_battery_state_kwh: float = 0.0,
 ) -> dict[str, float]:
 
-    self_consumed_no_battery, grid_import_no_battery, solar_surplus_no_battery = simulate_self_consumption(
-        consumption_kwh,
-        solar_generation_kwh
+    self_consumed_no_battery, grid_import_no_battery, solar_surplus_no_battery = (
+        simulate_self_consumption(consumption_kwh, solar_generation_kwh)
     )
 
     battery_results = simulate_battery(
@@ -24,7 +23,7 @@ def compare_battery_scenario(
         battery_efficiency=battery_efficiency,
         max_charge_power_kw=max_charge_power_kw,
         max_discharge_power_kw=max_discharge_power_kw,
-        initial_battery_state_kwh=initial_battery_state_kwh
+        initial_battery_state_kwh=initial_battery_state_kwh,
     )
 
     total_consumption = sum(consumption_kwh)
@@ -68,5 +67,5 @@ def compare_battery_scenario(
         "self_sufficiency_with_battery": self_sufficiency_with_battery,
         "self_sufficiency_improvement": (
             self_sufficiency_with_battery - self_sufficiency_no_battery
-        )
+        ),
     }

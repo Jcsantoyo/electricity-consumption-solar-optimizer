@@ -9,57 +9,59 @@ from scripts.generate_final_results_summary import (
     format_years,
     format_eur,
     format_eur_per_year,
-    format_kwh_per_year
+    format_kwh_per_year,
 )
 
 
 def build_sample_comparison_df() -> pd.DataFrame:
-    return pd.DataFrame([
-        {
-            "optimization_type": "historical",
-            "scenario": "best_payback",
-            "solar_peak_power_kw": 3.0,
-            "battery_capacity_kwh": 0.0,
-            "investment_cost_eur": 3500.0,
-            "annual_savings_eur": 684.83,
-            "payback_years": 5.11,
-            "self_sufficiency": 0.3158,
-            "annual_grid_import_kwh": 6457.20
-        },
-        {
-            "optimization_type": "historical",
-            "scenario": "best_self_sufficiency",
-            "solar_peak_power_kw": 3.0,
-            "battery_capacity_kwh": 5.0,
-            "investment_cost_eur": 6000.0,
-            "annual_savings_eur": 819.44,
-            "payback_years": 7.32,
-            "self_sufficiency": 0.4398,
-            "annual_grid_import_kwh": 5286.51
-        },
-        {
-            "optimization_type": "forecast_based",
-            "scenario": "best_payback",
-            "solar_peak_power_kw": 2.0,
-            "battery_capacity_kwh": 0.0,
-            "investment_cost_eur": 2600.0,
-            "annual_savings_eur": 551.64,
-            "payback_years": 4.71,
-            "self_sufficiency": 0.3046,
-            "annual_grid_import_kwh": 6160.30
-        },
-        {
-            "optimization_type": "forecast_based",
-            "scenario": "best_self_sufficiency",
-            "solar_peak_power_kw": 3.0,
-            "battery_capacity_kwh": 5.0,
-            "investment_cost_eur": 6000.0,
-            "annual_savings_eur": 865.36,
-            "payback_years": 6.93,
-            "self_sufficiency": 0.4996,
-            "annual_grid_import_kwh": 4432.61
-        }
-    ])
+    return pd.DataFrame(
+        [
+            {
+                "optimization_type": "historical",
+                "scenario": "best_payback",
+                "solar_peak_power_kw": 3.0,
+                "battery_capacity_kwh": 0.0,
+                "investment_cost_eur": 3500.0,
+                "annual_savings_eur": 684.83,
+                "payback_years": 5.11,
+                "self_sufficiency": 0.3158,
+                "annual_grid_import_kwh": 6457.20,
+            },
+            {
+                "optimization_type": "historical",
+                "scenario": "best_self_sufficiency",
+                "solar_peak_power_kw": 3.0,
+                "battery_capacity_kwh": 5.0,
+                "investment_cost_eur": 6000.0,
+                "annual_savings_eur": 819.44,
+                "payback_years": 7.32,
+                "self_sufficiency": 0.4398,
+                "annual_grid_import_kwh": 5286.51,
+            },
+            {
+                "optimization_type": "forecast_based",
+                "scenario": "best_payback",
+                "solar_peak_power_kw": 2.0,
+                "battery_capacity_kwh": 0.0,
+                "investment_cost_eur": 2600.0,
+                "annual_savings_eur": 551.64,
+                "payback_years": 4.71,
+                "self_sufficiency": 0.3046,
+                "annual_grid_import_kwh": 6160.30,
+            },
+            {
+                "optimization_type": "forecast_based",
+                "scenario": "best_self_sufficiency",
+                "solar_peak_power_kw": 3.0,
+                "battery_capacity_kwh": 5.0,
+                "investment_cost_eur": 6000.0,
+                "annual_savings_eur": 865.36,
+                "payback_years": 6.93,
+                "self_sufficiency": 0.4996,
+                "annual_grid_import_kwh": 4432.61,
+            },
+        ]
+    )
 
 
 def test_format_helpers():
@@ -73,11 +75,7 @@ def test_format_helpers():
 def test_get_scenario_returns_expected_row():
     comparison_df = build_sample_comparison_df()
 
-    scenario = get_scenario(
-        comparison_df,
-        "forecast_based",
-        "best_payback"
-    )
+    scenario = get_scenario(comparison_df, "forecast_based", "best_payback")
 
     assert scenario["optimization_type"] == "forecast_based"
     assert scenario["scenario"] == "best_payback"
@@ -89,11 +87,7 @@ def test_get_scenario_raises_error_when_missing():
     comparison_df = build_sample_comparison_df()
 
     with pytest.raises(ValueError):
-        get_scenario(
-            comparison_df,
-            "historical",
-            "missing_scenario"
-        )
+        get_scenario(comparison_df, "historical", "missing_scenario")
 
 
 def test_build_final_results_summary_contains_main_sections():

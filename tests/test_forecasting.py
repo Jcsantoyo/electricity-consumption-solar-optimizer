@@ -9,17 +9,14 @@ from forecasting import (
     split_train_test_by_time,
     evaluate_forecast,
     get_feature_importance,
-    build_forecasted_consumption_dataframe
+    build_forecasted_consumption_dataframe,
 )
 
 
 def test_add_time_features_creates_expected_columns() -> None:
-    df = pd.DataFrame({
-        "datetime": [
-            pd.Timestamp("2025-01-04 21:00:00")
-        ],
-        "consumption_kwh": [0.50]
-    })
+    df = pd.DataFrame(
+        {"datetime": [pd.Timestamp("2025-01-04 21:00:00")], "consumption_kwh": [0.50]}
+    )
 
     result = add_time_features(df)
 
@@ -31,30 +28,18 @@ def test_add_time_features_creates_expected_columns() -> None:
 
 
 def test_add_lag_features_creates_lag_columns() -> None:
-    df = pd.DataFrame({
-        "consumption_kwh": [0.10, 0.20, 0.30, 0.40]
-    })
+    df = pd.DataFrame({"consumption_kwh": [0.10, 0.20, 0.30, 0.40]})
 
-    result = add_lag_features(
-        df,
-        target_column="consumption_kwh",
-        lags=[1]
-    )
+    result = add_lag_features(df, target_column="consumption_kwh", lags=[1])
 
     assert list(result["consumption_kwh_lag_1"]) == [0.10, 0.20, 0.30]
     assert list(result["consumption_kwh"]) == [0.20, 0.30, 0.40]
 
 
 def test_add_lag_features_drops_missing_values() -> None:
-    df = pd.DataFrame({
-        "consumption_kwh": [0.10, 0.20, 0.30]
-    })
+    df = pd.DataFrame({"consumption_kwh": [0.10, 0.20, 0.30]})
 
-    result = add_lag_features(
-        df,
-        target_column="consumption_kwh",
-        lags=[2]
-    )
+    result = add_lag_features(df, target_column="consumption_kwh", lags=[2])
 
     assert len(result) == 1
     assert result.loc[0, "consumption_kwh"] == 0.30
@@ -62,16 +47,9 @@ def test_add_lag_features_drops_missing_values() -> None:
 
 
 def test_prepare_forecasting_dataset_returns_X_and_y() -> None:
-    date_range = pd.date_range(
-        start="2025-01-01",
-        periods=30,
-        freq="h"
-    )
+    date_range = pd.date_range(start="2025-01-01", periods=30, freq="h")
 
-    df = pd.DataFrame({
-        "datetime": date_range,
-        "consumption_kwh": [0.5] * 30
-    })
+    df = pd.DataFrame({"datetime": date_range, "consumption_kwh": [0.5] * 30})
 
     X, y = prepare_forecasting_dataset(df)
 
@@ -82,7 +60,7 @@ def test_prepare_forecasting_dataset_returns_X_and_y() -> None:
         "weekday",
         "is_weekend",
         "consumption_kwh_lag_1",
-        "consumption_kwh_lag_24"
+        "consumption_kwh_lag_24",
     ]
 
     assert list(X.columns) == expected_columns
@@ -91,16 +69,12 @@ def test_prepare_forecasting_dataset_returns_X_and_y() -> None:
 
 
 def test_split_train_test_by_time_preserves_order() -> None:
-    X = pd.DataFrame({
-        "feature": list(range(10))
-    })
+    X = pd.DataFrame({"feature": list(range(10))})
 
     y = pd.Series(list(range(10)))
 
     X_train, X_test, y_train, y_test = split_train_test_by_time(
-        X,
-        y,
-        test_size_ratio=0.2
+        X, y, test_size_ratio=0.2
     )
 
     assert list(X_train["feature"]) == list(range(8))
@@ -120,55 +94,40 @@ def test_evaluate_forecast_returns_mae_and_rmse() -> None:
 
 
 def test_get_feature_importance_returns_sorted_dataframe() -> None:
-    X_train = pd.DataFrame({
-        "feature_a": [1, 2, 3, 4, 5, 6],
-        "feature_b": [6, 5, 4, 3, 2, 1]
-    })
+    X_train = pd.DataFrame(
+        {"feature_a": [1, 2, 3, 4, 5, 6], "feature_b": [6, 5, 4, 3, 2, 1]}
+    )
 
     y_train = pd.Series([1, 2, 3, 4, 5, 6])
 
-    model = RandomForestRegressor(
-        n_estimators=20,
-        random_state=42
-    )
+    model = RandomForestRegressor(n_estimators=20, random_state=42)
 
     model.fit(X_train, y_train)
 
-    importance_df = get_feature_importance(
-        model,
-        list(X_train.columns)
-    )
+    importance_df = get_feature_importance(model, list(X_train.columns))
 
     assert list(importance_df.columns) == ["feature", "importance"]
     assert len(importance_df) == 2
     assert importance_df["importance"].iloc[0] >= importance_df["importance"].iloc[1]
 
-def test_build_forecasted_consumption_dataframe():
-    original_df = pd.DataFrame({
-        "datetime": pd.to_datetime([
-            "2024-01-01 00:00:00",
-            "2024-01-01 01:00:00"
-        ]),
-        "consumption_kwh": [1.0, 1.2]
-    })
 
-    forecast_results_df = pd.DataFrame({
-        "predicted_consumption_kwh": [0.9, 1.1, 1.3]
-    })
+def test_build_forecasted_consumption_dataframe():
+    original_df = pd.DataFrame(
+        {
+            "datetime": pd.to_datetime(["2024-01-01 00:00:00", "2024-01-01 01:00:00"]),
+            "consumption_kwh": [1.0, 1.2],
+        }
+    )
+
+    forecast_results_df = pd.DataFrame({"predicted_consumption_kwh": [0.9, 1.1, 1.3]})
 
     forecast_df = build_forecasted_consumption_dataframe(
-        original_df,
-        forecast_results_df
+        original_df, forecast_results_df
     )
 
-    assert list(forecast_df.columns) == [
-        "datetime",
-        "consumption_kwh"
-    ]
+    assert list(forecast_df.columns) == ["datetime", "consumption_kwh"]
 
     assert len(forecast_df) == 3
-    assert forecast_df.loc[0, "datetime"] == pd.Timestamp(
-        "2024-01-01 02:00:00"
-    )
+    assert forecast_df.loc[0, "datetime"] == pd.Timestamp("2024-01-01 02:00:00")
     assert forecast_df.loc[0, "consumption_kwh"] == 0.9
     assert forecast_df.loc[2, "consumption_kwh"] == 1.3

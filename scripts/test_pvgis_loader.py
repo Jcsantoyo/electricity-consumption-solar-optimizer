@@ -20,7 +20,11 @@ def main() -> None:
     print(f"End datetime: {df['datetime'].max()}")
 
     print("\nFirst rows:")
-    print(df[["datetime", "P", "solar_generation_1kw_kwh"]].head(24).to_string(index=False))
+    print(
+        df[["datetime", "P", "solar_generation_1kw_kwh"]]
+        .head(24)
+        .to_string(index=False)
+    )
 
     print("\nTotal yearly generation for 1 kW system:")
     print(f"{df['solar_generation_1kw_kwh'].sum():.2f} kWh")

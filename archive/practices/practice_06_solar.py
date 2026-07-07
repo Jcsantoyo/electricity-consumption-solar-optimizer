@@ -1,13 +1,30 @@
-from solar import( 
-    generate_daily_solar_profile,
-    simulate_self_consumption
-)
+from solar import generate_daily_solar_profile, simulate_self_consumption
 
 daily_hourly_consumption_kwh = [
-    0.2, 0.15, 0.1, 0.1, 0.1, 0.13,
-    0.2, 0.23, 0.25, 0.24, 0.25, 0.27,
-    0.3, 0.35, 0.4, 0.3, 0.3, 0.28,
-    0.25, 0.25, 0.3, 0.23, 0.2, 0.2
+    0.2,
+    0.15,
+    0.1,
+    0.1,
+    0.1,
+    0.13,
+    0.2,
+    0.23,
+    0.25,
+    0.24,
+    0.25,
+    0.27,
+    0.3,
+    0.35,
+    0.4,
+    0.3,
+    0.3,
+    0.28,
+    0.25,
+    0.25,
+    0.3,
+    0.23,
+    0.2,
+    0.2,
 ]
 
 peak_power_kw = 3.0
@@ -21,7 +38,9 @@ total_solar_generation = sum(daily_solar_generation_kwh)
 
 print(f"\nTotal daily solar generation: {total_solar_generation:.2f} kWh")
 
-self_consumed_kwh, grid_import_kwh, solar_surplus_kwh = simulate_self_consumption(daily_hourly_consumption_kwh, daily_solar_generation_kwh)
+self_consumed_kwh, grid_import_kwh, solar_surplus_kwh = simulate_self_consumption(
+    daily_hourly_consumption_kwh, daily_solar_generation_kwh
+)
 
 
 print("\nHour | Consumption | Solar | Self-consumed | Grid import | Surplus")

@@ -11,7 +11,7 @@ from optimization import (
     print_scenario_comparison,
     build_scenario_summary_text,
     build_best_scenarios_dataframe,
-    build_outputs_index_text
+    build_outputs_index_text,
 )
 from visualization import (
     plot_payback_by_solar_and_battery,
@@ -19,16 +19,13 @@ from visualization import (
     plot_best_scenarios_comparison,
     plot_best_scenario_timeseries,
     plot_battery_state_over_time,
-    plot_cumulative_energy_flows
+    plot_cumulative_energy_flows,
 )
 
 from solar import generate_solar_profile_for_timestamps
 from battery import simulate_battery
 
-from solar_data_loader import(
-    load_pvgis_solar_data,
-    get_pvgis_generation_for_timestamps
-)
+from solar_data_loader import load_pvgis_solar_data, get_pvgis_generation_for_timestamps
 
 
 def ensure_output_directories() -> None:
@@ -52,7 +49,7 @@ def main() -> None:
         print(f"\nInvalid input data file: {file_path}")
         print(error)
         return
-    
+
     simulation_days = (
         df_consumption["datetime"].max() - df_consumption["datetime"].min()
     ).days + 1
@@ -98,24 +95,18 @@ def main() -> None:
         peak_price=tariff_profile["peak_price_eur_per_kwh"],
         flat_price=tariff_profile["flat_price_eur_per_kwh"],
         off_peak_price=tariff_profile["off_peak_price_eur_per_kwh"],
-        surplus_compensation_price=tariff_profile[
-            "surplus_compensation_eur_per_kwh"
-        ],
+        surplus_compensation_price=tariff_profile["surplus_compensation_eur_per_kwh"],
         contracted_power_kw=tariff_profile["contracted_power_kw"],
-        power_price_eur_per_kw_year=tariff_profile[
-            "power_price_eur_per_kw_year"
-        ],
+        power_price_eur_per_kw_year=tariff_profile["power_price_eur_per_kw_year"],
         simulation_days=simulation_days,
-        pvgis_df=pvgis_df
+        pvgis_df=pvgis_df,
     )
 
     results_output_path = config.GRID_SEARCH_RESULTS_PATH
     results_df.to_csv(results_output_path, index=False)
 
     best_payback_scenario = get_best_scenario_by_payback(results_df)
-    best_self_sufficiency_scenario = get_best_scenario_by_self_sufficiency(
-        results_df
-    )
+    best_self_sufficiency_scenario = get_best_scenario_by_self_sufficiency(results_df)
 
     if pvgis_df is None:
         solar_data_source = "Synthetic solar profile"
@@ -123,9 +114,7 @@ def main() -> None:
         solar_data_source = f"PVGIS solar data ({config.PVGIS_SOLAR_DATA_PATH})"
 
     summary_text = build_scenario_summary_text(
-        best_payback_scenario,
-        best_self_sufficiency_scenario,
-        solar_data_source
+        best_payback_scenario, best_self_sufficiency_scenario, solar_data_source
     )
 
     summary_output_path = config.SUMMARY_REPORT_PATH
@@ -134,8 +123,7 @@ def main() -> None:
         file.write(summary_text)
 
     best_scenarios_df = build_best_scenarios_dataframe(
-        best_payback_scenario,
-        best_self_sufficiency_scenario
+        best_payback_scenario, best_self_sufficiency_scenario
     )
 
     best_peak_power_kw = best_payback_scenario["solar_peak_power_kw"]
@@ -143,14 +131,11 @@ def main() -> None:
 
     if pvgis_df is None:
         best_solar_generation_kwh = generate_solar_profile_for_timestamps(
-            timestamps,
-            best_peak_power_kw
+            timestamps, best_peak_power_kw
         )
     else:
         best_solar_generation_kwh = get_pvgis_generation_for_timestamps(
-            pvgis_df,
-            timestamps,
-            best_peak_power_kw
+            pvgis_df, timestamps, best_peak_power_kw
         )
 
     best_battery_results = simulate_battery(
@@ -160,15 +145,19 @@ def main() -> None:
         battery_efficiency=battery_efficiency,
         max_charge_power_kw=max_charge_power_kw,
         max_discharge_power_kw=max_discharge_power_kw,
-        initial_battery_state_kwh=initial_battery_state_kwh
+        initial_battery_state_kwh=initial_battery_state_kwh,
     )
 
     best_timeseries_df = df_consumption.copy()
 
     best_timeseries_df["solar_generation_kwh"] = best_solar_generation_kwh
     best_timeseries_df["self_consumed_kwh"] = best_battery_results["self_consumed_kwh"]
-    best_timeseries_df["battery_charge_kwh"] = best_battery_results["battery_charge_kwh"]
-    best_timeseries_df["battery_discharge_kwh"] = best_battery_results["battery_discharge_kwh"]
+    best_timeseries_df["battery_charge_kwh"] = best_battery_results[
+        "battery_charge_kwh"
+    ]
+    best_timeseries_df["battery_discharge_kwh"] = best_battery_results[
+        "battery_discharge_kwh"
+    ]
     best_timeseries_df["grid_import_kwh"] = best_battery_results["grid_import_kwh"]
     best_timeseries_df["solar_surplus_kwh"] = best_battery_results["solar_surplus_kwh"]
     best_timeseries_df["battery_state_kwh"] = best_battery_results["battery_state_kwh"]
@@ -220,52 +209,38 @@ def main() -> None:
     )
     print(f"Outputs index saved to: {outputs_index_path}")
 
-    print_scenario_summary(
-        "Best scenario by payback",
-        best_payback_scenario
-    )
+    print_scenario_summary("Best scenario by payback", best_payback_scenario)
 
     print_scenario_summary(
-        "Best scenario by self-sufficiency",
-        best_self_sufficiency_scenario
+        "Best scenario by self-sufficiency", best_self_sufficiency_scenario
     )
 
-    print_scenario_comparison(
-        best_payback_scenario,
-        best_self_sufficiency_scenario
-    )
+    print_scenario_comparison(best_payback_scenario, best_self_sufficiency_scenario)
 
     plot_payback_by_solar_and_battery(
-        results_df,
-        battery_capacities_kwh,
-        config.PAYBACK_PLOT_PATH
+        results_df, battery_capacities_kwh, config.PAYBACK_PLOT_PATH
     )
 
     plot_self_sufficiency_by_solar_and_battery(
-        results_df,
-        battery_capacities_kwh,
-        config.SELF_SUFFICIENCY_PLOT_PATH
+        results_df, battery_capacities_kwh, config.SELF_SUFFICIENCY_PLOT_PATH
     )
 
     plot_best_scenarios_comparison(
-        best_scenarios_df,
-        config.BEST_SCENARIOS_COMPARISON_PLOT_PATH
+        best_scenarios_df, config.BEST_SCENARIOS_COMPARISON_PLOT_PATH
     )
 
     plot_best_scenario_timeseries(
-        best_timeseries_df,
-        config.BEST_SCENARIO_TIMESERIES_PLOT_PATH
+        best_timeseries_df, config.BEST_SCENARIO_TIMESERIES_PLOT_PATH
     )
 
     plot_battery_state_over_time(
-        best_timeseries_df,
-        config.BEST_SCENARIO_BATTERY_STATE_PLOT_PATH
+        best_timeseries_df, config.BEST_SCENARIO_BATTERY_STATE_PLOT_PATH
     )
 
     plot_cumulative_energy_flows(
-        best_timeseries_df,
-        config.BEST_SCENARIO_CUMULATIVE_ENERGY_PLOT_PATH
+        best_timeseries_df, config.BEST_SCENARIO_CUMULATIVE_ENERGY_PLOT_PATH
     )
-  
+
+
 if __name__ == "__main__":
     main()

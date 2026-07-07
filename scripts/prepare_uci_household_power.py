@@ -10,7 +10,7 @@ sys.path.append(str(SRC_PATH))
 from uci_household_loader import (
     load_uci_household_power_data,
     convert_uci_minute_power_to_hourly_consumption,
-    save_hourly_consumption_data
+    save_hourly_consumption_data,
 )
 
 
@@ -30,10 +30,7 @@ def main() -> None:
     print("\nConverting minute-level power data to hourly consumption...")
     hourly_df = convert_uci_minute_power_to_hourly_consumption(df)
 
-    save_hourly_consumption_data(
-        hourly_df,
-        output_path
-    )
+    save_hourly_consumption_data(hourly_df, output_path)
 
     print("\nHourly consumption dataset generated:")
     print(f"Output file: {output_path}")

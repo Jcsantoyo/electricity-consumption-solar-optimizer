@@ -10,15 +10,12 @@ sys.path.append(str(SRC_PATH))
 import config
 
 from data_loader import load_consumption_data
-from forecasting import (
-    run_consumption_forecast,
-    build_forecasted_consumption_dataframe
-)
+from forecasting import run_consumption_forecast, build_forecasted_consumption_dataframe
 from optimization import (
     run_economic_grid_search,
     get_best_scenario_by_payback,
     get_best_scenario_by_self_sufficiency,
-    build_best_scenarios_dataframe
+    build_best_scenarios_dataframe,
 )
 from solar_data_loader import load_pvgis_solar_data
 
@@ -26,32 +23,20 @@ from solar_data_loader import load_pvgis_solar_data
 def main() -> None:
     os.makedirs("reports", exist_ok=True)
 
-    consumption_df = load_consumption_data(
-        config.CONSUMPTION_DATA_PATH
-    )
+    consumption_df = load_consumption_data(config.CONSUMPTION_DATA_PATH)
 
-    forecast_results = run_consumption_forecast(
-        consumption_df
-    )
+    forecast_results = run_consumption_forecast(consumption_df)
 
     forecasted_consumption_df = build_forecasted_consumption_dataframe(
-        original_df=consumption_df,
-        forecast_results_df=forecast_results["results_df"]
+        original_df=consumption_df, forecast_results_df=forecast_results["results_df"]
     )
 
-    forecasted_consumption_path = (
-        "reports/forecasted_consumption_for_optimization.csv"
-    )
+    forecasted_consumption_path = "reports/forecasted_consumption_for_optimization.csv"
 
-    forecasted_consumption_df.to_csv(
-        forecasted_consumption_path,
-        index=False
-    )
+    forecasted_consumption_df.to_csv(forecasted_consumption_path, index=False)
 
     if config.USE_PVGIS_SOLAR_DATA:
-        pvgis_df = load_pvgis_solar_data(
-            config.PVGIS_SOLAR_DATA_PATH
-        )
+        pvgis_df = load_pvgis_solar_data(config.PVGIS_SOLAR_DATA_PATH)
     else:
         pvgis_df = None
 
@@ -76,47 +61,28 @@ def main() -> None:
         peak_price=tariff_profile["peak_price_eur_per_kwh"],
         flat_price=tariff_profile["flat_price_eur_per_kwh"],
         off_peak_price=tariff_profile["off_peak_price_eur_per_kwh"],
-        surplus_compensation_price=tariff_profile[
-            "surplus_compensation_eur_per_kwh"
-        ],
+        surplus_compensation_price=tariff_profile["surplus_compensation_eur_per_kwh"],
         contracted_power_kw=tariff_profile["contracted_power_kw"],
-        power_price_eur_per_kw_year=tariff_profile[
-            "power_price_eur_per_kw_year"
-        ],
+        power_price_eur_per_kw_year=tariff_profile["power_price_eur_per_kw_year"],
         simulation_days=simulation_days,
-        pvgis_df=pvgis_df
+        pvgis_df=pvgis_df,
     )
 
-    optimization_results_path = (
-        "reports/forecast_optimization_results.csv"
-    )
+    optimization_results_path = "reports/forecast_optimization_results.csv"
 
-    results_df.to_csv(
-        optimization_results_path,
-        index=False
-    )
+    results_df.to_csv(optimization_results_path, index=False)
 
-    best_payback_scenario = get_best_scenario_by_payback(
-        results_df
-    )
+    best_payback_scenario = get_best_scenario_by_payback(results_df)
 
-    best_self_sufficiency_scenario = get_best_scenario_by_self_sufficiency(
-        results_df
-    )
+    best_self_sufficiency_scenario = get_best_scenario_by_self_sufficiency(results_df)
 
     best_scenarios_df = build_best_scenarios_dataframe(
-        best_payback_scenario,
-        best_self_sufficiency_scenario
+        best_payback_scenario, best_self_sufficiency_scenario
     )
 
-    best_scenarios_path = (
-        "reports/forecast_optimization_best_scenarios.csv"
-    )
+    best_scenarios_path = "reports/forecast_optimization_best_scenarios.csv"
 
-    best_scenarios_df.to_csv(
-        best_scenarios_path,
-        index=False
-    )
+    best_scenarios_df.to_csv(best_scenarios_path, index=False)
 
     print("\nForecast-based optimization")
     print(f"Input file: {config.CONSUMPTION_DATA_PATH}")
@@ -145,10 +111,7 @@ def main() -> None:
         f"Annual savings: "
         f"{best_self_sufficiency_scenario['annual_savings_eur']:.2f} EUR/year"
     )
-    print(
-        f"Payback: "
-        f"{best_self_sufficiency_scenario['payback_years']:.2f} years"
-    )
+    print(f"Payback: {best_self_sufficiency_scenario['payback_years']:.2f} years")
     print(
         f"Self-sufficiency: "
         f"{best_self_sufficiency_scenario['self_sufficiency'] * 100:.2f}%"

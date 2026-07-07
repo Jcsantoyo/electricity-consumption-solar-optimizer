@@ -5,10 +5,30 @@ from solar import generate_daily_solar_profile
 from scenarios import compare_battery_scenario
 
 daily_hourly_consumption_kwh = [
-    0.2, 0.15, 0.1, 0.1, 0.1, 0.13,
-    0.2, 0.23, 0.25, 0.24, 0.25, 0.27,
-    0.3, 0.35, 0.4, 0.3, 0.3, 0.28,
-    0.25, 0.25, 0.3, 0.23, 0.2, 0.2
+    0.2,
+    0.15,
+    0.1,
+    0.1,
+    0.1,
+    0.13,
+    0.2,
+    0.23,
+    0.25,
+    0.24,
+    0.25,
+    0.27,
+    0.3,
+    0.35,
+    0.4,
+    0.3,
+    0.3,
+    0.28,
+    0.25,
+    0.25,
+    0.3,
+    0.23,
+    0.2,
+    0.2,
 ]
 
 solar_peak_powers_kw = [0.5, 1.0, 1.5, 2.0, 3.0]
@@ -32,20 +52,26 @@ for peak_power_kw in solar_peak_powers_kw:
             battery_efficiency,
             max_charge_power_kw,
             max_discharge_power_kw,
-            initial_battery_state_kwh
+            initial_battery_state_kwh,
         )
 
-        results.append({
-            "solar_peak_power_kw": peak_power_kw,
-            "battery_capacity_kwh": battery_capacity_kwh,
-            "total_solar_generation_kwh": summary["total_solar_generation_kwh"],
-            "grid_import_with_battery_kwh": summary["grid_import_with_battery_kwh"],
-            "solar_surplus_with_battery_kwh": summary["solar_surplus_with_battery_kwh"],
-            "self_sufficiency_with_battery": summary["self_sufficiency_with_battery"],
-            "grid_import_reduction_kwh": summary["grid_import_reduction_kwh"],
-            "solar_surplus_reduction_kwh": summary["solar_surplus_reduction_kwh"],
-            "self_sufficiency_improvement": summary["self_sufficiency_improvement"]
-        })
+        results.append(
+            {
+                "solar_peak_power_kw": peak_power_kw,
+                "battery_capacity_kwh": battery_capacity_kwh,
+                "total_solar_generation_kwh": summary["total_solar_generation_kwh"],
+                "grid_import_with_battery_kwh": summary["grid_import_with_battery_kwh"],
+                "solar_surplus_with_battery_kwh": summary[
+                    "solar_surplus_with_battery_kwh"
+                ],
+                "self_sufficiency_with_battery": summary[
+                    "self_sufficiency_with_battery"
+                ],
+                "grid_import_reduction_kwh": summary["grid_import_reduction_kwh"],
+                "solar_surplus_reduction_kwh": summary["solar_surplus_reduction_kwh"],
+                "self_sufficiency_improvement": summary["self_sufficiency_improvement"],
+            }
+        )
 
 df = pd.DataFrame(results)
 
@@ -68,7 +94,7 @@ for battery_capacity_kwh in battery_capacities_kwh:
         subset["solar_peak_power_kw"],
         subset["self_sufficiency_with_battery"],
         marker="o",
-        label=f"{battery_capacity_kwh} kWh battery"
+        label=f"{battery_capacity_kwh} kWh battery",
     )
 
 plt.title("Self-Sufficiency by Solar Power and Battery Capacity")

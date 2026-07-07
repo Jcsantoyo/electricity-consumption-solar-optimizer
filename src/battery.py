@@ -2,13 +2,12 @@ def simulate_battery(
     consumption_kwh: list[float],
     solar_generation_kwh: list[float],
     battery_capacity_kwh: float,
-    battery_efficiency = 0.90,
+    battery_efficiency=0.90,
     max_charge_power_kw: float | None = None,
     max_discharge_power_kw: float | None = None,
-    initial_battery_state_kwh = 0.0
-
+    initial_battery_state_kwh=0.0,
 ) -> dict[str, list[float]]:
-    
+
     battery_state = min(initial_battery_state_kwh, battery_capacity_kwh)
 
     self_consumed_kwh = []
@@ -19,7 +18,6 @@ def simulate_battery(
     battery_state_kwh = []
 
     for hour, consumption in enumerate(consumption_kwh):
-
         solar_generation = solar_generation_kwh[hour]
 
         self_consumed = min(consumption, solar_generation)
@@ -34,7 +32,11 @@ def simulate_battery(
         else:
             charge_power_limit = max_charge_power_kw
 
-        raw_battery_charge = min(charge_power_limit, avalaible_capacity / battery_efficiency, initial_solar_surplus)
+        raw_battery_charge = min(
+            charge_power_limit,
+            avalaible_capacity / battery_efficiency,
+            initial_solar_surplus,
+        )
 
         effective_battery_charge = raw_battery_charge * battery_efficiency
 
@@ -45,7 +47,9 @@ def simulate_battery(
         else:
             discharge_power_limit = max_discharge_power_kw
 
-        battery_discharge = min(remaining_consumption, battery_state, discharge_power_limit)
+        battery_discharge = min(
+            remaining_consumption, battery_state, discharge_power_limit
+        )
 
         battery_state = battery_state - battery_discharge
 
@@ -65,5 +69,5 @@ def simulate_battery(
         "battery_discharge_kwh": battery_discharge_kwh,
         "grid_import_kwh": grid_import_kwh,
         "solar_surplus_kwh": solar_surplus_kwh,
-        "battery_state_kwh": battery_state_kwh
+        "battery_state_kwh": battery_state_kwh,
     }

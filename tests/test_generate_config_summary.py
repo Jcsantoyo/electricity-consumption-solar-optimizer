@@ -22,9 +22,7 @@ def test_configuration_summary_contains_current_config_values():
     assert config.PVGIS_SOLAR_DATA_PATH in summary
     assert config.ACTIVE_TARIFF_PROFILE in summary
 
-    solar_power_values = ", ".join(
-        str(value) for value in config.SOLAR_PEAK_POWERS_KW
-    )
+    solar_power_values = ", ".join(str(value) for value in config.SOLAR_PEAK_POWERS_KW)
     battery_capacity_values = ", ".join(
         str(value) for value in config.BATTERY_CAPACITIES_KWH
     )

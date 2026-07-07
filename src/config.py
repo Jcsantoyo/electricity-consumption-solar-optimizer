@@ -52,7 +52,7 @@ TARIFF_PROFILES = {
         "off_peak_price_eur_per_kwh": 0.20,
         "surplus_compensation_eur_per_kwh": 0.07,
         "contracted_power_kw": 4.6,
-        "power_price_eur_per_kw_year": 35.0
+        "power_price_eur_per_kw_year": 35.0,
     },
     "spanish_2_0td_example": {
         "peak_price_eur_per_kwh": 0.25,
@@ -60,8 +60,8 @@ TARIFF_PROFILES = {
         "off_peak_price_eur_per_kwh": 0.12,
         "surplus_compensation_eur_per_kwh": 0.07,
         "contracted_power_kw": 4.6,
-        "power_price_eur_per_kw_year": 35.0
-    }
+        "power_price_eur_per_kw_year": 35.0,
+    },
 }
 
 

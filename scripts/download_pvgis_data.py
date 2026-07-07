@@ -13,7 +13,7 @@ def download_pvgis_hourly_data(
     loss_percent: float,
     start_year: int,
     end_year: int,
-    output_path: str
+    output_path: str,
 ) -> None:
     params = {
         "lat": latitude,
@@ -25,7 +25,7 @@ def download_pvgis_hourly_data(
         "loss": loss_percent,
         "angle": 30,
         "aspect": 0,
-        "outputformat": "json"
+        "outputformat": "json",
     }
 
     response = requests.get(PVGIS_URL, params=params, timeout=30)
@@ -67,7 +67,7 @@ def main() -> None:
         loss_percent,
         start_year,
         end_year,
-        output_path
+        output_path,
     )
 
 

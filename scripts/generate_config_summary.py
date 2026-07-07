@@ -75,15 +75,17 @@ def build_configuration_summary() -> str:
     for profile_name in config.TARIFF_PROFILES:
         lines.append(f"- `{profile_name}`")
 
-    lines.extend([
-        "",
-        "## Notes",
-        "",
-        "The tariff values are illustrative assumptions.",
-        "They can be replaced by prices from a specific electricity contract",
-        "or by hourly PVPC prices in a future version.",
-        ""
-    ])
+    lines.extend(
+        [
+            "",
+            "## Notes",
+            "",
+            "The tariff values are illustrative assumptions.",
+            "They can be replaced by prices from a specific electricity contract",
+            "or by hourly PVPC prices in a future version.",
+            "",
+        ]
+    )
 
     return "\n".join(lines)
 

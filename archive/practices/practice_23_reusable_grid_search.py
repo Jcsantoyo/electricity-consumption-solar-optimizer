@@ -7,7 +7,7 @@ from optimization import (
     get_best_scenario_by_payback,
     get_best_scenario_by_self_sufficiency,
     print_scenario_summary,
-    print_scenario_comparison
+    print_scenario_comparison,
 )
 
 
@@ -51,7 +51,7 @@ df = run_economic_grid_search(
     solar_cost_per_kw,
     battery_cost_per_kwh,
     simulation_days,
-    days_per_year=days_per_year
+    days_per_year=days_per_year,
 )
 
 print("\nReusable economic grid search:")
@@ -61,23 +61,14 @@ print(df.to_string(index=False))
 best_payback_scenario = get_best_scenario_by_payback(df)
 best_self_sufficiency_scenario = get_best_scenario_by_self_sufficiency(df)
 
-print_scenario_summary(
-    "Best scenario by payback",
-    best_payback_scenario
-)
+print_scenario_summary("Best scenario by payback", best_payback_scenario)
 
 print_scenario_summary(
-    "Best scenario by self-sufficiency",
-    best_self_sufficiency_scenario
+    "Best scenario by self-sufficiency", best_self_sufficiency_scenario
 )
 
-print_scenario_comparison(
-    best_payback_scenario,
-    best_self_sufficiency_scenario
-)
+print_scenario_comparison(best_payback_scenario, best_self_sufficiency_scenario)
 
 plot_payback_by_solar_and_battery(
-    df,
-    battery_capacities_kwh,
-    "images/reusable_grid_search_payback.png"
+    df, battery_capacities_kwh, "images/reusable_grid_search_payback.png"
 )

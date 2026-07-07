@@ -3,10 +3,30 @@ from scenarios import compare_battery_scenario
 
 
 daily_hourly_consumption_kwh = [
-    0.2, 0.15, 0.1, 0.1, 0.1, 0.13,
-    0.2, 0.23, 0.25, 0.24, 0.25, 0.27,
-    0.3, 0.35, 0.4, 0.3, 0.3, 0.28,
-    0.25, 0.25, 0.3, 0.23, 0.2, 0.2
+    0.2,
+    0.15,
+    0.1,
+    0.1,
+    0.1,
+    0.13,
+    0.2,
+    0.23,
+    0.25,
+    0.24,
+    0.25,
+    0.27,
+    0.3,
+    0.35,
+    0.4,
+    0.3,
+    0.3,
+    0.28,
+    0.25,
+    0.25,
+    0.3,
+    0.23,
+    0.2,
+    0.2,
 ]
 
 peak_power_kw = 1.0
@@ -21,7 +41,7 @@ summary = compare_battery_scenario(
     battery_efficiency=0.90,
     max_charge_power_kw=1.0,
     max_discharge_power_kw=1.0,
-    initial_battery_state_kwh=0.0
+    initial_battery_state_kwh=0.0,
 )
 
 print("\nBattery scenario comparison:")

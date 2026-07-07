@@ -5,10 +5,30 @@ from solar import generate_daily_solar_profile
 from battery import simulate_battery
 
 daily_hourly_consumption_kwh = [
-    0.2, 0.15, 0.1, 0.1, 0.1, 0.13,
-    0.2, 0.23, 0.25, 0.24, 0.25, 0.27,
-    0.3, 0.35, 0.4, 0.3, 0.3, 0.28,
-    0.25, 0.25, 0.3, 0.23, 0.2, 0.2
+    0.2,
+    0.15,
+    0.1,
+    0.1,
+    0.1,
+    0.13,
+    0.2,
+    0.23,
+    0.25,
+    0.24,
+    0.25,
+    0.27,
+    0.3,
+    0.35,
+    0.4,
+    0.3,
+    0.3,
+    0.28,
+    0.25,
+    0.25,
+    0.3,
+    0.23,
+    0.2,
+    0.2,
 ]
 
 peak_power_kw = 1.0
@@ -27,20 +47,22 @@ battery_results = simulate_battery(
     battery_efficiency=battery_efficiency,
     max_charge_power_kw=max_charge_power_kw,
     max_discharge_power_kw=max_discharge_power_kw,
-    initial_battery_state_kwh=initial_battery_state_kwh
+    initial_battery_state_kwh=initial_battery_state_kwh,
 )
 
-df = pd.DataFrame({
-    "hour": range(24),
-    "consumption_kwh": daily_hourly_consumption_kwh,
-    "solar_generation_kwh": daily_solar_generation_kwh,
-    "self_consumed_kwh": battery_results["self_consumed_kwh"],
-    "battery_charge_kwh": battery_results["battery_charge_kwh"],
-    "battery_discharge_kwh": battery_results["battery_discharge_kwh"],
-    "grid_import_kwh": battery_results["grid_import_kwh"],
-    "solar_surplus_kwh": battery_results["solar_surplus_kwh"],
-    "battery_state_kwh": battery_results["battery_state_kwh"]
-})
+df = pd.DataFrame(
+    {
+        "hour": range(24),
+        "consumption_kwh": daily_hourly_consumption_kwh,
+        "solar_generation_kwh": daily_solar_generation_kwh,
+        "self_consumed_kwh": battery_results["self_consumed_kwh"],
+        "battery_charge_kwh": battery_results["battery_charge_kwh"],
+        "battery_discharge_kwh": battery_results["battery_discharge_kwh"],
+        "grid_import_kwh": battery_results["grid_import_kwh"],
+        "solar_surplus_kwh": battery_results["solar_surplus_kwh"],
+        "battery_state_kwh": battery_results["battery_state_kwh"],
+    }
+)
 
 print("Max battery state:", df["battery_state_kwh"].max())
 print("Min battery state:", df["battery_state_kwh"].min())

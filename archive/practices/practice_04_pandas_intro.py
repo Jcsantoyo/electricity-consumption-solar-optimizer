@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
+
 def get_price_for_hour(hour: int) -> float:
     if hour < 7:
         return 0.10
@@ -8,18 +9,36 @@ def get_price_for_hour(hour: int) -> float:
         return 0.18
     else:
         return 0.28
-    
+
+
 daily_hourly_consumption_kwh = [
-    0.2, 0.15, 0.1, 0.1, 0.1, 0.13,
-    0.2, 0.23, 0.25, 0.24, 0.25, 0.27,
-    0.3, 0.35, 0.4, 0.3, 0.3, 0.28,
-    0.25, 0.25, 0.3, 0.23, 0.2, 0.2
+    0.2,
+    0.15,
+    0.1,
+    0.1,
+    0.1,
+    0.13,
+    0.2,
+    0.23,
+    0.25,
+    0.24,
+    0.25,
+    0.27,
+    0.3,
+    0.35,
+    0.4,
+    0.3,
+    0.3,
+    0.28,
+    0.25,
+    0.25,
+    0.3,
+    0.23,
+    0.2,
+    0.2,
 ]
 
-df = pd.DataFrame({
-    "hour": range(24),
-    "consumption_kwh": daily_hourly_consumption_kwh
-})
+df = pd.DataFrame({"hour": range(24), "consumption_kwh": daily_hourly_consumption_kwh})
 
 df["price_eur_per_kwh"] = df["hour"].apply(get_price_for_hour)
 

@@ -14,13 +14,11 @@ from visualization import (
     plot_historical_vs_forecast_savings,
     plot_historical_vs_forecast_self_sufficiency,
     plot_historical_vs_forecast_investment_cost,
-    plot_historical_vs_forecast_grid_import
+    plot_historical_vs_forecast_grid_import,
 )
 
-def load_best_scenarios(
-    file_path: str,
-    optimization_type: str
-) -> pd.DataFrame:
+
+def load_best_scenarios(file_path: str, optimization_type: str) -> pd.DataFrame:
     df = pd.read_csv(file_path)
 
     df = df.copy()
@@ -28,37 +26,19 @@ def load_best_scenarios(
 
     if "scenario" not in df.columns:
         if "criterion" in df.columns:
-            df = df.rename(
-                columns={
-                    "criterion": "scenario"
-                }
-            )
+            df = df.rename(columns={"criterion": "scenario"})
         elif "selection_criterion" in df.columns:
-            df = df.rename(
-                columns={
-                    "selection_criterion": "scenario"
-                }
-            )
+            df = df.rename(columns={"selection_criterion": "scenario"})
         else:
-            df["scenario"] = [
-                "best_payback",
-                "best_self_sufficiency"
-            ][:len(df)]
+            df["scenario"] = ["best_payback", "best_self_sufficiency"][: len(df)]
 
     return df
 
 
 def build_optimization_comparison(
-    historical_df: pd.DataFrame,
-    forecast_df: pd.DataFrame
+    historical_df: pd.DataFrame, forecast_df: pd.DataFrame
 ) -> pd.DataFrame:
-    comparison_df = pd.concat(
-        [
-            historical_df,
-            forecast_df
-        ],
-        ignore_index=True
-    )
+    comparison_df = pd.concat([historical_df, forecast_df], ignore_index=True)
 
     columns = [
         "optimization_type",
@@ -69,7 +49,7 @@ def build_optimization_comparison(
         "annual_savings_eur",
         "payback_years",
         "self_sufficiency",
-        "annual_grid_import_kwh"
+        "annual_grid_import_kwh",
     ]
 
     comparison_df = comparison_df[columns]
@@ -88,41 +68,31 @@ def main() -> None:
     investment_cost_plot_path = "images/historical_vs_forecast_investment_cost.png"
     grid_import_plot_path = "images/historical_vs_forecast_grid_import.png"
 
-
     os.makedirs("reports", exist_ok=True)
     os.makedirs("images", exist_ok=True)
 
-    historical_df = load_best_scenarios(
-        historical_path,
-        optimization_type="historical"
-    )
+    historical_df = load_best_scenarios(historical_path, optimization_type="historical")
 
-    forecast_df = load_best_scenarios(
-        forecast_path,
-        optimization_type="forecast_based"
-    )
+    forecast_df = load_best_scenarios(forecast_path, optimization_type="forecast_based")
 
-    comparison_df = build_optimization_comparison(
-        historical_df,
-        forecast_df
-    )
+    comparison_df = build_optimization_comparison(historical_df, forecast_df)
 
-    comparison_df.to_csv(
-        output_path,
-        index=False
-    )
-
+    comparison_df.to_csv(output_path, index=False)
 
     plot_historical_vs_forecast_payback(comparison_df, payback_plot_path)
 
     plot_historical_vs_forecast_savings(comparison_df, savings_plot_path)
 
-    plot_historical_vs_forecast_self_sufficiency(comparison_df, self_sufficiency_plot_path)
+    plot_historical_vs_forecast_self_sufficiency(
+        comparison_df, self_sufficiency_plot_path
+    )
 
-    plot_historical_vs_forecast_investment_cost(comparison_df, investment_cost_plot_path)
+    plot_historical_vs_forecast_investment_cost(
+        comparison_df, investment_cost_plot_path
+    )
 
     plot_historical_vs_forecast_grid_import(comparison_df, grid_import_plot_path)
-        
+
     print("\nHistorical vs forecast-based optimization comparison")
     print(f"Historical results: {historical_path}")
     print(f"Forecast-based results: {forecast_path}")

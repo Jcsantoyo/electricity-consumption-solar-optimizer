@@ -8,14 +8,11 @@ SRC_PATH = PROJECT_ROOT / "src"
 sys.path.append(str(SRC_PATH))
 
 from data_loader import load_consumption_data
-from forecasting import(
-    run_consumption_forecast,
-    compare_forecasting_models
-)
-from visualization import(
+from forecasting import run_consumption_forecast, compare_forecasting_models
+from visualization import (
     plot_forecast_actual_vs_predicted,
     plot_feature_importance,
-    plot_forecasting_model_comparison
+    plot_forecasting_model_comparison,
 )
 
 
@@ -35,10 +32,7 @@ def main() -> None:
 
     forecast_results_output_path = "reports/forecast_results.csv"
 
-    results_df.to_csv(
-        forecast_results_output_path,
-        index=False
-    )
+    results_df.to_csv(forecast_results_output_path, index=False)
 
     print(f"\nForecast results saved to: {forecast_results_output_path}")
 
@@ -48,12 +42,9 @@ def main() -> None:
 
     print("\nFirst predictions:")
     print(
-        results_df[
-            [
-                "actual_consumption_kwh",
-                "predicted_consumption_kwh"
-            ]
-        ].head(20).to_string(index=False)
+        results_df[["actual_consumption_kwh", "predicted_consumption_kwh"]]
+        .head(20)
+        .to_string(index=False)
     )
 
     print("\nFeature importance:")
@@ -61,10 +52,7 @@ def main() -> None:
 
     feature_importance_report_path = "reports/forecast_feature_importance.csv"
 
-    feature_importance_df.to_csv(
-        feature_importance_report_path,
-        index=False
-    )
+    feature_importance_df.to_csv(feature_importance_report_path, index=False)
 
     print(f"Feature importance report saved to: {feature_importance_report_path}")
 
@@ -75,28 +63,19 @@ def main() -> None:
 
     model_comparison_report_path = "reports/forecast_model_comparison.csv"
 
-    comparison_df.to_csv(
-        model_comparison_report_path,
-        index=False
-    )
+    comparison_df.to_csv(model_comparison_report_path, index=False)
 
     print(f"Model comparison report saved to: {model_comparison_report_path}")
 
     model_comparison_output_path = "images/forecast_model_comparison.png"
 
-    plot_forecasting_model_comparison(
-        comparison_df,
-        model_comparison_output_path
-    )
+    plot_forecasting_model_comparison(comparison_df, model_comparison_output_path)
 
     print(f"Model comparison plot saved to: {model_comparison_output_path}")
 
     output_path = "images/consumption_forecast_actual_vs_predicted.png"
 
-    plot_forecast_actual_vs_predicted(
-        results_df,
-        output_path
-    )
+    plot_forecast_actual_vs_predicted(results_df, output_path)
 
     print(f"\nForecast plot saved to: {output_path}")
 

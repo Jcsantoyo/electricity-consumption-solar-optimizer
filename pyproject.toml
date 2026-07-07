@@ -9,3 +9,11 @@ pythonpath = [
 ]
 
 addopts = "-ra"
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "F"
+]

@@ -5,11 +5,7 @@ import os
 start_date = "2025-01-01"
 num_days = 30
 
-date_range = pd.date_range(
-    start=start_date,
-    periods=num_days * 24,
-    freq="h"
-)
+date_range = pd.date_range(start=start_date, periods=num_days * 24, freq="h")
 
 consumption_values = []
 
@@ -33,10 +29,7 @@ for timestamp in date_range:
     if weekday >= 5:
         base_consumption *= 1.15
 
-    random_noise = np.random.normal(
-        loc=0.0,
-        scale=0.05
-    )
+    random_noise = np.random.normal(loc=0.0, scale=0.05)
 
     consumption = base_consumption + random_noise
 
@@ -44,10 +37,7 @@ for timestamp in date_range:
 
     consumption_values.append(consumption)
 
-df = pd.DataFrame({
-    "datetime": date_range,
-    "consumption_kwh": consumption_values
-})
+df = pd.DataFrame({"datetime": date_range, "consumption_kwh": consumption_values})
 
 os.makedirs("data/simulated", exist_ok=True)
 
@@ -62,4 +52,3 @@ print(f"Start datetime: {df['datetime'].min()}")
 print(f"End datetime: {df['datetime'].max()}")
 print(f"Total consumption: {df['consumption_kwh'].sum():.2f} kWh")
 print(f"Average hourly consumption: {df['consumption_kwh'].mean():.3f} kWh")
-

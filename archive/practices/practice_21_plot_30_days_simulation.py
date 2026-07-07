@@ -1,11 +1,7 @@
-import pandas as pd
 import matplotlib.pyplot as plt
 
 from data_loader import load_consumption_data
-from solar import(
-    generate_solar_profile_for_timestamps,
-    simulate_self_consumption
-) 
+from solar import generate_solar_profile_for_timestamps, simulate_self_consumption
 
 from battery import simulate_battery
 
@@ -23,11 +19,12 @@ max_charge_power_kw = 1.0
 max_discharge_power_kw = 1.0
 initial_battery_state_kwh = 0.0
 
-solar_generation_kwh = generate_solar_profile_for_timestamps(df["datetime"], peak_power_kw)
+solar_generation_kwh = generate_solar_profile_for_timestamps(
+    df["datetime"], peak_power_kw
+)
 
-self_consumed_no_battery, grid_import_no_battery, solar_surplus_no_battery = simulate_self_consumption(
-    consumption_kwh,
-    solar_generation_kwh
+self_consumed_no_battery, grid_import_no_battery, solar_surplus_no_battery = (
+    simulate_self_consumption(consumption_kwh, solar_generation_kwh)
 )
 
 battery_results = simulate_battery(
@@ -37,7 +34,7 @@ battery_results = simulate_battery(
     battery_efficiency=battery_efficiency,
     max_charge_power_kw=max_charge_power_kw,
     max_discharge_power_kw=max_discharge_power_kw,
-    initial_battery_state_kwh=initial_battery_state_kwh
+    initial_battery_state_kwh=initial_battery_state_kwh,
 )
 
 df["solar_generation_kwh"] = solar_generation_kwh
@@ -61,13 +58,9 @@ total_grid_import_with_battery = df["grid_import_with_battery_kwh"].sum()
 total_solar_surplus_no_battery = df["solar_surplus_no_battery_kwh"].sum()
 total_solar_surplus_with_battery = df["solar_surplus_with_battery_kwh"].sum()
 
-self_sufficiency_no_battery = 1 - (
-    total_grid_import_no_battery / total_consumption
-)
+self_sufficiency_no_battery = 1 - (total_grid_import_no_battery / total_consumption)
 
-self_sufficiency_with_battery = 1 - (
-    total_grid_import_with_battery / total_consumption
-)
+self_sufficiency_with_battery = 1 - (total_grid_import_with_battery / total_consumption)
 
 print("\n30-day simulation with time series:")
 print(f"Input file: {file_path}")
@@ -91,17 +84,9 @@ print(f"Self-sufficiency: {self_sufficiency_with_battery:.2%}")
 
 plt.figure(figsize=(12, 5))
 
-plt.plot(
-    df["datetime"],
-    df["consumption_kwh"],
-    label="Consumption"
-)
+plt.plot(df["datetime"], df["consumption_kwh"], label="Consumption")
 
-plt.plot(
-    df["datetime"],
-    df["solar_generation_kwh"],
-    label="Solar generation"
-)
+plt.plot(df["datetime"], df["solar_generation_kwh"], label="Solar generation")
 
 plt.title("Consumption vs Solar Generation Over 30 Days")
 plt.xlabel("Datetime")
@@ -116,13 +101,11 @@ plt.figure(figsize=(12, 5))
 plt.plot(
     df["datetime"],
     df["grid_import_no_battery_kwh"],
-    label="Grid import without battery"
+    label="Grid import without battery",
 )
 
 plt.plot(
-    df["datetime"],
-    df["grid_import_with_battery_kwh"],
-    label="Grid import with battery"
+    df["datetime"], df["grid_import_with_battery_kwh"], label="Grid import with battery"
 )
 
 plt.title("Grid Import Over 30 Days")
@@ -135,11 +118,7 @@ plt.savefig("images/grid_import_30_days.png", dpi=300, bbox_inches="tight")
 
 plt.figure(figsize=(12, 5))
 
-plt.plot(
-    df["datetime"],
-    df["battery_state_kwh"],
-    label="Battery state"
-)
+plt.plot(df["datetime"], df["battery_state_kwh"], label="Battery state")
 
 plt.title("Battery State of Charge Over 30 Days")
 plt.xlabel("Datetime")
@@ -154,13 +133,13 @@ plt.figure(figsize=(12, 5))
 plt.plot(
     df["datetime"],
     df["solar_surplus_no_battery_kwh"],
-    label="Solar surplus without battery"
+    label="Solar surplus without battery",
 )
 
 plt.plot(
     df["datetime"],
     df["solar_surplus_with_battery_kwh"],
-    label="Solar surplus with battery"
+    label="Solar surplus with battery",
 )
 
 plt.title("Solar Surplus Over 30 Days")

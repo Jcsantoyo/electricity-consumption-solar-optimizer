@@ -1,4 +1,3 @@
-import pandas as pd
 import matplotlib.pyplot as plt
 
 from data_loader import load_consumption_data
@@ -26,9 +25,7 @@ print(f"Maximum hourly consumption: {max_consumption:.2f} kWh")
 print(f"Minimum hourly consumption: {min_consumption:.2f} kWh")
 
 daily_consumption = (
-    df.groupby(df["datetime"].dt.date)["consumption_kwh"]
-    .sum()
-    .reset_index()
+    df.groupby(df["datetime"].dt.date)["consumption_kwh"].sum().reset_index()
 )
 
 daily_consumption.columns = ["date", "daily_consumption_kwh"]
@@ -36,21 +33,14 @@ daily_consumption.columns = ["date", "daily_consumption_kwh"]
 print("\nDaily consumption:")
 print(daily_consumption.to_string(index=False))
 
-average_consumption_by_hour = (
-    df.groupby("hour")["consumption_kwh"]
-    .mean()
-    .reset_index()
-)
+average_consumption_by_hour = df.groupby("hour")["consumption_kwh"].mean().reset_index()
 
 print("\nAverage consumption by hour:")
 print(average_consumption_by_hour.to_string(index=False))
 
 plt.figure(figsize=(12, 5))
 
-plt.plot(
-    df["datetime"],
-    df["consumption_kwh"]
-)
+plt.plot(df["datetime"], df["consumption_kwh"])
 
 plt.title("Hourly Consumption Over 30 Days")
 plt.xlabel("Datetime")
@@ -62,9 +52,7 @@ plt.savefig("images/hourly_consumption_30_days.png", dpi=300, bbox_inches="tight
 plt.figure(figsize=(10, 5))
 
 plt.plot(
-    daily_consumption["date"],
-    daily_consumption["daily_consumption_kwh"],
-    marker="o"
+    daily_consumption["date"], daily_consumption["daily_consumption_kwh"], marker="o"
 )
 
 plt.title("Daily Consumption Over 30 Days")
@@ -80,7 +68,7 @@ plt.figure(figsize=(10, 5))
 plt.plot(
     average_consumption_by_hour["hour"],
     average_consumption_by_hour["consumption_kwh"],
-    marker="o"
+    marker="o",
 )
 
 plt.title("Average Consumption by Hour")
@@ -90,4 +78,3 @@ plt.xticks(range(24))
 plt.grid(True)
 
 plt.savefig("images/average_consumption_by_hour.png", dpi=300, bbox_inches="tight")
-

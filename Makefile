@@ -1,10 +1,16 @@
-.PHONY: install test pipeline optimize forecast forecast-optimize compare config-summary final-summary clean-reports
+.PHONY: install test lint format pipeline optimize forecast forecast-optimize compare config-summary final-summary clean-reports
 
 install:
 	pip install -r requirements.txt
 
 test:
 	python -m pytest
+
+lint:
+	ruff check .
+
+format:
+	ruff format .
 
 pipeline:
 	python scripts/run_full_pipeline.py

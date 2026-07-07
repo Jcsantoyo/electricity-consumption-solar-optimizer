@@ -18,8 +18,7 @@ max_discharge_power_kw = 1.0
 initial_battery_state_kwh = 0.0
 
 solar_generation_kwh = generate_solar_profile_for_timestamps(
-    df_consumption["datetime"],
-    peak_power_kw
+    df_consumption["datetime"], peak_power_kw
 )
 
 summary = compare_battery_scenario(
@@ -29,7 +28,7 @@ summary = compare_battery_scenario(
     battery_efficiency=battery_efficiency,
     max_charge_power_kw=max_charge_power_kw,
     max_discharge_power_kw=max_discharge_power_kw,
-    initial_battery_state_kwh=initial_battery_state_kwh
+    initial_battery_state_kwh=initial_battery_state_kwh,
 )
 
 print("\nSynthetic 30-day simulation:")

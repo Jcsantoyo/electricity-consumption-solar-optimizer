@@ -8,9 +8,7 @@ def test_makefile_exists():
 
 
 def test_makefile_contains_expected_commands():
-    makefile_text = Path("Makefile").read_text(
-        encoding="utf-8"
-    )
+    makefile_text = Path("Makefile").read_text(encoding="utf-8")
 
     expected_commands = [
         "install:",
@@ -30,16 +28,12 @@ def test_makefile_contains_expected_commands():
 
 
 def test_makefile_pipeline_runs_full_pipeline_script():
-    makefile_text = Path("Makefile").read_text(
-        encoding="utf-8"
-    )
+    makefile_text = Path("Makefile").read_text(encoding="utf-8")
 
     assert "python scripts/run_full_pipeline.py" in makefile_text
 
 
 def test_makefile_test_runs_pytest():
-    makefile_text = Path("Makefile").read_text(
-        encoding="utf-8"
-    )
+    makefile_text = Path("Makefile").read_text(encoding="utf-8")
 
     assert "python -m pytest" in makefile_text

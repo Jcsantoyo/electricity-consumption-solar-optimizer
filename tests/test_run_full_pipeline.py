@@ -27,12 +27,9 @@ def test_full_pipeline_steps_are_in_expected_order():
         "scripts/run_forecasting.py",
         "scripts/run_forecast_optimization.py",
         "scripts/compare_optimization_results.py",
-        "scripts/generate_final_results_summary.py"
+        "scripts/generate_final_results_summary.py",
     ]
 
-    positions = [
-        script_text.index(step)
-        for step in expected_steps
-    ]
+    positions = [script_text.index(step) for step in expected_steps]
 
     assert positions == sorted(positions)

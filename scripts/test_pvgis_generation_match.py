@@ -7,10 +7,7 @@ SRC_PATH = PROJECT_ROOT / "src"
 sys.path.append(str(SRC_PATH))
 
 from data_loader import load_consumption_data
-from solar_data_loader import (
-    load_pvgis_solar_data,
-    get_pvgis_generation_for_timestamps
-)
+from solar_data_loader import load_pvgis_solar_data, get_pvgis_generation_for_timestamps
 
 
 def main() -> None:
@@ -23,9 +20,7 @@ def main() -> None:
     peak_power_kw = 1.5
 
     solar_generation_kwh = get_pvgis_generation_for_timestamps(
-        df_pvgis,
-        df_consumption["datetime"],
-        peak_power_kw
+        df_pvgis, df_consumption["datetime"], peak_power_kw
     )
 
     df_consumption["solar_generation_kwh"] = solar_generation_kwh
@@ -37,13 +32,9 @@ def main() -> None:
 
     print("\nFirst rows:")
     print(
-        df_consumption[
-            [
-                "datetime",
-                "consumption_kwh",
-                "solar_generation_kwh"
-            ]
-        ].head(48).to_string(index=False)
+        df_consumption[["datetime", "consumption_kwh", "solar_generation_kwh"]]
+        .head(48)
+        .to_string(index=False)
     )
 
     print("\nTotal solar generation:")

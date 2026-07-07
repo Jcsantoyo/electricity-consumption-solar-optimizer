@@ -22,7 +22,32 @@ total_cost = total_consumption * price_per_kwh
 
 print("Total cost:", total_cost)
 
-daily_hourly_consumption_kwh = [0.2, 0.15, 0.1, 0.1, 0.1, 0.13, 0.2, 0.23, 0.25, 0.24, 0.25, 0.27, 0.3, 0.35, 0.4, 0.3, 0.3, 0.28, 0.25, 0.25, 0.3, 0.23, 0.2, 0.2]
+daily_hourly_consumption_kwh = [
+    0.2,
+    0.15,
+    0.1,
+    0.1,
+    0.1,
+    0.13,
+    0.2,
+    0.23,
+    0.25,
+    0.24,
+    0.25,
+    0.27,
+    0.3,
+    0.35,
+    0.4,
+    0.3,
+    0.3,
+    0.28,
+    0.25,
+    0.25,
+    0.3,
+    0.23,
+    0.2,
+    0.2,
+]
 
 print("Number of daily records:", len(daily_hourly_consumption_kwh))
 
@@ -47,8 +72,8 @@ hourly_costs_eur = []
 
 for hour, consumption in enumerate(daily_hourly_consumption_kwh):
     hourly_cost = consumption * price_per_kwh
-    hourly_costs_eur.append(hourly_cost,2)
-    
+    hourly_costs_eur.append(hourly_cost, 2)
+
 print("\nHourly costs list:")
 
 for hour, cost in enumerate(hourly_costs_eur):

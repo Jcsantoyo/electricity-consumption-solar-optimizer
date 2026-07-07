@@ -1,31 +1,52 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from solar import (
-    generate_daily_solar_profile,
-    simulate_self_consumption
-)
+from solar import generate_daily_solar_profile, simulate_self_consumption
 
 daily_hourly_consumption_kwh = [
-    0.2, 0.15, 0.1, 0.1, 0.1, 0.13,
-    0.2, 0.23, 0.25, 0.24, 0.25, 0.27,
-    0.3, 0.35, 0.4, 0.3, 0.3, 0.28,
-    0.25, 0.25, 0.3, 0.23, 0.2, 0.2
+    0.2,
+    0.15,
+    0.1,
+    0.1,
+    0.1,
+    0.13,
+    0.2,
+    0.23,
+    0.25,
+    0.24,
+    0.25,
+    0.27,
+    0.3,
+    0.35,
+    0.4,
+    0.3,
+    0.3,
+    0.28,
+    0.25,
+    0.25,
+    0.3,
+    0.23,
+    0.2,
+    0.2,
 ]
 
 peak_power_kw = 1.0
 
 daily_solar_generation_kwh = generate_daily_solar_profile(peak_power_kw)
 
-self_consumed_kwh, grid_import_kwh, solar_surplus_kwh = simulate_self_consumption(daily_hourly_consumption_kwh, daily_solar_generation_kwh)
+self_consumed_kwh, grid_import_kwh, solar_surplus_kwh = simulate_self_consumption(
+    daily_hourly_consumption_kwh, daily_solar_generation_kwh
+)
 
-df = pd.DataFrame({
-    "hour": range(24),
-    "consumption_kwh": daily_hourly_consumption_kwh,
-    "solar_generation_kwh": daily_solar_generation_kwh,
-    "self_consumed_kwh": self_consumed_kwh,
-    "grid_import_kwh": grid_import_kwh,
-    "solar_surplus_kwh": solar_surplus_kwh
-})
+df = pd.DataFrame(
+    {
+        "hour": range(24),
+        "consumption_kwh": daily_hourly_consumption_kwh,
+        "solar_generation_kwh": daily_solar_generation_kwh,
+        "self_consumed_kwh": self_consumed_kwh,
+        "grid_import_kwh": grid_import_kwh,
+        "solar_surplus_kwh": solar_surplus_kwh,
+    }
+)
 
 
 total_consumption = df["consumption_kwh"].sum()
@@ -71,7 +92,7 @@ plt.legend()
 
 plt.savefig("images/consumption_vs_solar_generation.png", dpi=300, bbox_inches="tight")
 
-plt.figure(figsize=(10,5))
+plt.figure(figsize=(10, 5))
 
 plt.plot(df["hour"], df["grid_import_kwh"], marker="o", label="Grid Import")
 plt.plot(df["hour"], df["solar_surplus_kwh"], marker="o", label="Solar surplus")

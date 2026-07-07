@@ -12,7 +12,7 @@ def test_battery_charges_with_solar_surplus() -> None:
         battery_efficiency=1.0,
         max_charge_power_kw=None,
         max_discharge_power_kw=None,
-        initial_battery_state_kwh=0.0
+        initial_battery_state_kwh=0.0,
     )
 
     assert results["self_consumed_kwh"] == [1.0]
@@ -33,7 +33,7 @@ def test_battery_discharges_when_consumption_exceeds_solar() -> None:
         battery_efficiency=1.0,
         max_charge_power_kw=None,
         max_discharge_power_kw=None,
-        initial_battery_state_kwh=1.0
+        initial_battery_state_kwh=1.0,
     )
 
     assert results["self_consumed_kwh"] == [0.5]
@@ -53,7 +53,7 @@ def test_battery_does_not_exceed_capacity() -> None:
         battery_efficiency=1.0,
         max_charge_power_kw=None,
         max_discharge_power_kw=None,
-        initial_battery_state_kwh=0.0
+        initial_battery_state_kwh=0.0,
     )
 
     assert results["battery_state_kwh"] == [2.0]
@@ -72,7 +72,7 @@ def test_battery_does_not_go_below_zero() -> None:
         battery_efficiency=1.0,
         max_charge_power_kw=None,
         max_discharge_power_kw=None,
-        initial_battery_state_kwh=1.0
+        initial_battery_state_kwh=1.0,
     )
 
     assert results["battery_discharge_kwh"] == [1.0]
@@ -91,7 +91,7 @@ def test_charge_power_limit_is_respected() -> None:
         battery_efficiency=1.0,
         max_charge_power_kw=1.5,
         max_discharge_power_kw=None,
-        initial_battery_state_kwh=0.0
+        initial_battery_state_kwh=0.0,
     )
 
     assert results["battery_charge_kwh"] == [1.5]
@@ -110,7 +110,7 @@ def test_discharge_power_limit_is_respected() -> None:
         battery_efficiency=1.0,
         max_charge_power_kw=None,
         max_discharge_power_kw=2.0,
-        initial_battery_state_kwh=5.0
+        initial_battery_state_kwh=5.0,
     )
 
     assert results["battery_discharge_kwh"] == [2.0]
@@ -129,7 +129,7 @@ def test_battery_efficiency_reduces_stored_energy() -> None:
         battery_efficiency=0.90,
         max_charge_power_kw=None,
         max_discharge_power_kw=None,
-        initial_battery_state_kwh=0.0
+        initial_battery_state_kwh=0.0,
     )
 
     assert results["battery_charge_kwh"] == [2.0]

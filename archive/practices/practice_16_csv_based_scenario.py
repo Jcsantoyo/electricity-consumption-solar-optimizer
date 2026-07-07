@@ -26,7 +26,7 @@ summary = compare_battery_scenario(
     battery_efficiency=battery_efficiency,
     max_charge_power_kw=max_charge_power_kw,
     max_discharge_power_kw=max_discharge_power_kw,
-    initial_battery_state_kwh=initial_battery_state_kwh
+    initial_battery_state_kwh=initial_battery_state_kwh,
 )
 
 print("\nCSV-based scenario simulation:")

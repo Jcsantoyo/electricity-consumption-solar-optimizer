@@ -11,21 +11,24 @@ def get_solar_generation_for_hour(hour: int, peak_power_kw: float) -> float:
         return peak_power_kw * 0.35
     else:
         return 0.0
-    
+
+
 def generate_daily_solar_profile(peak_power: int) -> list[float]:
     daily_solar_generation_kwh = []
 
     for hour in range(24):
         solar_generation = get_solar_generation_for_hour(hour, peak_power)
         daily_solar_generation_kwh.append(solar_generation)
-    
+
     return daily_solar_generation_kwh
 
-def simulate_self_consumption(consumption_kwh: list[float], solar_generation_kwh: list[float]) -> tuple[list[float], list[float], list[float]]:
+
+def simulate_self_consumption(
+    consumption_kwh: list[float], solar_generation_kwh: list[float]
+) -> tuple[list[float], list[float], list[float]]:
     self_consumed_kwh = []
     grid_import_kwh = []
     solar_surplus_kwh = []
-
 
     for hour, solar_generation in enumerate(solar_generation_kwh):
         consumption = consumption_kwh[hour]
@@ -42,11 +45,10 @@ def simulate_self_consumption(consumption_kwh: list[float], solar_generation_kwh
 
 
 def generate_solar_profile_for_timestamps(
-        timestamps,
-        peak_power_kw: float
+    timestamps, peak_power_kw: float
 ) -> list[float]:
     solar_generation_kwh = []
-    
+
     for timestamp in timestamps:
         hour = timestamp.hour
 
