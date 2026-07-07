@@ -52,6 +52,10 @@ Comparison table between the best historical optimization scenarios and the best
 
 Summary of the configuration used by the project pipeline, including input data paths, PVGIS settings, grid search parameters, battery model assumptions, economic assumptions and the active tariff profile.
 
+### `final_results_summary.md`
+
+Readable final summary of the main results produced by the full pipeline. It compares the best historical and forecast-based optimization scenarios.
+
 ### `summary.txt`
 
 Readable summary of the best historical economic scenario and the best historical self-sufficiency scenario.

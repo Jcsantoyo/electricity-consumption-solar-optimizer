@@ -386,6 +386,13 @@ def build_outputs_index_text(solar_data_source: str) -> str:
         "input data paths, PVGIS settings, grid search parameters, battery "
         "model assumptions, economic assumptions and the active tariff profile.\n\n"
     )
+    
+    text += "### `final_results_summary.md`\n\n"
+    text += (
+        "Readable final summary of the main results produced by the full "
+        "pipeline. It compares the best historical and forecast-based "
+        "optimization scenarios.\n\n"
+    )
 
     text += "### `summary.txt`\n\n"
     text += (
