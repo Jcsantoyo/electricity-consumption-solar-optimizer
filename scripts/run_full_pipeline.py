@@ -24,6 +24,10 @@ def main() -> None:
     commands = [
         [
             python_executable,
+            "scripts/generate_config_summary.py"
+        ],
+        [
+            python_executable,
             "src/main.py"
         ],
         [
