@@ -706,6 +706,7 @@ electricity-consumption-solar-optimizer/
 │   ├── test_tariff.py
 │   └── README.md
 │
+├── CONTRIBUTING.md
 ├── LICENSE
 ├── Makefile
 ├── pyproject.toml
@@ -727,6 +728,8 @@ SETUP.md
 ```
 
 It explains how to clone the repository, create a virtual environment, install dependencies, prepare the required data files, run tests, run lint checks and execute the full pipeline.
+
+For development workflow and contribution notes, see `CONTRIBUTING.md`.
 
 ## Installation
 
@@ -1500,6 +1503,16 @@ It combines:
 The project can be adapted to a real household by replacing the public dataset with consumption data downloaded from a smart meter, Datadis or an electricity distributor.
 
 ---
+
+## Contributing
+
+Development workflow notes are available in:
+
+```text
+CONTRIBUTING.md
+```
+
+It explains how to set up the project, run tests, run lint checks, execute the full pipeline and prepare commits.
 
 ## License
 
