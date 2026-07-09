@@ -658,6 +658,7 @@ electricity-consumption-solar-optimizer/
 │   ├── test_solar_data_loader.py
 │   └── test_tariff.py
 │
+├── LICENSE
 ├── Makefile
 ├── pyproject.toml
 ├── requirements.txt
@@ -1438,6 +1439,14 @@ It combines:
 - Continuous integration
 
 The project can be adapted to a real household by replacing the public dataset with consumption data downloaded from a smart meter, Datadis or an electricity distributor.
+
+---
+
+## License
+
+This project is licensed under the MIT License.
+
+See the `LICENSE` file for details.
 
 ---
 
