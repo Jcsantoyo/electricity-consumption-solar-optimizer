@@ -706,6 +706,7 @@ electricity-consumption-solar-optimizer/
 │   ├── test_tariff.py
 │   └── README.md
 │
+├── CHANGELOG.md
 ├── CONTRIBUTING.md
 ├── LICENSE
 ├── Makefile
@@ -1503,6 +1504,16 @@ It combines:
 The project can be adapted to a real household by replacing the public dataset with consumption data downloaded from a smart meter, Datadis or an electricity distributor.
 
 ---
+
+## Changelog
+
+Project changes and milestones are documented in:
+
+```text
+CHANGELOG.md
+```
+
+The changelog summarizes the main features, documentation improvements, testing setup and reproducibility work added to the project.
 
 ## Contributing
 
