@@ -588,6 +588,21 @@ The full pipeline also generates `reports/final_results_summary.md`, a readable 
 
 ---
 
+## Folder documentation
+
+Several folders include their own README files with more detailed documentation:
+
+- `data/README.md`
+- `reports/README.md`
+- `images/README.md`
+- `scripts/README.md`
+- `src/README.md`
+- `tests/README.md`
+- `notebooks/README.md`
+- `.github/workflows/README.md`
+
+These files explain the purpose of each folder, the main files inside them and how they relate to the full project pipeline.
+
 ## Repository structure
 
 ```text
@@ -595,7 +610,8 @@ electricity-consumption-solar-optimizer/
 │
 ├── .github/
 │   └── workflows/
-│       └── tests.yml
+│       ├── tests.yml
+│       └── README.md
 │
 ├── data/
 │   ├── raw/
@@ -623,7 +639,8 @@ electricity-consumption-solar-optimizer/
 │   ├── historical_vs_forecast_savings.png
 │   ├── historical_vs_forecast_self_sufficiency.png
 │   ├── historical_vs_forecast_investment_cost.png
-│   └── historical_vs_forecast_grid_import.png
+│   ├── historical_vs_forecast_grid_import.png
+│   └── README.md
 │
 ├── reports/
 │   ├── configuration_summary.md
@@ -639,13 +656,15 @@ electricity-consumption-solar-optimizer/
 │   ├── forecast_optimization_best_scenarios.csv
 │   ├── historical_vs_forecast_optimization.csv
 │   ├── summary.txt
-│   └── outputs_index.md
+│   ├── outputs_index.md
+│   └── README.md
 │
 ├── notebooks/
 │   ├── 01_exploratory_analysis.ipynb
 │   ├── 02_solar_battery_simulation.ipynb
 │   ├── 03_optimization_analysis.ipynb
-│   └── 04_consumption_forecasting.ipynb
+│   ├── 04_consumption_forecasting.ipynb
+│   └── README.md
 │
 ├── scripts/
 │   ├── __init__.py
@@ -657,7 +676,8 @@ electricity-consumption-solar-optimizer/
 │   ├── run_forecast_optimization.py
 │   ├── run_full_pipeline.py
 │   ├── test_pvgis_generation_match.py
-│   └── test_pvgis_loader.py
+│   ├── test_pvgis_loader.py
+│   └── README.md
 │
 ├── src/
 │   ├── battery.py
@@ -672,7 +692,8 @@ electricity-consumption-solar-optimizer/
 │   ├── solar_data_loader.py
 │   ├── tariff.py
 │   ├── uci_household_loader.py
-│   └── visualization.py
+│   ├── visualization.py
+│   └── README.md
 │
 ├── tests/
 │   ├── test_battery.py
@@ -680,7 +701,8 @@ electricity-consumption-solar-optimizer/
 │   ├── test_economics.py
 │   ├── test_forecasting.py
 │   ├── test_solar_data_loader.py
-│   └── test_tariff.py
+│   ├── test_tariff.py
+│   └── README.md
 │
 ├── LICENSE
 ├── Makefile
