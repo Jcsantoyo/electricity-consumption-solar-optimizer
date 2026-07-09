@@ -7,6 +7,14 @@ __pycache__/
 *.pyo
 *.pyd
 
+# Test and lint cache
+.pytest_cache/
+.ruff_cache/
+
+# Coverage reports
+.coverage
+htmlcov/
+
 # Jupyter
 .ipynb_checkpoints/
 
@@ -16,6 +24,11 @@ __pycache__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
 
 # Data files
 data/raw/*
