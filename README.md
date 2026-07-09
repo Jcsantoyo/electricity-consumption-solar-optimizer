@@ -31,6 +31,8 @@ This project builds a complete data science pipeline for residential solar and b
 
 It uses real household electricity consumption data, PVGIS solar generation, configurable electricity tariffs, battery simulation, Machine Learning forecasting and forecast-based optimization.
 
+For setup instructions from a fresh clone, see `SETUP.md`.
+
 The full pipeline can be run with:
 
 ```bash
@@ -590,7 +592,7 @@ The full pipeline also generates `reports/final_results_summary.md`, a readable 
 
 ## Folder documentation
 
-Several folders include their own README files with more detailed documentation:
+Several folders include their own README files with more detailed documentation. The repository also includes `SETUP.md` for installation and execution instructions:
 
 - `data/README.md`
 - `reports/README.md`
@@ -707,6 +709,7 @@ electricity-consumption-solar-optimizer/
 ├── LICENSE
 ├── Makefile
 ├── pyproject.toml
+├── SETUP.md
 ├── requirements.txt
 ├── .gitattributes
 ├── .gitignore
@@ -714,6 +717,16 @@ electricity-consumption-solar-optimizer/
 ```
 
 ---
+
+## Setup guide
+
+A detailed setup guide is available in:
+
+```text
+SETUP.md
+```
+
+It explains how to clone the repository, create a virtual environment, install dependencies, prepare the required data files, run tests, run lint checks and execute the full pipeline.
 
 ## Installation
 
