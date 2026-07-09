@@ -27,6 +27,7 @@ from battery import simulate_battery
 
 from solar_data_loader import load_pvgis_solar_data, get_pvgis_generation_for_timestamps
 
+from price_loader import load_hourly_prices_if_enabled
 
 def ensure_output_directories() -> None:
     os.makedirs("reports", exist_ok=True)
@@ -73,6 +74,17 @@ def main() -> None:
             print(f"\nInvalid PVGIS solar data file: {config.PVGIS_SOLAR_DATA_PATH}")
             print(error)
             return
+        
+
+    hourly_price_df = load_hourly_prices_if_enabled(
+        use_hourly_price_data=config.USE_HOURLY_PRICE_DATA,
+        file_path=config.HOURLY_PRICE_DATA_PATH
+    )
+
+    if hourly_price_df is None:
+        print("Hourly electricity price data: disabled")
+    else:
+        print(f"Hourly electricity price data loaded: {len(hourly_price_df)} rows")
 
     battery_capacities_kwh = config.BATTERY_CAPACITIES_KWH
 
