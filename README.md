@@ -47,10 +47,13 @@ Main outputs:
 
 The project is designed to compare whether the best solar and battery configuration changes when the optimization is based on historical consumption or predicted future consumption.
 
+It was also developed as a learning project to improve Python, data analysis and Machine Learning workflow skills.
+
 ## Project highlights
 
 This project demonstrates:
 
+- Learning-oriented Python and data analysis project
 - End-to-end data science pipeline design
 - Real-world electricity consumption data processing
 - PVGIS solar generation integration
@@ -66,6 +69,16 @@ This project demonstrates:
 - Automated testing with pytest
 - Basic code quality checks with Ruff
 - Continuous integration with GitHub Actions
+
+## Learning purpose and AI assistance
+
+This project was also developed as a learning project.
+
+One of its goals was to improve practical Python skills and learn more about data analysis, time series processing, Machine Learning workflows, testing, automation and project organization.
+
+AI assistance was used during the development process as a learning and guidance tool. It helped with planning the project structure, explaining concepts, reviewing code ideas, debugging errors and improving documentation.
+
+The implementation, decisions, testing, execution and repository maintenance were carried out iteratively while using the project as a way to learn by building.
 
 ## Project overview
 
@@ -96,6 +109,16 @@ The forecasting pipeline:
 The full pipeline runner executes all main stages in order using a single command.
 
 ---
+
+## Data documentation
+
+The `data/` folder includes its own README:
+
+```text
+data/README.md
+```
+
+It explains the raw, processed and simulated datasets used by the project, including the UCI household consumption dataset, PVGIS solar generation data and the processed hourly consumption file.
 
 ## Current dataset
 
@@ -582,8 +605,9 @@ electricity-consumption-solar-optimizer/
 │   ├── processed/
 │   │   └── uci_household_power_hourly.csv
 │   │
-│   └── simulated/
-│       └── synthetic_consumption_30_days.csv
+│   ├── simulated/
+│   │   └── synthetic_consumption_30_days.csv
+│   └── README.md
 │
 ├── images/
 │   ├── main_payback_grid_search.png
