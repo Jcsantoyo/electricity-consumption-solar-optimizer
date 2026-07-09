@@ -48,3 +48,12 @@ def prepare_hourly_price_data(price_df: pd.DataFrame) -> pd.DataFrame:
     prepared_df = prepared_df.reset_index(drop=True)
 
     return prepared_df
+
+def load_hourly_prices_if_enabled(
+        use_hourly_price_data: bool,
+        file_path: str
+) -> pd.DataFrame | None:
+    if not use_hourly_price_data:
+        return None
+    
+    return load_hourly_prices(file_path)

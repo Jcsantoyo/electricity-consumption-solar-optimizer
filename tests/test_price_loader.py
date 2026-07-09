@@ -6,6 +6,7 @@ from price_loader import (
     load_hourly_prices,
     prepare_hourly_price_data,
     validate_hourly_price_columns,
+    load_hourly_prices_if_enabled
 )
 
 
@@ -123,3 +124,31 @@ def test_hourly_price_data_is_disabled_by_default() -> None:
 def test_hourly_price_data_path_points_to_raw_data_folder() -> None:
     assert config.HOURLY_PRICE_DATA_PATH.startswith("data/raw/")
     assert config.HOURLY_PRICE_DATA_PATH.endswith(".csv")
+
+def test_load_hourly_prices_if_enabled_returns_none_when_disabled() -> None:
+    price_df = load_hourly_prices_if_enabled(
+        use_hourly_price_data=False,
+        file_path="missing_hourly_prices.csv",
+    )
+
+    assert price_df is None
+
+
+def test_load_hourly_prices_if_enabled_loads_file_when_enabled(tmp_path) -> None:
+    price_file = tmp_path / "hourly_prices.csv"
+
+    price_file.write_text(
+        "datetime,price_eur_per_kwh\n"
+        "2025-01-01 01:00:00,0.11\n"
+        "2025-01-01 00:00:00,0.12\n",
+        encoding="utf-8",
+    )
+
+    price_df = load_hourly_prices_if_enabled(
+        use_hourly_price_data=True,
+        file_path=str(price_file),
+    )
+
+    assert price_df is not None
+    assert len(price_df) == 2
+    assert list(price_df["price_eur_per_kwh"]) == [0.12, 0.11]
