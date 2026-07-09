@@ -47,6 +47,26 @@ Main outputs:
 
 The project is designed to compare whether the best solar and battery configuration changes when the optimization is based on historical consumption or predicted future consumption.
 
+## Project highlights
+
+This project demonstrates:
+
+- End-to-end data science pipeline design
+- Real-world electricity consumption data processing
+- PVGIS solar generation integration
+- Solar self-consumption simulation
+- Battery charge and discharge simulation
+- Configurable electricity tariff modeling
+- Economic grid search optimization
+- Machine Learning consumption forecasting
+- Forecast-based decision making
+- Historical vs forecast-based scenario comparison
+- Reproducible reports and plots
+- Makefile-based project commands
+- Automated testing with pytest
+- Basic code quality checks with Ruff
+- Continuous integration with GitHub Actions
+
 ## Project overview
 
 This project simulates how a household could reduce grid electricity consumption by installing photovoltaic solar panels and, optionally, a battery.
