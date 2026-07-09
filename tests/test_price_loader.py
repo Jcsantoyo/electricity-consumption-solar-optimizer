@@ -1,0 +1,111 @@
+import pandas as pd
+import pytest
+
+from price_loader import (
+    load_hourly_prices,
+    prepare_hourly_price_data,
+    validate_hourly_price_columns,
+)
+
+
+def test_validate_hourly_price_columns_accepts_valid_columns() -> None:
+    price_df = pd.DataFrame(
+        {
+            "datetime": ["2025-01-01 00:00:00"],
+            "price_eur_per_kwh": [0.12],
+        }
+    )
+
+    validate_hourly_price_columns(price_df)
+
+
+def test_validate_hourly_price_columns_raises_error_for_missing_columns() -> None:
+    price_df = pd.DataFrame(
+        {
+            "datetime": ["2025-01-01 00:00:00"],
+            "price": [0.12],
+        }
+    )
+
+    with pytest.raises(ValueError, match="Missing required hourly price columns"):
+        validate_hourly_price_columns(price_df)
+
+
+def test_prepare_hourly_price_data_converts_and_sorts_data() -> None:
+    price_df = pd.DataFrame(
+        {
+            "datetime": [
+                "2025-01-01 02:00:00",
+                "2025-01-01 00:00:00",
+                "2025-01-01 01:00:00",
+            ],
+            "price_eur_per_kwh": [
+                "0.10",
+                "0.12",
+                "0.11",
+            ],
+        }
+    )
+
+    prepared_df = prepare_hourly_price_data(price_df)
+
+    assert list(prepared_df["price_eur_per_kwh"]) == [0.12, 0.11, 0.10]
+    assert prepared_df["datetime"].is_monotonic_increasing
+
+
+def test_prepare_hourly_price_data_raises_error_for_invalid_datetime() -> None:
+    price_df = pd.DataFrame(
+        {
+            "datetime": ["not-a-date"],
+            "price_eur_per_kwh": [0.12],
+        }
+    )
+
+    with pytest.raises(ValueError, match="invalid datetime"):
+        prepare_hourly_price_data(price_df)
+
+
+def test_prepare_hourly_price_data_raises_error_for_invalid_price() -> None:
+    price_df = pd.DataFrame(
+        {
+            "datetime": ["2025-01-01 00:00:00"],
+            "price_eur_per_kwh": ["not-a-price"],
+        }
+    )
+
+    with pytest.raises(ValueError, match="invalid price"):
+        prepare_hourly_price_data(price_df)
+
+
+def test_prepare_hourly_price_data_raises_error_for_negative_price() -> None:
+    price_df = pd.DataFrame(
+        {
+            "datetime": ["2025-01-01 00:00:00"],
+            "price_eur_per_kwh": [-0.01],
+        }
+    )
+
+    with pytest.raises(ValueError, match="negative prices"):
+        prepare_hourly_price_data(price_df)
+
+
+def test_load_hourly_prices_loads_valid_csv(tmp_path) -> None:
+    price_file = tmp_path / "hourly_prices.csv"
+
+    price_file.write_text(
+        "datetime,price_eur_per_kwh\n"
+        "2025-01-01 01:00:00,0.11\n"
+        "2025-01-01 00:00:00,0.12\n",
+        encoding="utf-8",
+    )
+
+    price_df = load_hourly_prices(str(price_file))
+
+    assert len(price_df) == 2
+    assert list(price_df["price_eur_per_kwh"]) == [0.12, 0.11]
+    assert price_df["datetime"].is_monotonic_increasing
+
+
+def test_load_hourly_prices_raises_error_for_missing_file() -> None:
+    with pytest.raises(FileNotFoundError, match="Hourly price file not found"):
+        load_hourly_prices("missing_hourly_prices.csv")
