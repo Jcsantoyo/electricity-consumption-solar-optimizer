@@ -711,6 +711,7 @@ electricity-consumption-solar-optimizer/
 ├── LICENSE
 ├── Makefile
 ├── pyproject.toml
+├── ROADMAP.md
 ├── SETUP.md
 ├── requirements.txt
 ├── .gitattributes
@@ -1505,6 +1506,16 @@ The project can be adapted to a real household by replacing the public dataset w
 
 ---
 
+## Roadmap
+
+Possible future improvements are documented in:
+
+```text
+ROADMAP.md
+```
+
+The roadmap lists possible next steps such as hourly electricity price support, PVPC/ESIOS integration, weather-based forecasting, a YAML configuration file, a command-line interface, a Streamlit dashboard, real household data adaptation and stricter code quality checks.
+
 ## Changelog
 
 Project changes and milestones are documented in:
@@ -1534,6 +1545,9 @@ See the `LICENSE` file for details.
 ---
 
 ## Future improvements
+
+A more detailed list of future improvements is available in `ROADMAP.md`.
+
 
 Possible next steps:
 
