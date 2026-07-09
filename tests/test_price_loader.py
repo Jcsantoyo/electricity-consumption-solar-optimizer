@@ -1,5 +1,6 @@
 import pandas as pd
 import pytest
+import config
 
 from price_loader import (
     load_hourly_prices,
@@ -109,3 +110,16 @@ def test_load_hourly_prices_loads_valid_csv(tmp_path) -> None:
 def test_load_hourly_prices_raises_error_for_missing_file() -> None:
     with pytest.raises(FileNotFoundError, match="Hourly price file not found"):
         load_hourly_prices("missing_hourly_prices.csv")
+
+def test_hourly_price_configuration_exists() -> None:
+    assert isinstance(config.USE_HOURLY_PRICE_DATA, bool)
+    assert isinstance(config.HOURLY_PRICE_DATA_PATH, str)
+
+
+def test_hourly_price_data_is_disabled_by_default() -> None:
+    assert config.USE_HOURLY_PRICE_DATA is False
+
+
+def test_hourly_price_data_path_points_to_raw_data_folder() -> None:
+    assert config.HOURLY_PRICE_DATA_PATH.startswith("data/raw/")
+    assert config.HOURLY_PRICE_DATA_PATH.endswith(".csv")
