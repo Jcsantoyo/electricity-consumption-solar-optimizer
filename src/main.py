@@ -112,6 +112,7 @@ def main() -> None:
         power_price_eur_per_kw_year=tariff_profile["power_price_eur_per_kw_year"],
         simulation_days=simulation_days,
         pvgis_df=pvgis_df,
+        hourly_price_df=hourly_price_df
     )
 
     results_output_path = config.GRID_SEARCH_RESULTS_PATH

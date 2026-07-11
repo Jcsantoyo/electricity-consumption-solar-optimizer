@@ -146,7 +146,7 @@ def run_economic_grid_search(
 
             simulation_df["solar_generation_kwh"] = solar_generation_kwh
 
-            scenario_net_cost = calculate_net_electricity_cost_with_tariff(
+            scenario_net_cost = calculate_net_electricity_cost_for_price_mode(
                 simulation_df,
                 grid_import_column="grid_import_kwh",
                 surplus_column="solar_surplus_kwh",

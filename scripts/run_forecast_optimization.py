@@ -18,7 +18,7 @@ from optimization import (
     build_best_scenarios_dataframe,
 )
 from solar_data_loader import load_pvgis_solar_data
-
+from price_loader import load_hourly_prices_if_enabled
 
 def main() -> None:
     os.makedirs("reports", exist_ok=True)
@@ -39,13 +39,29 @@ def main() -> None:
         pvgis_df = load_pvgis_solar_data(config.PVGIS_SOLAR_DATA_PATH)
     else:
         pvgis_df = None
+   
+    hourly_price_df = load_hourly_prices_if_enabled(
+        use_hourly_price_data=config.USE_HOURLY_PRICE_DATA,
+        file_path=config.HOURLY_PRICE_DATA_PATH,
+    )
 
+    if hourly_price_df is None:
+        print("Hourly electricity price data: disabled")
+    else:
+        print(
+            "Hourly electricity price data loaded: "
+            f"{len(hourly_price_df)} rows"
+    )
+        
+        
     simulation_days = (
         forecasted_consumption_df["datetime"].max()
         - forecasted_consumption_df["datetime"].min()
     ).days + 1
 
     tariff_profile = config.get_active_tariff_profile()
+
+    
 
     results_df = run_economic_grid_search(
         consumption_df=forecasted_consumption_df,
@@ -66,6 +82,7 @@ def main() -> None:
         power_price_eur_per_kw_year=tariff_profile["power_price_eur_per_kw_year"],
         simulation_days=simulation_days,
         pvgis_df=pvgis_df,
+        hourly_price_df=hourly_price_df
     )
 
     optimization_results_path = "reports/forecast_optimization_results.csv"
