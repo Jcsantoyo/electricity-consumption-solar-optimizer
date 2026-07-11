@@ -50,10 +50,44 @@ def prepare_hourly_price_data(price_df: pd.DataFrame) -> pd.DataFrame:
     return prepared_df
 
 def load_hourly_prices_if_enabled(
-        use_hourly_price_data: bool,
-        file_path: str
+    use_hourly_price_data: bool,
+    file_path: str
 ) -> pd.DataFrame | None:
     if not use_hourly_price_data:
         return None
     
     return load_hourly_prices(file_path)
+
+
+def validate_hourly_price_coverage(
+    consumption_df: pd.DataFrame,
+    price_df: pd.DataFrame
+) -> None:
+    
+    if "datetime" not in consumption_df.columns:
+        raise ValueError("Consumtion data is missing required column: datetime")
+    
+    if "datetime" not in price_df.columns:
+        raise ValueError("Hourly price data is missing required column: datetime")
+    
+    consumption_datetimes = set(
+        pd.to_datetime(consumption_df["datetime"], errors="coerce")
+    )
+
+    price_datetimes = set(
+        pd.to_datetime(price_df["datetime"], errors="coerce")
+    )
+
+    if pd.NaT in consumption_datetimes:
+        raise ValueError("Consumption data contains invalid datetime values")
+    
+    if pd.NaT in price_datetimes:
+        raise ValueError("Hourly price data contains invalid datetime values")
+    
+    missing_datetimes = consumption_datetimes - price_datetimes
+
+    if missing_datetimes:
+        raise ValueError(
+            "Hourly price data does not cover "
+            f"{len(missing_datetimes)} consumption timestamps"
+        )

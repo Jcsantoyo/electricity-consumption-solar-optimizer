@@ -18,7 +18,10 @@ from optimization import (
     build_best_scenarios_dataframe,
 )
 from solar_data_loader import load_pvgis_solar_data
-from price_loader import load_hourly_prices_if_enabled
+from price_loader import(
+    load_hourly_prices_if_enabled,
+    validate_hourly_price_coverage
+) 
 
 def main() -> None:
     os.makedirs("reports", exist_ok=True)
@@ -48,12 +51,17 @@ def main() -> None:
     if hourly_price_df is None:
         print("Hourly electricity price data: disabled")
     else:
+        validate_hourly_price_coverage(
+            consumption_df=forecasted_consumption_df,
+            price_df=hourly_price_df,
+        )
+
         print(
             "Hourly electricity price data loaded: "
             f"{len(hourly_price_df)} rows"
-    )
+        )
         
-        
+
     simulation_days = (
         forecasted_consumption_df["datetime"].max()
         - forecasted_consumption_df["datetime"].min()

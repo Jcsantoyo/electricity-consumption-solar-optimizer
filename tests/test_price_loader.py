@@ -6,7 +6,8 @@ from price_loader import (
     load_hourly_prices,
     prepare_hourly_price_data,
     validate_hourly_price_columns,
-    load_hourly_prices_if_enabled
+    load_hourly_prices_if_enabled,
+    validate_hourly_price_coverage
 )
 
 
@@ -152,3 +153,101 @@ def test_load_hourly_prices_if_enabled_loads_file_when_enabled(tmp_path) -> None
     assert price_df is not None
     assert len(price_df) == 2
     assert list(price_df["price_eur_per_kwh"]) == [0.12, 0.11]
+
+def test_validate_hourly_price_coverage_accepts_complete_coverage() -> None:
+    consumption_df = pd.DataFrame(
+        {
+            "datetime": [
+                "2025-01-01 00:00:00",
+                "2025-01-01 01:00:00",
+            ],
+            "consumption_kwh": [
+                1.0,
+                2.0,
+            ],
+        }
+    )
+
+    price_df = pd.DataFrame(
+        {
+            "datetime": [
+                "2025-01-01 00:00:00",
+                "2025-01-01 01:00:00",
+            ],
+            "price_eur_per_kwh": [
+                0.10,
+                0.20,
+            ],
+        }
+    )
+
+    validate_hourly_price_coverage(
+        consumption_df=consumption_df,
+        price_df=price_df,
+    )
+
+
+def test_validate_hourly_price_coverage_raises_error_for_missing_timestamp() -> None:
+    consumption_df = pd.DataFrame(
+        {
+            "datetime": [
+                "2025-01-01 00:00:00",
+                "2025-01-01 01:00:00",
+            ],
+            "consumption_kwh": [
+                1.0,
+                2.0,
+            ],
+        }
+    )
+
+    price_df = pd.DataFrame(
+        {
+            "datetime": [
+                "2025-01-01 00:00:00",
+            ],
+            "price_eur_per_kwh": [
+                0.10,
+            ],
+        }
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="does not cover 1 consumption timestamps",
+    ):
+        validate_hourly_price_coverage(
+            consumption_df=consumption_df,
+            price_df=price_df,
+        )
+
+
+def test_validate_hourly_price_coverage_ignores_extra_price_timestamps() -> None:
+    consumption_df = pd.DataFrame(
+        {
+            "datetime": [
+                "2025-01-01 00:00:00",
+            ],
+            "consumption_kwh": [
+                1.0,
+            ],
+        }
+    )
+
+    price_df = pd.DataFrame(
+        {
+            "datetime": [
+                "2025-01-01 00:00:00",
+                "2025-01-01 01:00:00",
+            ],
+            "price_eur_per_kwh": [
+                0.10,
+                0.20,
+            ],
+        }
+    )
+
+    validate_hourly_price_coverage(
+        consumption_df=consumption_df,
+        price_df=price_df,
+    )
