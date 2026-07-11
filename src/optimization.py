@@ -7,9 +7,70 @@ from economics import (
 )
 
 from solar_data_loader import get_pvgis_generation_for_timestamps
-from tariff import calculate_net_electricity_cost_with_tariff
 from battery import simulate_battery
+from hourly_price_calculator import calculate_total_hourly_grid_import_cost
+from tariff import(
+    calculate_fixed_power_cost,
+    calculate_net_electricity_cost_with_tariff,
+    calculate_surplus_compensation
+)
 
+def calculate_net_electricity_cost_for_price_mode(
+    df: pd.DataFrame,
+    grid_import_column: str,
+    surplus_column: str,
+    peak_price: float,
+    flat_price: float,
+    off_peak_price: float,
+    surplus_compensation_price: float,
+    contracted_power_kw: float,
+    power_price_eur_per_kw_year: float,
+    simulation_days: int,
+    hourly_price_df: pd.DataFrame | None = None
+) -> float:
+    
+    if hourly_price_df is None:
+        return calculate_net_electricity_cost_with_tariff(
+            df,
+            grid_import_column,
+            surplus_column,
+            peak_price,
+            flat_price,
+            off_peak_price,
+            surplus_compensation_price,
+            contracted_power_kw,
+            power_price_eur_per_kw_year,
+            simulation_days
+        )
+    
+    hourly_energy_df = df[["datetime", grid_import_column]].copy()
+
+    hourly_energy_df = hourly_energy_df.rename(
+        columns={
+            grid_import_column: "grid_import_kwh"
+        }
+    )
+
+    variable_grid_cost = calculate_total_hourly_grid_import_cost(
+        hourly_energy_df,
+        hourly_price_df
+    )
+
+    surplus_compensation = calculate_surplus_compensation(
+        df,
+        surplus_column,
+        surplus_compensation_price
+    )
+
+    fixed_power_cost = calculate_fixed_power_cost(
+        contracted_power_kw,
+        power_price_eur_per_kw_year,
+        simulation_days
+    )
+
+    net_cost = variable_grid_cost + fixed_power_cost - surplus_compensation
+
+    return max(net_cost, 0.0)
 
 def run_economic_grid_search(
     consumption_df: pd.DataFrame,
@@ -30,6 +91,7 @@ def run_economic_grid_search(
     power_price_eur_per_kw_year: float,
     simulation_days: int,
     pvgis_df: pd.DataFrame | None = None,
+    hourly_price_df: pd.DataFrame | None = None
 ) -> pd.DataFrame:
     results = []
 
@@ -37,7 +99,7 @@ def run_economic_grid_search(
     base_cost_df["grid_import_kwh"] = base_cost_df["consumption_kwh"]
     base_cost_df["solar_surplus_kwh"] = 0.0
 
-    base_net_cost = calculate_net_electricity_cost_with_tariff(
+    base_net_cost = calculate_net_electricity_cost_for_price_mode(
         base_cost_df,
         grid_import_column="grid_import_kwh",
         surplus_column="solar_surplus_kwh",
@@ -48,6 +110,7 @@ def run_economic_grid_search(
         contracted_power_kw=contracted_power_kw,
         power_price_eur_per_kw_year=power_price_eur_per_kw_year,
         simulation_days=simulation_days,
+        hourly_price_df=hourly_price_df
     )
 
     for solar_peak_power_kw in solar_peak_powers_kw:
@@ -94,6 +157,7 @@ def run_economic_grid_search(
                 contracted_power_kw=contracted_power_kw,
                 power_price_eur_per_kw_year=power_price_eur_per_kw_year,
                 simulation_days=simulation_days,
+                hourly_price_df=hourly_price_df
             )
 
             period_savings = base_net_cost - scenario_net_cost
