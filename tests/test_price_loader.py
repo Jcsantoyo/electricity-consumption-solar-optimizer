@@ -251,3 +251,55 @@ def test_validate_hourly_price_coverage_ignores_extra_price_timestamps() -> None
         consumption_df=consumption_df,
         price_df=price_df,
     )
+
+def test_prepare_hourly_price_data_allows_negative_prices_when_enabled() -> None:
+    price_df = pd.DataFrame(
+        {
+            "datetime": [
+                "2026-07-05 10:00:00",
+                "2026-07-05 11:00:00",
+            ],
+            "price_eur_per_kwh": [
+                -0.0000475,
+                -0.0001025,
+            ],
+        }
+    )
+
+    prepared_df = prepare_hourly_price_data(
+        price_df,
+        allow_negative_prices=True,
+    )
+
+    assert list(prepared_df["price_eur_per_kwh"]) == pytest.approx(
+        [
+            -0.0000475,
+            -0.0001025,
+        ]
+    )
+
+def test_load_hourly_prices_allows_negative_prices_when_enabled(
+    tmp_path,
+) -> None:
+    price_file = tmp_path / "omie_hourly_prices.csv"
+
+    price_file.write_text(
+        "datetime,price_eur_per_kwh\n"
+        "2026-07-05 10:00:00,-0.0000475\n"
+        "2026-07-05 11:00:00,-0.0001025\n",
+        encoding="utf-8",
+    )
+
+    price_df = load_hourly_prices(
+        file_path=str(price_file),
+        allow_negative_prices=True,
+    )
+
+    assert len(price_df) == 2
+    assert price_df["price_eur_per_kwh"].min() < 0
+
+def test_negative_hourly_price_configuration_exists() -> None:
+    assert isinstance(
+        config.ALLOW_NEGATIVE_HOURLY_PRICES,
+        bool,
+    )

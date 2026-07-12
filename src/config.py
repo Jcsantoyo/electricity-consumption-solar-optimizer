@@ -67,6 +67,7 @@ TARIFF_PROFILES = {
 # Hourly electricity price data
 USE_HOURLY_PRICE_DATA = False
 HOURLY_PRICE_DATA_PATH = "data/raw/hourly_prices.csv"
+ALLOW_NEGATIVE_HOURLY_PRICES = True
 
 
 def get_active_tariff_profile() -> dict:

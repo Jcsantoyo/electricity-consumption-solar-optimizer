@@ -46,6 +46,7 @@ def main() -> None:
     hourly_price_df = load_hourly_prices_if_enabled(
         use_hourly_price_data=config.USE_HOURLY_PRICE_DATA,
         file_path=config.HOURLY_PRICE_DATA_PATH,
+        allow_negative_prices=config.ALLOW_NEGATIVE_HOURLY_PRICES
     )
 
     if hourly_price_df is None:
