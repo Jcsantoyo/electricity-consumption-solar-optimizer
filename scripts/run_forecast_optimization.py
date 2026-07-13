@@ -23,6 +23,8 @@ from price_loader import(
     validate_hourly_price_coverage
 ) 
 
+from price_mode import build_electricity_price_mode_description
+
 def main() -> None:
     os.makedirs("reports", exist_ok=True)
 
@@ -62,6 +64,7 @@ def main() -> None:
             f"{len(hourly_price_df)} rows"
         )
         
+    
 
     simulation_days = (
         forecasted_consumption_df["datetime"].max()
@@ -70,7 +73,18 @@ def main() -> None:
 
     tariff_profile = config.get_active_tariff_profile()
 
-    
+    electricity_price_mode = (
+        build_electricity_price_mode_description(
+            use_hourly_price_data=config.USE_HOURLY_PRICE_DATA,
+            hourly_price_data_path=config.HOURLY_PRICE_DATA_PATH,
+            tariff_profile_name=config.ACTIVE_TARIFF_PROFILE,
+        )
+    )
+
+    print(
+        "Electricity price mode: "
+        f"{electricity_price_mode}"
+    )
 
     results_df = run_economic_grid_search(
         consumption_df=forecasted_consumption_df,

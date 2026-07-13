@@ -32,6 +32,9 @@ from price_loader import (
     validate_hourly_price_coverage
 )
 
+from price_mode import build_electricity_price_mode_description
+
+
 def ensure_output_directories() -> None:
     os.makedirs("reports", exist_ok=True)
     os.makedirs("images", exist_ok=True)
@@ -97,6 +100,12 @@ def main() -> None:
             "Hourly electricity price data loaded: "
             f"{len(hourly_price_df)} rows"
         )
+
+    electricity_price_mode = build_electricity_price_mode_description(
+        use_hourly_price_data=config.USE_HOURLY_PRICE_DATA,
+        hourly_price_data_path=config.HOURLY_PRICE_DATA_PATH,
+        tariff_profile_name=config.ACTIVE_TARIFF_PROFILE
+    )
 
     battery_capacities_kwh = config.BATTERY_CAPACITIES_KWH
 
@@ -207,7 +216,7 @@ def main() -> None:
         print("Solar data source: synthetic profile")
     else:
         print(f"Solar data source: PVGIS ({config.PVGIS_SOLAR_DATA_PATH})")
-    print(f"Tariff profile: {config.ACTIVE_TARIFF_PROFILE}")
+    print(f"Electricity price mode: {electricity_price_mode}")
     print(f"Number of hours: {len(df_consumption)}")
     print(f"Results saved to: {results_output_path}")
     print(f"Summary saved to: {summary_output_path}")
