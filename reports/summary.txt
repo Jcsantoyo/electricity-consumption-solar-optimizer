@@ -2,6 +2,7 @@ Electricity Consumption Solar Optimizer
 ======================================
 
 Solar data source: PVGIS solar data (data/raw/pvgis_hourly_linares_1kw_2020.csv)
+Electricity price mode: Hourly electricity prices (data/processed/omie_hourly_prices.csv); fixed power cost and surplus compensation from tariff profile 'spanish_2_0td_example'
 
 Best scenario by payback:
 Solar peak power: 3.00 kW

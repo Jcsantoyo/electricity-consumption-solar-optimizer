@@ -149,7 +149,10 @@ def main() -> None:
         solar_data_source = f"PVGIS solar data ({config.PVGIS_SOLAR_DATA_PATH})"
 
     summary_text = build_scenario_summary_text(
-        best_payback_scenario, best_self_sufficiency_scenario, solar_data_source
+        best_payback_scenario, 
+        best_self_sufficiency_scenario, 
+        solar_data_source, 
+        electricity_price_mode
     )
 
     summary_output_path = config.SUMMARY_REPORT_PATH
@@ -200,7 +203,7 @@ def main() -> None:
     best_timeseries_output_path = config.BEST_SCENARIO_TIMESERIES_PATH
     best_timeseries_df.to_csv(best_timeseries_output_path, index=False)
 
-    outputs_index_text = build_outputs_index_text(solar_data_source)
+    outputs_index_text = build_outputs_index_text(solar_data_source, electricity_price_mode)
 
     outputs_index_path = config.OUTPUTS_INDEX_PATH
 
