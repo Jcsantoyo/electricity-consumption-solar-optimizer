@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -323,3 +325,68 @@ def plot_historical_vs_forecast_grid_import(
     plt.grid(axis="y")
 
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
+
+
+def plot_price_mode_comparison(
+    comparison_df: pd.DataFrame,
+    output_path: str,
+) -> None:
+    required_columns = {
+        "price_mode",
+        "variable_grid_cost_eur",
+    }
+
+    missing_columns = required_columns - set(comparison_df.columns)
+
+    if missing_columns:
+        missing_text = ", ".join(sorted(missing_columns))
+        raise ValueError(
+            f"Missing required comparison columns: {missing_text}"
+        )
+
+    display_names = {
+        "flat_fixed": "Fixed tariff",
+        "spanish_2_0td": "Spanish 2.0TD",
+        "hourly": "OMIE hourly",
+    }
+
+    plot_df = comparison_df.copy()
+
+    plot_df["price_mode_label"] = (
+        plot_df["price_mode"]
+        .map(display_names)
+        .fillna(plot_df["price_mode"])
+    )
+
+    output_file = Path(output_path)
+    output_file.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    figure, axis = plt.subplots(figsize=(8, 5))
+
+    bars = axis.bar(
+        plot_df["price_mode_label"],
+        plot_df["variable_grid_cost_eur"],
+    )
+
+    axis.set_title(
+        "Variable Grid-Import Cost by Price Mode"
+    )
+    axis.set_xlabel("Electricity price mode")
+    axis.set_ylabel("Variable grid cost (EUR)")
+    axis.grid(axis="y", alpha=0.3)
+
+    axis.bar_label(
+        bars,
+        fmt="%.2f EUR",
+        padding=3,
+    )
+
+    figure.tight_layout()
+    figure.savefig(
+        output_file,
+        dpi=150,
+    )
+    plt.close(figure)

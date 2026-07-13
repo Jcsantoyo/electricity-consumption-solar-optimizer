@@ -1,7 +1,6 @@
 import sys
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -13,6 +12,7 @@ if str(SRC_DIRECTORY) not in sys.path:
 import config
 from price_comparison import compare_all_price_modes
 from price_loader import load_hourly_prices
+from visualization import plot_price_mode_comparison
 
 DEFAULT_ENERGY_DATA_PATH = "reports/best_scenario_timeseries.csv"
 DEFAULT_OUTPUT_CSV_PATH = "reports/electricity_price_mode_comparison.csv"
@@ -116,32 +116,6 @@ def build_price_mode_comparison_markdown(
 
     return "\n".join(lines)
 
-def plot_price_mode_comparison(
-    comparison_df: pd.DataFrame,
-    output_path: str,
-) -> None:
-    output_file = Path(output_path)
-    output_file.parent.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
-    figure, axis = plt.subplots(figsize=(8, 5))
-
-    axis.bar(
-        comparison_df["price_mode"],
-        comparison_df["variable_grid_cost_eur"],
-    )
-
-    axis.set_title(
-        "Variable Grid-Import Cost by Price Mode"
-    )
-    axis.set_xlabel("Electricity price mode")
-    axis.set_ylabel("Variable grid cost (EUR)")
-    axis.grid(axis="y", alpha=0.3)
-
-    figure.tight_layout()
-    figure.savefig(output_file, dpi=150)
 
 def generate_price_mode_comparison(
     energy_data_path: str = DEFAULT_ENERGY_DATA_PATH,
