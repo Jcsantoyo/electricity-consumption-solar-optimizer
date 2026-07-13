@@ -1,0 +1,248 @@
+import sys
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import pandas as pd
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+SRC_DIRECTORY = PROJECT_ROOT / "src"
+
+if str(SRC_DIRECTORY) not in sys.path:
+    sys.path.insert(0, str(SRC_DIRECTORY))
+
+import config
+from price_comparison import compare_all_price_modes
+from price_loader import load_hourly_prices
+
+DEFAULT_ENERGY_DATA_PATH = "reports/best_scenario_timeseries.csv"
+DEFAULT_OUTPUT_CSV_PATH = "reports/electricity_price_mode_comparison.csv"
+DEFAULT_OUTPUT_MARKDOWN_PATH = "reports/electricity_price_mode_comparison.md"
+DEFAULT_OUTPUT_PLOT_PATH = "images/electricity_price_mode_comparison.png"
+
+# Example fixed household electricity price.
+# Replace this later with the real price from your contract.
+DEFAULT_FIXED_PRICE_EUR_PER_KWH = 0.20
+
+def load_energy_data(file_path: str) -> pd.DataFrame:
+    energy_df = pd.read_csv(file_path, parse_dates=["datetime"])
+
+    required_columns = {"datetime", "grid_import_kwh"}
+
+    missing_columns = required_columns - set(energy_df.columns)
+
+    if missing_columns:
+        missing_text = ", ".join(sorted(missing_columns))
+        raise ValueError(f"Missing required energy columns: {missing_text}")
+    
+    return energy_df[["datetime", "grid_import_kwh"]].copy()
+
+def build_price_mode_comparison_markdown(
+    comparison_df: pd.DataFrame,
+    fixed_price_eur_per_kwh: float,
+    energy_data_path: str,
+    hourly_price_data_path: str,
+) -> str:
+    cheapest_row = comparison_df.loc[
+        comparison_df["variable_grid_cost_eur"].idxmin()
+    ]
+
+    lines = [
+        "# Electricity Price Mode Comparison",
+        "",
+        (
+            "This report compares different electricity price "
+            "models using the same hourly grid-import profile."
+        ),
+        "",
+        "## Input data",
+        "",
+        f"- Energy data: `{energy_data_path}`",
+        (
+            "- Hourly electricity prices: "
+            f"`{hourly_price_data_path}`"
+        ),
+        (
+            "- Fixed electricity price: "
+            f"`{fixed_price_eur_per_kwh:.4f} EUR/kWh`"
+        ),
+        "",
+        "## Results",
+        "",
+        "| Price mode | Variable grid cost | Difference vs fixed | Difference vs 2.0TD |",
+        "|---|---:|---:|---:|",
+    ]
+
+    for row in comparison_df.itertuples(index=False):
+        lines.append(
+            f"| {row.price_mode} "
+            f"| {row.variable_grid_cost_eur:.2f} EUR "
+            f"| {row.difference_vs_flat_eur:.2f} EUR "
+            f"| {row.difference_vs_2_0td_eur:.2f} EUR |"
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Cheapest price mode",
+            "",
+            (
+                f"The lowest variable grid-import cost is obtained "
+                f"with `{cheapest_row['price_mode']}`:"
+            ),
+            "",
+            (
+                f"**{cheapest_row['variable_grid_cost_eur']:.2f} "
+                "EUR**"
+            ),
+            "",
+            "## Interpretation",
+            "",
+            (
+                "Only the variable cost of imported electricity is "
+                "compared here."
+            ),
+            (
+                "Fixed power charges, taxes, meter rental and surplus "
+                "compensation are not included in this comparison."
+            ),
+            (
+                "OMIE values represent wholesale market prices and "
+                "are not equivalent to a complete household retail "
+                "electricity tariff."
+            ),
+            "",
+        ]
+    )
+
+    return "\n".join(lines)
+
+def plot_price_mode_comparison(
+    comparison_df: pd.DataFrame,
+    output_path: str,
+) -> None:
+    output_file = Path(output_path)
+    output_file.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    figure, axis = plt.subplots(figsize=(8, 5))
+
+    axis.bar(
+        comparison_df["price_mode"],
+        comparison_df["variable_grid_cost_eur"],
+    )
+
+    axis.set_title(
+        "Variable Grid-Import Cost by Price Mode"
+    )
+    axis.set_xlabel("Electricity price mode")
+    axis.set_ylabel("Variable grid cost (EUR)")
+    axis.grid(axis="y", alpha=0.3)
+
+    figure.tight_layout()
+    figure.savefig(output_file, dpi=150)
+
+def generate_price_mode_comparison(
+    energy_data_path: str = DEFAULT_ENERGY_DATA_PATH,
+    fixed_price_eur_per_kwh: float = (
+        DEFAULT_FIXED_PRICE_EUR_PER_KWH
+    ),
+    output_csv_path: str = DEFAULT_OUTPUT_CSV_PATH,
+    output_markdown_path: str = (
+        DEFAULT_OUTPUT_MARKDOWN_PATH
+    ),
+    output_plot_path: str = DEFAULT_OUTPUT_PLOT_PATH,
+) -> pd.DataFrame:
+    energy_df = load_energy_data(energy_data_path)
+
+    price_df = load_hourly_prices(
+        file_path=config.HOURLY_PRICE_DATA_PATH,
+        allow_negative_prices=(
+            config.ALLOW_NEGATIVE_HOURLY_PRICES
+        ),
+    )
+
+    active_tariff = config.get_active_tariff_profile()
+
+    comparison_df = compare_all_price_modes(
+        energy_df=energy_df,
+        price_df=price_df,
+        fixed_price_eur_per_kwh=(
+            fixed_price_eur_per_kwh
+        ),
+        peak_price_eur_per_kwh=(
+            active_tariff["peak_price_eur_per_kwh"]
+        ),
+        flat_price_eur_per_kwh=(
+            active_tariff["flat_price_eur_per_kwh"]
+        ),
+        off_peak_price_eur_per_kwh=(
+            active_tariff["off_peak_price_eur_per_kwh"]
+        ),
+        allow_negative_hourly_prices=(
+            config.ALLOW_NEGATIVE_HOURLY_PRICES
+        ),
+    )
+
+    output_csv = Path(output_csv_path)
+    output_csv.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+    comparison_df.to_csv(
+        output_csv,
+        index=False,
+    )
+
+    markdown_text = build_price_mode_comparison_markdown(
+        comparison_df=comparison_df,
+        fixed_price_eur_per_kwh=(
+            fixed_price_eur_per_kwh
+        ),
+        energy_data_path=energy_data_path,
+        hourly_price_data_path=(
+            config.HOURLY_PRICE_DATA_PATH
+        ),
+    )
+
+    output_markdown = Path(output_markdown_path)
+    output_markdown.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+    output_markdown.write_text(
+        markdown_text,
+        encoding="utf-8",
+    )
+
+    plot_price_mode_comparison(
+        comparison_df=comparison_df,
+        output_path=output_plot_path,
+    )
+
+    return comparison_df
+
+
+def main() -> None:
+    comparison_df = generate_price_mode_comparison()
+
+    print("\nElectricity price mode comparison")
+    print(comparison_df.to_string(index=False))
+
+    print(
+        "\nCSV saved to: "
+        f"{DEFAULT_OUTPUT_CSV_PATH}"
+    )
+    print(
+        "Markdown report saved to: "
+        f"{DEFAULT_OUTPUT_MARKDOWN_PATH}"
+    )
+    print(
+        "Comparison plot saved to: "
+        f"{DEFAULT_OUTPUT_PLOT_PATH}"
+    )
+
+
+if __name__ == "__main__":
+    main()
