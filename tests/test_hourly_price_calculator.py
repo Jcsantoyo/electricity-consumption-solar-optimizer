@@ -177,3 +177,21 @@ def test_calculate_hourly_grid_import_cost_raises_error_for_missing_price_column
             energy_df=energy_df,
             price_df=price_df,
         )
+
+        
+def test_prepare_price_data_allows_negative_prices_when_enabled() -> None:
+    price_df = pd.DataFrame(
+        {
+            "datetime": ["2026-07-05 11:00:00"],
+            "price_eur_per_kwh": [-0.0001025],
+        }
+    )
+
+    prepared_df = prepare_price_data(
+        price_df,
+        allow_negative_prices=True,
+    )
+
+    assert prepared_df.iloc[0]["price_eur_per_kwh"] == pytest.approx(
+        -0.0001025
+    )

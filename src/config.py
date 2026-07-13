@@ -1,5 +1,5 @@
 # Input files
-CONSUMPTION_DATA_PATH = "data/processed/uci_household_power_hourly.csv"
+CONSUMPTION_DATA_PATH = "data/processed/uci_consumption_omie_scenario.csv"
 
 # Solar data source
 USE_PVGIS_SOLAR_DATA = True
@@ -65,8 +65,8 @@ TARIFF_PROFILES = {
 }
 
 # Hourly electricity price data
-USE_HOURLY_PRICE_DATA = False
-HOURLY_PRICE_DATA_PATH = "data/raw/hourly_prices.csv"
+USE_HOURLY_PRICE_DATA = True
+HOURLY_PRICE_DATA_PATH = "data/processed/omie_hourly_prices.csv"
 ALLOW_NEGATIVE_HOURLY_PRICES = True
 
 

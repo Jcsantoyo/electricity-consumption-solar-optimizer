@@ -118,12 +118,12 @@ def test_hourly_price_configuration_exists() -> None:
     assert isinstance(config.HOURLY_PRICE_DATA_PATH, str)
 
 
-def test_hourly_price_data_is_disabled_by_default() -> None:
-    assert config.USE_HOURLY_PRICE_DATA is False
+def test_hourly_price_data_configuration_is_boolean() -> None:
+    assert isinstance(config.USE_HOURLY_PRICE_DATA, bool)
 
 
-def test_hourly_price_data_path_points_to_raw_data_folder() -> None:
-    assert config.HOURLY_PRICE_DATA_PATH.startswith("data/raw/")
+def test_hourly_price_data_path_points_to_csv_file() -> None:
+    assert config.HOURLY_PRICE_DATA_PATH.startswith("data/")
     assert config.HOURLY_PRICE_DATA_PATH.endswith(".csv")
 
 def test_load_hourly_prices_if_enabled_returns_none_when_disabled() -> None:

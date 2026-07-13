@@ -12,13 +12,14 @@ REQUIRED_PRICE_COLUMNS = {
 
 def calculate_hourly_grid_import_cost(
     energy_df: pd.DataFrame,
-    price_df: pd.DataFrame
+    price_df: pd.DataFrame,
+    allow_negative_prices: bool = False
 ) -> pd.DataFrame:
     
     validate_hourly_cost_inputs(energy_df, price_df)
 
     prepared_energy_df = prepare_energy_data(energy_df)
-    prepared_price_df = prepare_price_data(price_df)
+    prepared_price_df = prepare_price_data(price_df, allow_negative_prices)
 
     merged_df = prepared_energy_df.merge(
         prepared_price_df,
@@ -34,11 +35,12 @@ def calculate_hourly_grid_import_cost(
     return merged_df
 
 def calculate_total_hourly_grid_import_cost(
-        energy_df: pd.DataFrame,
-        price_df: pd.DataFrame
+    energy_df: pd.DataFrame,
+    price_df: pd.DataFrame,
+    allow_negative_prices: bool = False
 ) -> float:
     
-    cost_df = calculate_hourly_grid_import_cost(energy_df=energy_df, price_df=price_df)
+    cost_df = calculate_hourly_grid_import_cost(energy_df, price_df, allow_negative_prices)
 
     return float(cost_df["grid_import_cost_eur"].sum())
 
@@ -91,7 +93,10 @@ def prepare_energy_data(energy_df: pd.DataFrame) -> pd.DataFrame:
     return prepared_df
 
 
-def prepare_price_data(price_df: pd.DataFrame) -> pd.DataFrame:
+def prepare_price_data(
+    price_df: pd.DataFrame,
+    allow_negative_prices: bool = False,
+) -> pd.DataFrame:
     prepared_df = price_df.copy()
 
     prepared_df["datetime"] = pd.to_datetime(
@@ -110,7 +115,10 @@ def prepare_price_data(price_df: pd.DataFrame) -> pd.DataFrame:
     if prepared_df["price_eur_per_kwh"].isna().any():
         raise ValueError("Price data contains invalid price values")
 
-    if (prepared_df["price_eur_per_kwh"] < 0).any():
+    if (
+        not allow_negative_prices
+        and (prepared_df["price_eur_per_kwh"] < 0).any()
+    ):
         raise ValueError("Price data contains negative price values")
 
     prepared_df = prepared_df.sort_values("datetime")

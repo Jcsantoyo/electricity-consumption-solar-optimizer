@@ -26,7 +26,8 @@ def calculate_net_electricity_cost_for_price_mode(
     contracted_power_kw: float,
     power_price_eur_per_kw_year: float,
     simulation_days: int,
-    hourly_price_df: pd.DataFrame | None = None
+    hourly_price_df: pd.DataFrame | None = None,
+    allow_negative_hourly_prices: bool = False
 ) -> float:
     
     if hourly_price_df is None:
@@ -53,7 +54,8 @@ def calculate_net_electricity_cost_for_price_mode(
 
     variable_grid_cost = calculate_total_hourly_grid_import_cost(
         hourly_energy_df,
-        hourly_price_df
+        hourly_price_df,
+        allow_negative_hourly_prices
     )
 
     surplus_compensation = calculate_surplus_compensation(
@@ -91,7 +93,8 @@ def run_economic_grid_search(
     power_price_eur_per_kw_year: float,
     simulation_days: int,
     pvgis_df: pd.DataFrame | None = None,
-    hourly_price_df: pd.DataFrame | None = None
+    hourly_price_df: pd.DataFrame | None = None,
+    allow_negative_hourly_prices: bool = False
 ) -> pd.DataFrame:
     results = []
 
@@ -110,7 +113,8 @@ def run_economic_grid_search(
         contracted_power_kw=contracted_power_kw,
         power_price_eur_per_kw_year=power_price_eur_per_kw_year,
         simulation_days=simulation_days,
-        hourly_price_df=hourly_price_df
+        hourly_price_df=hourly_price_df,
+        allow_negative_hourly_prices=allow_negative_hourly_prices
     )
 
     for solar_peak_power_kw in solar_peak_powers_kw:
@@ -157,7 +161,8 @@ def run_economic_grid_search(
                 contracted_power_kw=contracted_power_kw,
                 power_price_eur_per_kw_year=power_price_eur_per_kw_year,
                 simulation_days=simulation_days,
-                hourly_price_df=hourly_price_df
+                hourly_price_df=hourly_price_df,
+                allow_negative_hourly_prices=allow_negative_hourly_prices
             )
 
             period_savings = base_net_cost - scenario_net_cost
