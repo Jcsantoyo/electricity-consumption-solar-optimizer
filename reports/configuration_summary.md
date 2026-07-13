@@ -4,9 +4,16 @@ This file summarizes the configuration used by the project pipeline.
 
 ## Input data
 
-- Consumption data path: `data/processed/uci_household_power_hourly.csv`
+- Consumption data path: `data/processed/uci_consumption_omie_scenario.csv`
 - Use PVGIS solar data: `True`
 - PVGIS solar data path: `data/raw/pvgis_hourly_linares_1kw_2020.csv`
+
+## Electricity price data
+
+- Use hourly electricity prices: `True`
+- Hourly price data path: `data/processed/omie_hourly_prices.csv`
+- Allow negative hourly prices: `True`
+- Electricity price mode: Hourly electricity prices (data/processed/omie_hourly_prices.csv); fixed power cost and surplus compensation from tariff profile 'spanish_2_0td_example'
 
 ## Simulation settings
 
@@ -59,6 +66,9 @@ This file summarizes the configuration used by the project pipeline.
 
 ## Notes
 
-The tariff values are illustrative assumptions.
-They can be replaced by prices from a specific electricity contract
-or by hourly PVPC prices in a future version.
+The tariff profile values are illustrative assumptions.
+When hourly prices are enabled, they replace the tariff profile prices
+for the variable cost of imported electricity.
+The tariff profile still provides fixed power costs and surplus compensation.
+OMIE prices represent wholesale market prices, not a complete household
+retail electricity tariff.

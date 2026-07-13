@@ -8,7 +8,7 @@ SRC_PATH = PROJECT_ROOT / "src"
 sys.path.append(str(SRC_PATH))
 
 import config
-
+from price_mode import build_electricity_price_mode_description
 
 def format_list(values: list) -> str:
     return ", ".join(str(value) for value in values)
@@ -16,6 +16,12 @@ def format_list(values: list) -> str:
 
 def build_configuration_summary() -> str:
     active_tariff = config.get_active_tariff_profile()
+
+    electricity_price_mode = build_electricity_price_mode_description(
+        use_hourly_price_data=config.USE_HOURLY_PRICE_DATA,
+        hourly_price_data_path=config.HOURLY_PRICE_DATA_PATH,
+        tariff_profile_name=config.ACTIVE_TARIFF_PROFILE,
+    )
 
     lines = [
         "# Project Configuration Summary",
@@ -27,6 +33,16 @@ def build_configuration_summary() -> str:
         f"- Consumption data path: `{config.CONSUMPTION_DATA_PATH}`",
         f"- Use PVGIS solar data: `{config.USE_PVGIS_SOLAR_DATA}`",
         f"- PVGIS solar data path: `{config.PVGIS_SOLAR_DATA_PATH}`",
+        "",
+        "## Electricity price data",
+        "",
+        f"- Use hourly electricity prices: `{config.USE_HOURLY_PRICE_DATA}`",
+        f"- Hourly price data path: `{config.HOURLY_PRICE_DATA_PATH}`",
+        (
+            "- Allow negative hourly prices: "
+            f"`{config.ALLOW_NEGATIVE_HOURLY_PRICES}`"
+        ),
+        f"- Electricity price mode: {electricity_price_mode}",
         "",
         "## Simulation settings",
         "",
@@ -64,9 +80,15 @@ def build_configuration_summary() -> str:
         f"- Peak price: `{active_tariff['peak_price_eur_per_kwh']}` EUR/kWh",
         f"- Flat price: `{active_tariff['flat_price_eur_per_kwh']}` EUR/kWh",
         f"- Off-peak price: `{active_tariff['off_peak_price_eur_per_kwh']}` EUR/kWh",
-        f"- Surplus compensation: `{active_tariff['surplus_compensation_eur_per_kwh']}` EUR/kWh",
+        (
+            "- Surplus compensation: "
+            f"`{active_tariff['surplus_compensation_eur_per_kwh']}` EUR/kWh"
+        ),
         f"- Contracted power: `{active_tariff['contracted_power_kw']}` kW",
-        f"- Power price: `{active_tariff['power_price_eur_per_kw_year']}` EUR/kW/year",
+        (
+            "- Power price: "
+            f"`{active_tariff['power_price_eur_per_kw_year']}` EUR/kW/year"
+        ),
         "",
         "## Available tariff profiles",
         "",
@@ -80,15 +102,17 @@ def build_configuration_summary() -> str:
             "",
             "## Notes",
             "",
-            "The tariff values are illustrative assumptions.",
-            "They can be replaced by prices from a specific electricity contract",
-            "or by hourly PVPC prices in a future version.",
+            "The tariff profile values are illustrative assumptions.",
+            "When hourly prices are enabled, they replace the tariff profile prices",
+            "for the variable cost of imported electricity.",
+            "The tariff profile still provides fixed power costs and surplus compensation.",
+            "OMIE prices represent wholesale market prices, not a complete household",
+            "retail electricity tariff.",
             "",
         ]
     )
 
     return "\n".join(lines)
-
 
 def main() -> None:
     output_path = "reports/configuration_summary.md"
