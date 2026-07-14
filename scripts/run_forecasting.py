@@ -14,17 +14,23 @@ from visualization import (
     plot_feature_importance,
     plot_forecasting_model_comparison,
 )
-
+import config
 
 def main() -> None:
-    data_path = "data/processed/uci_household_power_hourly.csv"
+    data_path = config.CONSUMPTION_DATA_PATH
 
     df = load_consumption_data(data_path)
 
     os.makedirs("reports", exist_ok=True)
     os.makedirs("images", exist_ok=True)
 
-    forecast_results = run_consumption_forecast(df)
+    forecast_results = run_consumption_forecast(
+        df=df,
+        test_size_ratio=(
+            config.FORECAST_TEST_SIZE_RATIO
+        ),
+        random_state=config.RANDOM_SEED,
+    )
 
     metrics = forecast_results["metrics"]
     results_df = forecast_results["results_df"]
@@ -56,8 +62,13 @@ def main() -> None:
 
     print(f"Feature importance report saved to: {feature_importance_report_path}")
 
-    comparison_df = compare_forecasting_models(df)
-
+    comparison_df = compare_forecasting_models(
+        df=df,
+        test_size_ratio=(
+            config.FORECAST_TEST_SIZE_RATIO
+        ),
+        random_state=config.RANDOM_SEED,
+    )
     print("\nModel comparison:")
     print(comparison_df.to_string(index=False))
 

@@ -33,7 +33,7 @@ def main() -> None:
     forecast_results = run_consumption_forecast(consumption_df)
 
     forecasted_consumption_df = build_forecasted_consumption_dataframe(
-        original_df=consumption_df, forecast_results_df=forecast_results["results_df"]
+        original_df=consumption_df, forecast_results_df=forecast_results["results_df"], forecast_mode=config.FORECAST_MODE
     )
 
     forecasted_consumption_path = "reports/forecasted_consumption_for_optimization.csv"
@@ -105,7 +105,8 @@ def main() -> None:
         power_price_eur_per_kw_year=tariff_profile["power_price_eur_per_kw_year"],
         simulation_days=simulation_days,
         pvgis_df=pvgis_df,
-        hourly_price_df=hourly_price_df
+        hourly_price_df=hourly_price_df,
+        allow_negative_hourly_prices=config.ALLOW_NEGATIVE_HOURLY_PRICES
     )
 
     optimization_results_path = "reports/forecast_optimization_results.csv"
