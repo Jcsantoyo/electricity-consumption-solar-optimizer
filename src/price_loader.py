@@ -106,7 +106,15 @@ def validate_hourly_price_coverage(
     missing_datetimes = consumption_datetimes - price_datetimes
 
     if missing_datetimes:
+        first_missing = min(
+            missing_datetimes
+        )
+        last_missing = max(
+            missing_datetimes
+        )
+
         raise ValueError(
             "Hourly price data does not cover "
-            f"{len(missing_datetimes)} consumption timestamps"
+            f"{len(missing_datetimes)} consumption timestamps. "
+            f"Missing interval: {first_missing} to {last_missing}"
         )

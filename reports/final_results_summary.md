@@ -9,40 +9,40 @@ It compares historical optimization with forecast-based optimization.
 - Solar peak power: `3.00 kW`
 - Battery capacity: `0.00 kWh`
 - Investment cost: `3500.00 EUR`
-- Annual savings: `684.83 EUR/year`
-- Payback period: `5.11 years`
-- Self-sufficiency: `31.58%`
-- Annual grid import: `6457.20 kWh/year`
+- Annual savings: `268.23 EUR/year`
+- Payback period: `13.05 years`
+- Self-sufficiency: `25.21%`
+- Annual grid import: `11245.86 kWh/year`
 
 ## Best historical self-sufficiency scenario
 
 - Solar peak power: `3.00 kW`
 - Battery capacity: `5.00 kWh`
 - Investment cost: `6000.00 EUR`
-- Annual savings: `819.44 EUR/year`
-- Payback period: `7.32 years`
-- Self-sufficiency: `43.98%`
-- Annual grid import: `5286.51 kWh/year`
+- Annual savings: `235.26 EUR/year`
+- Payback period: `25.50 years`
+- Self-sufficiency: `33.91%`
+- Annual grid import: `9937.63 kWh/year`
 
 ## Best forecast-based economic scenario
 
-- Solar peak power: `2.00 kW`
+- Solar peak power: `3.00 kW`
 - Battery capacity: `0.00 kWh`
-- Investment cost: `2600.00 EUR`
-- Annual savings: `551.64 EUR/year`
-- Payback period: `4.71 years`
-- Self-sufficiency: `30.46%`
-- Annual grid import: `6160.30 kWh/year`
+- Investment cost: `3500.00 EUR`
+- Annual savings: `315.50 EUR/year`
+- Payback period: `11.09 years`
+- Self-sufficiency: `25.77%`
+- Annual grid import: `10278.96 kWh/year`
 
 ## Best forecast-based self-sufficiency scenario
 
 - Solar peak power: `3.00 kW`
 - Battery capacity: `5.00 kWh`
 - Investment cost: `6000.00 EUR`
-- Annual savings: `865.36 EUR/year`
-- Payback period: `6.93 years`
-- Self-sufficiency: `49.96%`
-- Annual grid import: `4432.61 kWh/year`
+- Annual savings: `259.71 EUR/year`
+- Payback period: `23.10 years`
+- Self-sufficiency: `37.83%`
+- Annual grid import: `8608.82 kWh/year`
 
 ## Main conclusion
 

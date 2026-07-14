@@ -18,6 +18,7 @@ def main() -> None:
     python_executable = sys.executable
 
     commands = [
+        [python_executable, "scripts/validate_scenario.py"],
         [python_executable, "scripts/generate_config_summary.py"],
         [python_executable, "src/main.py"],
         [python_executable, "scripts/generate_price_mode_comparison.py"],
