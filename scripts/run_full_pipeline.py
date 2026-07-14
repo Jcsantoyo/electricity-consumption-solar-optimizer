@@ -20,11 +20,11 @@ def main() -> None:
     commands = [
         [python_executable, "scripts/generate_config_summary.py"],
         [python_executable, "src/main.py"],
+        [python_executable, "scripts/generate_price_mode_comparison.py"],
         [python_executable, "scripts/run_forecasting.py"],
         [python_executable, "scripts/run_forecast_optimization.py"],
         [python_executable, "scripts/compare_optimization_results.py"],
-        [python_executable, "scripts/compare_optimization_results.py"],
-        [python_executable, "scripts/generate_final_results_summary.py"],
+        [python_executable, "scripts/generate_final_results_summary.py"]
     ]
 
     print("\nElectricity Consumption Solar Optimizer")
