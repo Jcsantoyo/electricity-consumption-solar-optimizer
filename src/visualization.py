@@ -390,3 +390,178 @@ def plot_price_mode_comparison(
         dpi=150,
     )
     plt.close(figure)
+
+
+def format_scenario_metric_name(
+    metric_column: str,
+) -> str:
+    return (
+        metric_column
+        .replace("_", " ")
+        .strip()
+        .title()
+    )
+
+
+def prepare_scenario_metric_values(
+    dataframe: pd.DataFrame,
+    metric_column: str,
+) -> tuple[pd.Series, str]:
+    values = dataframe[metric_column].copy()
+
+    if metric_column == "self_sufficiency":
+        return (
+            values * 100.0,
+            "Self-sufficiency (%)",
+        )
+
+    metric_labels = {
+        "annual_savings_eur": (
+            "Annual savings (EUR/year)"
+        ),
+        "payback_years": (
+            "Payback period (years)"
+        ),
+        "annual_grid_import_kwh": (
+            "Annual grid import (kWh/year)"
+        ),
+    }
+
+    return (
+        values,
+        metric_labels.get(
+            metric_column,
+            format_scenario_metric_name(
+                metric_column
+            ),
+        ),
+    )
+
+
+def plot_scenario_metric_comparison(
+    comparison_df: pd.DataFrame,
+    metric_column: str,
+    output_path: str,
+) -> bool:
+    required_columns = {
+        "scenario_name",
+        "criterion",
+        metric_column,
+    }
+
+    missing_columns = (
+        required_columns
+        - set(comparison_df.columns)
+    )
+
+    if missing_columns:
+        return False
+
+    plotting_df = comparison_df[
+        [
+            "scenario_name",
+            "criterion",
+            metric_column,
+        ]
+    ].dropna(
+        subset=[metric_column]
+    )
+
+    if plotting_df.empty:
+        return False
+
+    plotting_df = plotting_df.copy()
+
+    values, axis_label = (
+        prepare_scenario_metric_values(
+            dataframe=plotting_df,
+            metric_column=metric_column,
+        )
+    )
+
+    plotting_df["plot_value"] = values
+
+    pivot_df = plotting_df.pivot(
+        index="scenario_name",
+        columns="criterion",
+        values="plot_value",
+    )
+
+    output_file = Path(output_path)
+    output_file.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    axis = pivot_df.plot(
+        kind="bar",
+        figsize=(11, 6),
+    )
+
+    axis.set_title(
+        f"{format_scenario_metric_name(metric_column)} "
+        "comparison across scenarios"
+    )
+    axis.set_xlabel(
+        "Project scenario"
+    )
+    axis.set_ylabel(
+        axis_label
+    )
+    axis.tick_params(
+        axis="x",
+        rotation=20,
+    )
+    axis.legend(
+        title="Criterion"
+    )
+    axis.grid(
+        axis="y",
+        alpha=0.3,
+    )
+
+    for container in axis.containers:
+        axis.bar_label(
+            container,
+            fmt="%.2f",
+            padding=3,
+        )
+
+    figure = axis.get_figure()
+    figure.tight_layout()
+    figure.savefig(
+        output_file,
+        dpi=150,
+    )
+    plt.close(figure)
+
+    return True
+
+
+def generate_scenario_metric_plots(
+    comparison_df: pd.DataFrame,
+    metric_columns: list[str],
+    output_directory: str,
+) -> list[str]:
+    generated_paths = []
+
+    for metric_column in metric_columns:
+        output_path = str(
+            Path(output_directory)
+            / f"{metric_column}_comparison.png"
+        )
+
+        generated = (
+            plot_scenario_metric_comparison(
+                comparison_df=comparison_df,
+                metric_column=metric_column,
+                output_path=output_path,
+            )
+        )
+
+        if generated:
+            generated_paths.append(
+                output_path
+            )
+
+    return generated_paths

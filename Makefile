@@ -1,51 +1,96 @@
 SCENARIO ?= uci_omie_june_2026
+SCENARIOS ?=
 
-.PHONY: install test lint format validate-scenario pipeline optimize forecast forecast-optimize compare price-mode-comparison config-summary final-summary run-manifest clean-reports clean-all-reports
+.PHONY: install \
+	test \
+	lint \
+	format \
+	validate-scenario \
+	pipeline \
+	optimize \
+	forecast \
+	forecast-optimize \
+	compare \
+	price-mode-comparison \
+	config-summary \
+	final-summary \
+	run-manifest \
+	compare-scenarios \
+	clean-reports \
+	clean-all-reports \
+	clean-scenario-comparison
+
 
 install:
 	pip install -r requirements.txt
 
+
 test:
 	python -m pytest
+
 
 lint:
 	ruff check .
 
+
 format:
 	ruff format .
+
 
 validate-scenario:
 	PROJECT_SCENARIO=$(SCENARIO) python scripts/validate_scenario.py
 
+
 pipeline:
 	PROJECT_SCENARIO=$(SCENARIO) python scripts/run_full_pipeline.py
+
 
 optimize:
 	PROJECT_SCENARIO=$(SCENARIO) python src/main.py
 
+
 forecast:
 	PROJECT_SCENARIO=$(SCENARIO) python scripts/run_forecasting.py
+
 
 forecast-optimize:
 	PROJECT_SCENARIO=$(SCENARIO) python scripts/run_forecast_optimization.py
 
+
 compare:
 	PROJECT_SCENARIO=$(SCENARIO) python scripts/compare_optimization_results.py
+
 
 price-mode-comparison:
 	PROJECT_SCENARIO=$(SCENARIO) python scripts/generate_price_mode_comparison.py
 
+
 config-summary:
 	PROJECT_SCENARIO=$(SCENARIO) python scripts/generate_config_summary.py
+
 
 final-summary:
 	PROJECT_SCENARIO=$(SCENARIO) python scripts/generate_final_results_summary.py
 
+
 run-manifest:
 	PROJECT_SCENARIO=$(SCENARIO) python scripts/generate_run_manifest.py
 
+
+compare-scenarios:
+	python scripts/compare_project_scenarios.py $(SCENARIOS)
+
+
 clean-reports:
-	rm -rf reports/$(SCENARIO) images/$(SCENARIO)
+	rm -rf reports/$(SCENARIO)
+	rm -rf images/$(SCENARIO)
+
 
 clean-all-reports:
-	rm -rf reports/* images/*
+	rm -rf reports/*
+	rm -rf images/*
+
+
+clean-scenario-comparison:
+	rm -rf reports/scenario_comparison
+	rm -rf images/scenario_comparison
