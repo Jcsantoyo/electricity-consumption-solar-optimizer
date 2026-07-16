@@ -1,7 +1,14 @@
-import os
+import sys
 from pathlib import Path
 
 import pandas as pd
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+SRC_PATH = PROJECT_ROOT / "src"
+
+sys.path.append(str(SRC_PATH))
+
+import config
 
 
 def format_percent(value: float) -> str:
@@ -25,9 +32,10 @@ def format_kwh_per_year(value: float) -> str:
 
 
 def get_scenario(
-    comparison_df: pd.DataFrame, optimization_type: str, scenario: str
+    comparison_df: pd.DataFrame,
+    optimization_type: str,
+    scenario: str,
 ) -> pd.Series:
-
     filtered_df = comparison_df[
         (comparison_df["optimization_type"] == optimization_type)
         & (comparison_df["scenario"] == scenario)
@@ -46,10 +54,16 @@ def format_scenario_section(title: str, scenario_row: pd.Series) -> str:
         f"- Solar peak power: `{scenario_row['solar_peak_power_kw']:.2f} kW`",
         f"- Battery capacity: `{scenario_row['battery_capacity_kwh']:.2f} kWh`",
         f"- Investment cost: `{format_eur(scenario_row['investment_cost_eur'])}`",
-        f"- Annual savings: `{format_eur_per_year(scenario_row['annual_savings_eur'])}`",
+        (
+            "- Annual savings: "
+            f"`{format_eur_per_year(scenario_row['annual_savings_eur'])}`"
+        ),
         f"- Payback period: `{format_years(scenario_row['payback_years'])}`",
         f"- Self-sufficiency: `{format_percent(scenario_row['self_sufficiency'])}`",
-        f"- Annual grid import: `{format_kwh_per_year(scenario_row['annual_grid_import_kwh'])}`",
+        (
+            "- Annual grid import: "
+            f"`{format_kwh_per_year(scenario_row['annual_grid_import_kwh'])}`"
+        ),
         "",
     ]
 
@@ -57,44 +71,68 @@ def format_scenario_section(title: str, scenario_row: pd.Series) -> str:
 
 
 def build_final_results_summary(comparison_df: pd.DataFrame) -> str:
-
-    historical_payback = get_scenario(comparison_df, "historical", "best_payback")
-
-    historical_self_sufficiency = get_scenario(
-        comparison_df, "historical", "best_self_sufficiency"
+    historical_payback = get_scenario(
+        comparison_df,
+        "historical",
+        "best_payback",
     )
-
-    forecast_payback = get_scenario(comparison_df, "forecast_based", "best_payback")
-
+    historical_self_sufficiency = get_scenario(
+        comparison_df,
+        "historical",
+        "best_self_sufficiency",
+    )
+    forecast_payback = get_scenario(
+        comparison_df,
+        "forecast_based",
+        "best_payback",
+    )
     forecast_self_sufficiency = get_scenario(
-        comparison_df, "forecast_based", "best_self_sufficiency"
+        comparison_df,
+        "forecast_based",
+        "best_self_sufficiency",
     )
 
     lines = [
         "# Final Results Summary",
         "",
-        "This report summarizes the main results produced by the full project pipeline.",
+        (
+            "This report summarizes the main results produced by the full "
+            "project pipeline."
+        ),
         "",
         "It compares historical optimization with forecast-based optimization.",
         "",
         format_scenario_section(
-            "Best historical economic scenario", historical_payback
+            "Best historical economic scenario",
+            historical_payback,
         ),
         format_scenario_section(
-            "Best historical self-sufficiency scenario", historical_self_sufficiency
+            "Best historical self-sufficiency scenario",
+            historical_self_sufficiency,
         ),
         format_scenario_section(
-            "Best forecast-based economic scenario", forecast_payback
+            "Best forecast-based economic scenario",
+            forecast_payback,
         ),
         format_scenario_section(
-            "Best forecast-based self-sufficiency scenario", forecast_self_sufficiency
+            "Best forecast-based self-sufficiency scenario",
+            forecast_self_sufficiency,
         ),
         "## Main conclusion",
         "",
-        "The best economic scenario and the best self-sufficiency scenario are not necessarily the same.",
+        (
+            "The best economic scenario and the best self-sufficiency scenario "
+            "are not necessarily the same."
+        ),
         "",
-        "In the current results, the forecast-based economic optimum can differ from the historical economic optimum.",
-        "This means that using predicted future consumption may change the recommended solar and battery configuration.",
+        (
+            "In the current results, the forecast-based economic optimum can "
+            "differ from the historical economic optimum."
+        ),
+        (
+            "This means that using predicted future consumption may change the "
+            "recommended solar and battery configuration."
+        ),
         "",
     ]
 
@@ -102,16 +140,14 @@ def build_final_results_summary(comparison_df: pd.DataFrame) -> str:
 
 
 def main() -> None:
+    paths = config.OUTPUT_PATHS
+    paths.create_directories()
 
-    input_path = "reports/historical_vs_forecast_optimization.csv"
-    output_path = "reports/final_results_summary.md"
+    input_path = paths.historical_vs_forecast_comparison
+    output_path = paths.final_results_summary
 
     comparison_df = pd.read_csv(input_path)
-
     summary = build_final_results_summary(comparison_df)
-
-    os.makedirs("reports", exist_ok=True)
-
     Path(output_path).write_text(summary, encoding="utf-8")
 
     print("\nFinal results summary generated")

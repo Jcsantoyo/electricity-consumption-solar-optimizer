@@ -1,4 +1,3 @@
-import os
 import sys
 from pathlib import Path
 
@@ -7,28 +6,25 @@ SRC_PATH = PROJECT_ROOT / "src"
 
 sys.path.append(str(SRC_PATH))
 
+import config
 from data_loader import load_consumption_data
-from forecasting import run_consumption_forecast, compare_forecasting_models
+from forecasting import compare_forecasting_models, run_consumption_forecast
 from visualization import (
-    plot_forecast_actual_vs_predicted,
     plot_feature_importance,
+    plot_forecast_actual_vs_predicted,
     plot_forecasting_model_comparison,
 )
-import config
+
 
 def main() -> None:
+    config.OUTPUT_PATHS.create_directories()
+
     data_path = config.CONSUMPTION_DATA_PATH
-
     df = load_consumption_data(data_path)
-
-    os.makedirs("reports", exist_ok=True)
-    os.makedirs("images", exist_ok=True)
 
     forecast_results = run_consumption_forecast(
         df=df,
-        test_size_ratio=(
-            config.FORECAST_TEST_SIZE_RATIO
-        ),
+        test_size_ratio=config.FORECAST_TEST_SIZE_RATIO,
         random_state=config.RANDOM_SEED,
     )
 
@@ -36,12 +32,10 @@ def main() -> None:
     results_df = forecast_results["results_df"]
     feature_importance_df = forecast_results["feature_importance_df"]
 
-    forecast_results_output_path = "reports/forecast_results.csv"
-
+    forecast_results_output_path = config.OUTPUT_PATHS.forecast_results
     results_df.to_csv(forecast_results_output_path, index=False)
 
     print(f"\nForecast results saved to: {forecast_results_output_path}")
-
     print("\nConsumption forecast results:")
     print(f"MAE: {metrics['mae']:.4f} kWh")
     print(f"RMSE: {metrics['rmse']:.4f} kWh")
@@ -56,45 +50,65 @@ def main() -> None:
     print("\nFeature importance:")
     print(feature_importance_df.to_string(index=False))
 
-    feature_importance_report_path = "reports/forecast_feature_importance.csv"
-
-    feature_importance_df.to_csv(feature_importance_report_path, index=False)
-
-    print(f"Feature importance report saved to: {feature_importance_report_path}")
+    feature_importance_report_path = (
+        config.OUTPUT_PATHS.forecast_feature_importance
+    )
+    feature_importance_df.to_csv(
+        feature_importance_report_path,
+        index=False,
+    )
+    print(
+        "Feature importance report saved to: "
+        f"{feature_importance_report_path}"
+    )
 
     comparison_df = compare_forecasting_models(
         df=df,
-        test_size_ratio=(
-            config.FORECAST_TEST_SIZE_RATIO
-        ),
+        test_size_ratio=config.FORECAST_TEST_SIZE_RATIO,
         random_state=config.RANDOM_SEED,
     )
+
     print("\nModel comparison:")
     print(comparison_df.to_string(index=False))
 
-    model_comparison_report_path = "reports/forecast_model_comparison.csv"
-
+    model_comparison_report_path = (
+        config.OUTPUT_PATHS.forecast_model_comparison
+    )
     comparison_df.to_csv(model_comparison_report_path, index=False)
+    print(
+        "Model comparison report saved to: "
+        f"{model_comparison_report_path}"
+    )
 
-    print(f"Model comparison report saved to: {model_comparison_report_path}")
+    model_comparison_output_path = (
+        config.OUTPUT_PATHS.forecast_model_comparison_plot
+    )
+    plot_forecasting_model_comparison(
+        comparison_df,
+        model_comparison_output_path,
+    )
+    print(
+        "Model comparison plot saved to: "
+        f"{model_comparison_output_path}"
+    )
 
-    model_comparison_output_path = "images/forecast_model_comparison.png"
+    forecast_plot_path = (
+        config.OUTPUT_PATHS.forecast_actual_vs_predicted_plot
+    )
+    plot_forecast_actual_vs_predicted(results_df, forecast_plot_path)
+    print(f"\nForecast plot saved to: {forecast_plot_path}")
 
-    plot_forecasting_model_comparison(comparison_df, model_comparison_output_path)
-
-    print(f"Model comparison plot saved to: {model_comparison_output_path}")
-
-    output_path = "images/consumption_forecast_actual_vs_predicted.png"
-
-    plot_forecast_actual_vs_predicted(results_df, output_path)
-
-    print(f"\nForecast plot saved to: {output_path}")
-
-    feature_importance_output_path = "images/forecast_feature_importance.png"
-
-    plot_feature_importance(feature_importance_df, feature_importance_output_path)
-
-    print(f"Feature importance plot saved to: {feature_importance_output_path}")
+    feature_importance_plot_path = (
+        config.OUTPUT_PATHS.forecast_feature_importance_plot
+    )
+    plot_feature_importance(
+        feature_importance_df,
+        feature_importance_plot_path,
+    )
+    print(
+        "Feature importance plot saved to: "
+        f"{feature_importance_plot_path}"
+    )
 
 
 if __name__ == "__main__":

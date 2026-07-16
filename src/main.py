@@ -1,5 +1,3 @@
-import os
-
 import config
 
 from data_loader import load_consumption_data
@@ -35,13 +33,8 @@ from price_loader import (
 from price_mode import build_electricity_price_mode_description
 
 
-def ensure_output_directories() -> None:
-    os.makedirs("reports", exist_ok=True)
-    os.makedirs("images", exist_ok=True)
-
-
 def main() -> None:
-    ensure_output_directories()
+    config.OUTPUT_PATHS.create_directories()
 
     file_path = config.CONSUMPTION_DATA_PATH
 
@@ -102,7 +95,7 @@ def main() -> None:
         )
 
     electricity_price_mode = build_electricity_price_mode_description(
-        use_hourly_price_data=config.ACTIVE_PROJECT_SCENARIO.price_mode,
+        price_mode=config.ACTIVE_PROJECT_SCENARIO.price_mode,
         hourly_price_data_path=config.HOURLY_PRICE_DATA_PATH,
         tariff_profile_name=config.ACTIVE_TARIFF_PROFILE
     )

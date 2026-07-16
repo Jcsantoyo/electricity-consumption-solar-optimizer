@@ -1,4 +1,3 @@
-import os
 import sys
 from pathlib import Path
 
@@ -18,7 +17,7 @@ def build_configuration_summary() -> str:
     active_tariff = config.get_active_tariff_profile()
 
     electricity_price_mode = build_electricity_price_mode_description(
-        use_hourly_price_data=config.ACTIVE_PROJECT_SCENARIO.price_mode,
+        price_mode=config.ACTIVE_PROJECT_SCENARIO.price_mode,
         hourly_price_data_path=config.HOURLY_PRICE_DATA_PATH,
         tariff_profile_name=config.ACTIVE_TARIFF_PROFILE,
     )
@@ -115,9 +114,8 @@ def build_configuration_summary() -> str:
     return "\n".join(lines)
 
 def main() -> None:
-    output_path = "reports/configuration_summary.md"
-
-    os.makedirs("reports", exist_ok=True)
+    config.OUTPUT_PATHS.create_directories()
+    output_path = config.OUTPUT_PATHS.configuration_summary
 
     summary = build_configuration_summary()
 

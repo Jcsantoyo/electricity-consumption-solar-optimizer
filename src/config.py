@@ -1,7 +1,9 @@
 import os
-from scenario_registry import(
+
+from output_paths import build_scenario_output_paths
+from scenario_registry import (
     DEFAULT_PROJECT_SCENARIO_NAME,
-    get_project_scenario
+    get_project_scenario,
 )
 
 
@@ -15,50 +17,41 @@ ACTIVE_PROJECT_SCENARIO = get_project_scenario(
     ACTIVE_PROJECT_SCENARIO_NAME
 )
 
+OUTPUT_PATHS = build_scenario_output_paths(
+    ACTIVE_PROJECT_SCENARIO_NAME
+)
+
 
 # Input files
-CONSUMPTION_DATA_PATH = (
-    ACTIVE_PROJECT_SCENARIO.consumption_data_path
-)
+CONSUMPTION_DATA_PATH = ACTIVE_PROJECT_SCENARIO.consumption_data_path
 
 
 # Solar data source
-USE_PVGIS_SOLAR_DATA = (
-    ACTIVE_PROJECT_SCENARIO.use_pvgis_solar_data
-)
-
-PVGIS_SOLAR_DATA_PATH = (
-    ACTIVE_PROJECT_SCENARIO.pvgis_solar_data_path
-)
+USE_PVGIS_SOLAR_DATA = ACTIVE_PROJECT_SCENARIO.use_pvgis_solar_data
+PVGIS_SOLAR_DATA_PATH = ACTIVE_PROJECT_SCENARIO.pvgis_solar_data_path
 
 
-# Output files
-GRID_SEARCH_RESULTS_PATH = "reports/grid_search_results.csv"
-BEST_SCENARIOS_PATH = "reports/best_scenarios.csv"
-SUMMARY_REPORT_PATH = "reports/summary.txt"
-
-PAYBACK_PLOT_PATH = "images/main_payback_grid_search.png"
-SELF_SUFFICIENCY_PLOT_PATH = (
-    "images/main_self_sufficiency_grid_search.png"
-)
+# Scenario-specific output files
+GRID_SEARCH_RESULTS_PATH = OUTPUT_PATHS.grid_search_results
+BEST_SCENARIOS_PATH = OUTPUT_PATHS.best_scenarios
+SUMMARY_REPORT_PATH = OUTPUT_PATHS.summary_report
+PAYBACK_PLOT_PATH = OUTPUT_PATHS.payback_plot
+SELF_SUFFICIENCY_PLOT_PATH = OUTPUT_PATHS.self_sufficiency_plot
 BEST_SCENARIOS_COMPARISON_PLOT_PATH = (
-    "images/best_scenarios_comparison.png"
+    OUTPUT_PATHS.best_scenarios_comparison_plot
 )
 BEST_SCENARIO_TIMESERIES_PLOT_PATH = (
-    "images/best_scenario_timeseries.png"
+    OUTPUT_PATHS.best_scenario_timeseries_plot
 )
-BEST_SCENARIO_TIMESERIES_PATH = (
-    "reports/best_scenario_timeseries.csv"
-)
+BEST_SCENARIO_TIMESERIES_PATH = OUTPUT_PATHS.best_scenario_timeseries
 BEST_SCENARIO_BATTERY_STATE_PLOT_PATH = (
-    "images/best_scenario_battery_state.png"
+    OUTPUT_PATHS.best_scenario_battery_state_plot
 )
 BEST_SCENARIO_CUMULATIVE_ENERGY_PLOT_PATH = (
-    "images/best_scenario_cumulative_energy.png"
+    OUTPUT_PATHS.best_scenario_cumulative_energy_plot
 )
-OUTPUTS_INDEX_PATH = "reports/outputs_index.md"
-
-RUN_MANIFEST_PATH = "reports/run_manifest.json"
+OUTPUTS_INDEX_PATH = OUTPUT_PATHS.outputs_index
+RUN_MANIFEST_PATH = OUTPUT_PATHS.run_manifest
 
 
 # Simulation settings
@@ -101,7 +94,6 @@ BATTERY_COST_EUR_PER_KWH = 500.0
 #
 # These values are illustrative and can be replaced with values
 # from a real electricity contract.
-
 TARIFF_PROFILES = {
     "flat_price": {
         "peak_price_eur_per_kwh": 0.20,
@@ -123,48 +115,28 @@ TARIFF_PROFILES = {
 
 
 # Active tariff profile
-ACTIVE_TARIFF_PROFILE = (
-    ACTIVE_PROJECT_SCENARIO.tariff_profile_name
-)
+ACTIVE_TARIFF_PROFILE = ACTIVE_PROJECT_SCENARIO.tariff_profile_name
 
 
 # Hourly electricity price data
-USE_HOURLY_PRICE_DATA = (
-    ACTIVE_PROJECT_SCENARIO.uses_hourly_prices
-)
-
-HOURLY_PRICE_DATA_PATH = (
-    ACTIVE_PROJECT_SCENARIO.hourly_price_data_path
-)
-
+USE_HOURLY_PRICE_DATA = ACTIVE_PROJECT_SCENARIO.uses_hourly_prices
+HOURLY_PRICE_DATA_PATH = ACTIVE_PROJECT_SCENARIO.hourly_price_data_path
 ALLOW_NEGATIVE_HOURLY_PRICES = (
     ACTIVE_PROJECT_SCENARIO.allow_negative_hourly_prices
 )
 
 
 # Forecast settings
-FORECAST_MODE = (
-    ACTIVE_PROJECT_SCENARIO.forecast_mode
-)
-
-FORECAST_TEST_SIZE_RATIO = (
-    ACTIVE_PROJECT_SCENARIO.forecast_test_size_ratio
-)
-
-RANDOM_SEED = (
-    ACTIVE_PROJECT_SCENARIO.random_seed
-)
+FORECAST_MODE = ACTIVE_PROJECT_SCENARIO.forecast_mode
+FORECAST_TEST_SIZE_RATIO = ACTIVE_PROJECT_SCENARIO.forecast_test_size_ratio
+RANDOM_SEED = ACTIVE_PROJECT_SCENARIO.random_seed
 
 
 def get_active_tariff_profile() -> dict:
     try:
-        return TARIFF_PROFILES[
-            ACTIVE_TARIFF_PROFILE
-        ]
+        return TARIFF_PROFILES[ACTIVE_TARIFF_PROFILE]
     except KeyError as error:
-        available_profiles = ", ".join(
-            sorted(TARIFF_PROFILES)
-        )
+        available_profiles = ", ".join(sorted(TARIFF_PROFILES))
 
         raise ValueError(
             "Unknown active tariff profile: "

@@ -6,15 +6,13 @@ def build_electricity_price_mode_description(
     if price_mode == "wholesale_hourly":
         if hourly_price_data_path is None:
             raise ValueError(
-                "Wholesale hourly price mode requires "
-                "an hourly price data path"
+                "Wholesale hourly price mode requires an hourly price data path"
             )
 
         return (
-            f"Hourly wholesale electricity prices "
-            f"({hourly_price_data_path}); "
-            "fixed power cost and surplus compensation "
-            "from tariff profile "
+            "Hourly wholesale electricity prices "
+            f"({hourly_price_data_path}); fixed power cost and surplus "
+            "compensation from tariff profile "
             f"'{tariff_profile_name}'"
         )
 
@@ -30,6 +28,4 @@ def build_electricity_price_mode_description(
             f"'{tariff_profile_name}'"
         )
 
-    raise ValueError(
-        f"Invalid electricity price mode: {price_mode}"
-    )
+    raise ValueError(f"Invalid electricity price mode: {price_mode}")

@@ -1,6 +1,6 @@
 SCENARIO ?= uci_omie_june_2026
 
-.PHONY: install test lint format validate-scenario pipeline optimize forecast forecast-optimize compare price-mode-comparison config-summary final-summary run-manifest clean-reports
+.PHONY: install test lint format validate-scenario pipeline optimize forecast forecast-optimize compare price-mode-comparison config-summary final-summary run-manifest clean-reports clean-all-reports
 
 install:
 	pip install -r requirements.txt
@@ -45,5 +45,7 @@ run-manifest:
 	PROJECT_SCENARIO=$(SCENARIO) python scripts/generate_run_manifest.py
 
 clean-reports:
-	rm -f reports/*.csv reports/*.txt reports/*.md reports/*.json
-	rm -f images/*.png
+	rm -rf reports/$(SCENARIO) images/$(SCENARIO)
+
+clean-all-reports:
+	rm -rf reports/* images/*

@@ -43,4 +43,6 @@ data/simulated/*
 # Keep sample datasets
 !data/raw/consumption_sample.csv
 
+reports/*/
+images/*/
 reports/*.json
