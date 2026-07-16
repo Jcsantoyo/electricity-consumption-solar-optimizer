@@ -2,7 +2,7 @@
 
 Solar data source: PVGIS solar data (data/raw/pvgis_hourly_linares_1kw_2020.csv)
 
-Electricity price mode: Hourly electricity prices (data/processed/omie_hourly_prices.csv); fixed power cost and surplus compensation from tariff profile 'spanish_2_0td_example'
+Electricity price mode: Time-of-use electricity prices from tariff profile 'flat_price'
 
 This folder contains the generated reports from the electricity consumption solar optimizer.
 

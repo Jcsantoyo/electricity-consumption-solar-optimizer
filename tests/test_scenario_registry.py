@@ -46,3 +46,10 @@ def test_unknown_project_scenario_raises_error() -> None:
         get_project_scenario(
             "does_not_exist"
         )
+
+def test_default_project_scenario_name_is_registered() -> None:
+    scenario = get_project_scenario(
+        DEFAULT_PROJECT_SCENARIO_NAME
+    )
+
+    assert scenario.name == DEFAULT_PROJECT_SCENARIO_NAME

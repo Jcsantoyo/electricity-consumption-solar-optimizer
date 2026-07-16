@@ -1,8 +1,15 @@
-from scenario_registry import get_project_scenario
+import os
+from scenario_registry import(
+    DEFAULT_PROJECT_SCENARIO_NAME,
+    get_project_scenario
+)
 
 
 # Active reproducible project scenario
-ACTIVE_PROJECT_SCENARIO_NAME = "uci_omie_june_2026"
+ACTIVE_PROJECT_SCENARIO_NAME = os.getenv(
+    "PROJECT_SCENARIO",
+    DEFAULT_PROJECT_SCENARIO_NAME,
+)
 
 ACTIVE_PROJECT_SCENARIO = get_project_scenario(
     ACTIVE_PROJECT_SCENARIO_NAME
