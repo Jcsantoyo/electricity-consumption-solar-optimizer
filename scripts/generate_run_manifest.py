@@ -46,6 +46,21 @@ def collect_generated_output_paths() -> list[str]:
         "images/consumption_forecast_actual_vs_predicted.png",
         "images/forecast_feature_importance.png",
         "images/electricity_price_mode_comparison.png",
+        "reports/historical_vs_forecast_optimization.csv",
+        "images/historical_vs_forecast_payback.png",
+        "images/historical_vs_forecast_savings.png",
+        (
+            "images/"
+            "historical_vs_forecast_self_sufficiency.png"
+        ),
+        (
+            "images/"
+            "historical_vs_forecast_investment_cost.png"
+        ),
+        (
+            "images/"
+            "historical_vs_forecast_grid_import.png"
+        ),
     ]
 
     return [

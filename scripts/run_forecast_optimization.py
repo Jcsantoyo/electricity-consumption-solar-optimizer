@@ -127,6 +127,7 @@ def main() -> None:
 
     print("\nForecast-based optimization")
     print(f"Input file: {config.CONSUMPTION_DATA_PATH}")
+    print(f"Electricity price mode: {electricity_price_mode}")
     print(f"Forecasted consumption saved to: {forecasted_consumption_path}")
     print(f"Optimization results saved to: {optimization_results_path}")
     print(f"Best scenarios saved to: {best_scenarios_path}")
