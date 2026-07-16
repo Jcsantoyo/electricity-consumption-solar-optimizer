@@ -51,6 +51,8 @@ BEST_SCENARIO_CUMULATIVE_ENERGY_PLOT_PATH = (
 )
 OUTPUTS_INDEX_PATH = "reports/outputs_index.md"
 
+RUN_MANIFEST_PATH = "reports/run_manifest.json"
+
 
 # Simulation settings
 DAYS_PER_YEAR = 365

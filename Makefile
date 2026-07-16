@@ -1,4 +1,4 @@
-.PHONY: install test lint format pipeline optimize forecast forecast-optimize compare price-mode-comparison config-summary final-summary clean-reports validate-scenario
+.PHONY: install test lint format pipeline optimize forecast forecast-optimize compare price-mode-comparison config-summary final-summary clean-reports validate-scenario run-manifest
 
 install:
 	pip install -r requirements.txt
@@ -29,6 +29,9 @@ compare:
 
 validate-scenario:
 	python scripts/validate_scenario.py
+
+run-manifest:
+	python scripts/generate_run_manifest.py
 
 price-mode-comparison:
 	python scripts/generate_price_mode_comparison.py

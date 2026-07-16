@@ -25,7 +25,8 @@ def main() -> None:
         [python_executable, "scripts/run_forecasting.py"],
         [python_executable, "scripts/run_forecast_optimization.py"],
         [python_executable, "scripts/compare_optimization_results.py"],
-        [python_executable, "scripts/generate_final_results_summary.py"]
+        [python_executable, "scripts/generate_final_results_summary.py"],
+        [python_executable, "scripts/generate_run_manifest.py"]
     ]
 
     print("\nElectricity Consumption Solar Optimizer")
