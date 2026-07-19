@@ -553,3 +553,119 @@ def test_hourly_price_model_matches_protocol() -> None:
     )
 
     assert accepted_model is model
+
+
+def test_fixed_price_model_calculates_variable_grid_cost() -> None:
+    energy_df = pd.DataFrame(
+        {
+            "datetime": pd.to_datetime(
+                [
+                    "2026-06-01 00:00:00",
+                    "2026-06-01 01:00:00",
+                ]
+            ),
+            "grid_import_kwh": [
+                1.0,
+                2.0,
+            ],
+        }
+    )
+
+    model = FixedPriceModel(
+        fixed_price_eur_per_kwh=0.20,
+        surplus_compensation_price=0.0,
+        contracted_power_kw=4.6,
+        power_price_eur_per_kw_year=35.0,
+    )
+
+    result = model.calculate_variable_grid_cost(
+        energy_df=energy_df,
+        grid_import_column="grid_import_kwh",
+    )
+
+    assert result == pytest.approx(
+        0.60
+    )
+
+def test_time_of_use_model_calculates_variable_grid_cost() -> None:
+    energy_df = pd.DataFrame(
+        {
+            "datetime": pd.to_datetime(
+                [
+                    "2026-06-01 02:00:00",
+                    "2026-06-01 11:00:00",
+                    "2026-06-01 15:00:00",
+                ]
+            ),
+            "grid_import_kwh": [
+                1.0,
+                2.0,
+                3.0,
+            ],
+        }
+    )
+
+    model = TimeOfUsePriceModel(
+        peak_price_eur_per_kwh=0.25,
+        flat_price_eur_per_kwh=0.18,
+        off_peak_price_eur_per_kwh=0.12,
+        surplus_compensation_price=0.0,
+        contracted_power_kw=4.6,
+        power_price_eur_per_kw_year=35.0,
+    )
+
+    result = model.calculate_variable_grid_cost(
+        energy_df=energy_df,
+        grid_import_column="grid_import_kwh",
+    )
+
+    assert result == pytest.approx(
+        1.16
+    )
+
+def test_hourly_price_model_calculates_variable_grid_cost() -> None:
+    energy_df = pd.DataFrame(
+        {
+            "datetime": pd.to_datetime(
+                [
+                    "2026-06-01 00:00:00",
+                    "2026-06-01 01:00:00",
+                ]
+            ),
+            "grid_import_kwh": [
+                1.0,
+                2.0,
+            ],
+        }
+    )
+
+    price_df = pd.DataFrame(
+        {
+            "datetime": pd.to_datetime(
+                [
+                    "2026-06-01 00:00:00",
+                    "2026-06-01 01:00:00",
+                ]
+            ),
+            "price_eur_per_kwh": [
+                0.10,
+                0.20,
+            ],
+        }
+    )
+
+    model = HourlyPriceModel(
+        price_df=price_df,
+        surplus_compensation_price=0.0,
+        contracted_power_kw=4.6,
+        power_price_eur_per_kw_year=35.0,
+    )
+
+    result = model.calculate_variable_grid_cost(
+        energy_df=energy_df,
+        grid_import_column="grid_import_kwh",
+    )
+
+    assert result == pytest.approx(
+        0.50
+    )

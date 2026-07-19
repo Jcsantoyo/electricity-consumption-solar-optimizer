@@ -5,11 +5,11 @@ import pandas as pd
 
 from hourly_price_calculator import calculate_total_hourly_grid_import_cost
 from tariff import (
-    calculate_net_electricity_cost_with_tariff,
     calculate_fixed_power_cost,
-    calculate_surplus_compensation
+    calculate_net_electricity_cost_with_tariff,
+    calculate_surplus_compensation,
+    calculate_variable_grid_cost_with_tariff,
 )
-
 
 class ElectricityPriceModel(Protocol):
     def calculate_net_cost(
@@ -18,6 +18,13 @@ class ElectricityPriceModel(Protocol):
         grid_import_column: str,
         surplus_column: str,
         simulation_days: int,
+    ) -> float:
+        ...
+    
+    def calulate_variable_grid_cost(
+        self,
+        energy_df: pd.DataFrame,
+        grid_import_column: str
     ) -> float:
         ...
 
@@ -63,6 +70,39 @@ class FixedPriceModel:
             self.contracted_power_kw,
             self.power_price_eur_per_kw_year,
             simulation_days
+        )
+    
+    def calculate_variable_grid_cost(
+        self,
+        energy_df: pd.DataFrame,
+        grid_import_column: str,
+    ) -> float:
+        if grid_import_column not in energy_df.columns:
+            raise ValueError(
+                "Missing required energy column: "
+                f"{grid_import_column}"
+            )
+
+        grid_import = pd.to_numeric(
+            energy_df[grid_import_column],
+            errors="coerce",
+        )
+
+        if grid_import.isna().any():
+            raise ValueError(
+                "Energy data contains invalid "
+                "grid import values"
+            )
+
+        if (grid_import < 0).any():
+            raise ValueError(
+                "Energy data contains negative "
+                "grid import values"
+            )
+
+        return float(
+            grid_import.sum()
+            * self.fixed_price_eur_per_kwh
         )
     
 
@@ -111,6 +151,55 @@ class TimeOfUsePriceModel:
             self.contracted_power_kw,
             self.power_price_eur_per_kw_year,
             simulation_days
+        )
+    
+    def calculate_variable_grid_cost(
+        self,
+        energy_df: pd.DataFrame,
+        grid_import_column: str,
+    ) -> float:
+        if "datetime" not in energy_df.columns:
+            raise ValueError(
+                "Missing required energy column: datetime"
+            )
+
+        if grid_import_column not in energy_df.columns:
+            raise ValueError(
+                "Missing required energy column: "
+                f"{grid_import_column}"
+            )
+
+        prepared_energy_df = energy_df.copy()
+
+        prepared_energy_df["datetime"] = (
+            pd.to_datetime(
+                prepared_energy_df["datetime"],
+                errors="coerce",
+            )
+        )
+
+        if prepared_energy_df[
+            "datetime"
+        ].isna().any():
+            raise ValueError(
+                "Energy data contains invalid "
+                "datetime values"
+            )
+
+        return float(
+            calculate_variable_grid_cost_with_tariff(
+                df=prepared_energy_df,
+                grid_import_column=grid_import_column,
+                peak_price=(
+                    self.peak_price_eur_per_kwh
+                ),
+                flat_price=(
+                    self.flat_price_eur_per_kwh
+                ),
+                off_peak_price=(
+                    self.off_peak_price_eur_per_kwh
+                ),
+            )
         )
         
 @dataclass(frozen=True)
@@ -179,44 +268,74 @@ class HourlyPriceModel:
         energy_df: pd.DataFrame,
         grid_import_column: str,
         surplus_column: str,
-        simulation_days: int
+        simulation_days: int,
     ) -> float:
         if simulation_days <= 0:
-            raise ValueError("Simulation days must be greater than zero")
-        
-        hourly_energy_df = energy_df[
-            [
-                "datetime",
-                grid_import_column,
-            ]
-        ].copy()
-        
-        hourly_energy_df = (
-            hourly_energy_df.rename(
-                columns={
-                    grid_import_column: "grid_import_kwh"
-                }
+            raise ValueError(
+                "Simulation days must be greater than zero"
+            )
+
+        variable_grid_cost = (
+            self.calculate_variable_grid_cost(
+                energy_df=energy_df,
+                grid_import_column=(
+                    grid_import_column
+                ),
             )
         )
-        
-        variable_grid_cost = calculate_total_hourly_grid_import_cost(
-            hourly_energy_df,
+
+        surplus_compensation = (
+            calculate_surplus_compensation(
+                df=energy_df,
+                surplus_column=surplus_column,
+                surplus_compensation_price=(
+                    self.surplus_compensation_price
+                ),
+            )
+        )
+
+        fixed_power_cost = (
+            calculate_fixed_power_cost(
+                contracted_power_kw=(
+                    self.contracted_power_kw
+                ),
+                power_price_eur_per_kw_year=(
+                    self.power_price_eur_per_kw_year
+                ),
+                simulation_days=simulation_days,
+            )
+        )
+
+        net_cost = (
+            variable_grid_cost
+            + fixed_power_cost
+            - surplus_compensation
+        )
+
+        return max(
+            float(net_cost),
+            0.0,
+        )
+    
+    def calculate_variable_grid_cost(
+        self,
+        energy_df: pd.DataFrame,
+        grid_import_column: str
+    ) -> float:
+        hourly_energy_df = energy_df.loc[
+            :,
+            [
+                "datetime",
+                grid_import_column
+            ],
+        ].copy()
+
+        hourly_energy_df = hourly_energy_df.rename(
+            columns={grid_import_column: "grid_import_kwh"}
+        )
+
+        return calculate_total_hourly_grid_import_cost(
+            energy_df,
             self.price_df,
             self.allow_negative_prices
         )
-
-        surplus_compensation = calculate_surplus_compensation(
-            energy_df,
-            surplus_column,
-            self.surplus_compensation_price
-        )
-
-        fixed_power_cost = calculate_fixed_power_cost(
-            self.contracted_power_kw,
-            self.power_price_eur_per_kw_year,
-            simulation_days
-        )
-
-        net_cost = variable_grid_cost + fixed_power_cost - surplus_compensation
-
-        return max(float(net_cost), 0.0)
