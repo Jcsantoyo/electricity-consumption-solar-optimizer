@@ -9,7 +9,7 @@ from scenario_registry import get_project_scenario
 from scenario_validation import (
     validate_project_scenario_data,
 )
-
+from price_model_factory import HourlyPriceModel
 
 def build_reproducible_consumption_data() -> pd.DataFrame:
     datetimes = pd.date_range(
@@ -135,6 +135,14 @@ def run_small_optimization(
     consumption_df: pd.DataFrame,
     price_df: pd.DataFrame,
 ) -> pd.DataFrame:
+    price_model = HourlyPriceModel(
+        price_df=price_df,
+        surplus_compensation_price=0.07,
+        contracted_power_kw=4.6,
+        power_price_eur_per_kw_year=35.0,
+        allow_negative_prices=True,
+    )
+
     return run_economic_grid_search(
         consumption_df=consumption_df,
         solar_peak_powers_kw=[
@@ -152,16 +160,9 @@ def run_small_optimization(
         fixed_installation_cost=800.0,
         solar_cost_per_kw=900.0,
         battery_cost_per_kwh=500.0,
-        peak_price=0.25,
-        flat_price=0.18,
-        off_peak_price=0.12,
-        surplus_compensation_price=0.07,
-        contracted_power_kw=4.6,
-        power_price_eur_per_kw_year=35.0,
+        price_model=price_model,
         simulation_days=3,
         pvgis_df=None,
-        hourly_price_df=price_df,
-        allow_negative_hourly_prices=True,
     )
 
 

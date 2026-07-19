@@ -1,46 +1,137 @@
 import pandas as pd
 import pytest
 
-from optimization import(
-    calculate_net_electricity_cost_for_price_mode,
-    run_economic_grid_search
-) 
+from electricity_price_models import (
+    FixedPriceModel,
+    HourlyPriceModel,
+    TimeOfUsePriceModel,
+)
+from optimization import (
+    run_economic_grid_search,
+)
 
 
-
-
-def build_energy_dataframe() -> pd.DataFrame:
+def build_consumption_dataframe() -> pd.DataFrame:
     return pd.DataFrame(
         {
             "datetime": pd.to_datetime(
                 [
-                    "2025-01-06 01:00:00",
-                    "2025-01-06 11:00:00",
-                    "2025-01-06 15:00:00",
+                    "2026-06-01 02:00:00",
+                    "2026-06-01 11:00:00",
+                    "2026-06-01 15:00:00",
                 ]
             ),
-            "grid_import_kwh": [
+            "consumption_kwh": [
                 1.0,
                 2.0,
                 3.0,
-            ],
-            "solar_surplus_kwh": [
-                0.0,
-                0.0,
-                0.0,
             ],
         }
     )
 
 
-def build_hourly_price_dataframe() -> pd.DataFrame:
-    return pd.DataFrame(
+def run_test_grid_search(
+    price_model: object,
+) -> pd.DataFrame:
+    return run_economic_grid_search(
+        consumption_df=(
+            build_consumption_dataframe()
+        ),
+        solar_peak_powers_kw=[
+            0.0,
+        ],
+        battery_capacities_kwh=[
+            0.0,
+        ],
+        battery_efficiency=0.90,
+        max_charge_power_kw=1.0,
+        max_discharge_power_kw=1.0,
+        initial_battery_state_kwh=0.0,
+        fixed_installation_cost=0.0,
+        solar_cost_per_kw=0.0,
+        battery_cost_per_kwh=0.0,
+        price_model=price_model,
+        simulation_days=1,
+        pvgis_df=None,
+    )
+
+
+def test_grid_search_uses_fixed_price_model() -> None:
+    price_model = FixedPriceModel(
+        fixed_price_eur_per_kwh=0.20,
+        surplus_compensation_price=0.0,
+        contracted_power_kw=0.0,
+        power_price_eur_per_kw_year=0.0,
+    )
+
+    results_df = run_test_grid_search(
+        price_model
+    )
+
+    assert len(results_df) == 1
+
+    expected_cost = (
+        6.0 * 0.20
+    )
+
+    assert results_df.loc[
+        0,
+        "base_net_cost_eur",
+    ] == pytest.approx(
+        expected_cost
+    )
+
+    assert results_df.loc[
+        0,
+        "scenario_net_cost_eur",
+    ] == pytest.approx(
+        expected_cost
+    )
+
+
+def test_grid_search_uses_time_of_use_model() -> None:
+    price_model = TimeOfUsePriceModel(
+        peak_price_eur_per_kwh=0.25,
+        flat_price_eur_per_kwh=0.18,
+        off_peak_price_eur_per_kwh=0.12,
+        surplus_compensation_price=0.0,
+        contracted_power_kw=0.0,
+        power_price_eur_per_kw_year=0.0,
+    )
+
+    results_df = run_test_grid_search(
+        price_model
+    )
+
+    expected_cost = (
+        1.0 * 0.12
+        + 2.0 * 0.25
+        + 3.0 * 0.18
+    )
+
+    assert results_df.loc[
+        0,
+        "base_net_cost_eur",
+    ] == pytest.approx(
+        expected_cost
+    )
+
+    assert results_df.loc[
+        0,
+        "scenario_net_cost_eur",
+    ] == pytest.approx(
+        expected_cost
+    )
+
+
+def test_grid_search_uses_hourly_price_model() -> None:
+    price_df = pd.DataFrame(
         {
             "datetime": pd.to_datetime(
                 [
-                    "2025-01-06 01:00:00",
-                    "2025-01-06 11:00:00",
-                    "2025-01-06 15:00:00",
+                    "2026-06-01 02:00:00",
+                    "2026-06-01 11:00:00",
+                    "2026-06-01 15:00:00",
                 ]
             ),
             "price_eur_per_kwh": [
@@ -51,127 +142,81 @@ def build_hourly_price_dataframe() -> pd.DataFrame:
         }
     )
 
-
-def test_price_mode_uses_tariff_when_hourly_prices_are_none() -> None:
-    energy_df = build_energy_dataframe()
-
-    net_cost = calculate_net_electricity_cost_for_price_mode(
-        df=energy_df,
-        grid_import_column="grid_import_kwh",
-        surplus_column="solar_surplus_kwh",
-        peak_price=0.25,
-        flat_price=0.18,
-        off_peak_price=0.12,
-        surplus_compensation_price=0.07,
+    price_model = HourlyPriceModel(
+        price_df=price_df,
+        surplus_compensation_price=0.0,
         contracted_power_kw=0.0,
         power_price_eur_per_kw_year=0.0,
-        simulation_days=1,
-        hourly_price_df=None,
     )
 
-    assert net_cost == pytest.approx(1.16)
-
-
-def test_price_mode_uses_hourly_prices_when_dataframe_is_provided() -> None:
-    energy_df = build_energy_dataframe()
-    hourly_price_df = build_hourly_price_dataframe()
-
-    net_cost = calculate_net_electricity_cost_for_price_mode(
-        df=energy_df,
-        grid_import_column="grid_import_kwh",
-        surplus_column="solar_surplus_kwh",
-        peak_price=0.25,
-        flat_price=0.18,
-        off_peak_price=0.12,
-        surplus_compensation_price=0.07,
-        contracted_power_kw=0.0,
-        power_price_eur_per_kw_year=0.0,
-        simulation_days=1,
-        hourly_price_df=hourly_price_df,
+    results_df = run_test_grid_search(
+        price_model
     )
 
-    assert net_cost == pytest.approx(0.95)
-
-
-def test_hourly_price_mode_keeps_fixed_cost_and_surplus_compensation() -> None:
-    energy_df = pd.DataFrame(
-        {
-            "datetime": pd.to_datetime(
-                [
-                    "2025-01-06 12:00:00",
-                ]
-            ),
-            "grid_import_kwh": [
-                1.0,
-            ],
-            "solar_surplus_kwh": [
-                0.5,
-            ],
-        }
+    expected_cost = (
+        1.0 * 0.10
+        + 2.0 * 0.20
+        + 3.0 * 0.15
     )
 
-    hourly_price_df = pd.DataFrame(
-        {
-            "datetime": pd.to_datetime(
-                [
-                    "2025-01-06 12:00:00",
-                ]
-            ),
-            "price_eur_per_kwh": [
-                0.20,
-            ],
-        }
+    assert results_df.loc[
+        0,
+        "base_net_cost_eur",
+    ] == pytest.approx(
+        expected_cost
     )
 
-    net_cost = calculate_net_electricity_cost_for_price_mode(
-        df=energy_df,
-        grid_import_column="grid_import_kwh",
-        surplus_column="solar_surplus_kwh",
-        peak_price=0.25,
-        flat_price=0.18,
-        off_peak_price=0.12,
-        surplus_compensation_price=0.07,
-        contracted_power_kw=4.6,
-        power_price_eur_per_kw_year=35.0,
-        simulation_days=1,
-        hourly_price_df=hourly_price_df,
+    assert results_df.loc[
+        0,
+        "scenario_net_cost_eur",
+    ] == pytest.approx(
+        expected_cost
     )
 
-    expected_variable_cost = 1.0 * 0.20
-    expected_fixed_cost = 4.6 * 35.0 / 365
-    expected_surplus_compensation = 0.5 * 0.07
-
-    expected_net_cost = (
-        expected_variable_cost
-        + expected_fixed_cost
-        - expected_surplus_compensation
-    )
-
-    assert net_cost == pytest.approx(expected_net_cost)
 
 def test_grid_search_allows_negative_hourly_prices() -> None:
     consumption_df = pd.DataFrame(
         {
             "datetime": pd.to_datetime(
-                ["2026-06-01 14:00:00"]
+                [
+                    "2026-06-01 14:00:00",
+                ]
             ),
-            "consumption_kwh": [1.0],
+            "consumption_kwh": [
+                1.0,
+            ],
         }
     )
 
     price_df = pd.DataFrame(
         {
             "datetime": pd.to_datetime(
-                ["2026-06-01 14:00:00"]
+                [
+                    "2026-06-01 14:00:00",
+                ]
             ),
-            "price_eur_per_kwh": [-0.01],
+            "price_eur_per_kwh": [
+                -0.01,
+            ],
         }
+    )
+
+    price_model = HourlyPriceModel(
+        price_df=price_df,
+        surplus_compensation_price=0.0,
+        contracted_power_kw=0.0,
+        power_price_eur_per_kw_year=0.0,
+        allow_negative_prices=True,
     )
 
     results_df = run_economic_grid_search(
         consumption_df=consumption_df,
-        solar_peak_powers_kw=[0.0],
-        battery_capacities_kwh=[0.0],
+        solar_peak_powers_kw=[
+            0.0,
+        ],
+        battery_capacities_kwh=[
+            0.0,
+        ],
         battery_efficiency=0.90,
         max_charge_power_kw=1.0,
         max_discharge_power_kw=1.0,
@@ -179,16 +224,23 @@ def test_grid_search_allows_negative_hourly_prices() -> None:
         fixed_installation_cost=800.0,
         solar_cost_per_kw=900.0,
         battery_cost_per_kwh=500.0,
-        peak_price=0.25,
-        flat_price=0.18,
-        off_peak_price=0.12,
-        surplus_compensation_price=0.07,
-        contracted_power_kw=4.6,
-        power_price_eur_per_kw_year=35.0,
+        price_model=price_model,
         simulation_days=1,
         pvgis_df=None,
-        hourly_price_df=price_df,
-        allow_negative_hourly_prices=True,
     )
 
     assert len(results_df) == 1
+
+    assert results_df.loc[
+        0,
+        "base_net_cost_eur",
+    ] == pytest.approx(
+        0.0
+    )
+
+    assert results_df.loc[
+        0,
+        "scenario_net_cost_eur",
+    ] == pytest.approx(
+        0.0
+    )
