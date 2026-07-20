@@ -6,10 +6,11 @@ import pandas as pd
 from hourly_price_calculator import calculate_total_hourly_grid_import_cost
 from tariff import (
     calculate_fixed_power_cost,
-    calculate_net_electricity_cost_with_tariff,
     calculate_surplus_compensation,
     calculate_variable_grid_cost_with_tariff,
 )
+
+from electricity_cost_breakdown import ElectricityCostBreakdown
 
 
 class ElectricityPriceModel(Protocol):
@@ -24,6 +25,14 @@ class ElectricityPriceModel(Protocol):
     def calculate_variable_grid_cost(
         self, energy_df: pd.DataFrame, grid_import_column: str
     ) -> float: ...
+
+    def calculate_cost_breakdown(
+        self,
+        energy_df: pd.DataFrame,
+        grid_import_column: str,
+        surplus_column: str,
+        simulation_days: int,
+    ) -> ElectricityCostBreakdown: ...
 
 
 @dataclass(frozen=True)
@@ -46,6 +55,39 @@ class FixedPriceModel:
         if self.power_price_eur_per_kw_year < 0:
             raise ValueError("Annual power price cannot be negative")
 
+    def calculate_cost_breakdown(
+        self,
+        energy_df: pd.DataFrame,
+        grid_import_column: str,
+        surplus_column: str,
+        simulation_days: int,
+    ) -> ElectricityCostBreakdown:
+        if simulation_days <= 0:
+            raise ValueError("Simulation days must be greater than zero")
+
+        variable_energy_cost = self.calculate_variable_grid_cost(
+            energy_df, grid_import_column
+        )
+
+        fixed_power_cost = calculate_fixed_power_cost(
+            self.contracted_power_kw, self.power_price_eur_per_kw_year, simulation_days
+        )
+
+        surplus_compensation = calculate_surplus_compensation(
+            energy_df, surplus_column, self.surplus_compensation_price
+        )
+
+        total_cost = max(
+            variable_energy_cost + fixed_power_cost - surplus_compensation, 0.0
+        )
+
+        return ElectricityCostBreakdown(
+            float(variable_energy_cost),
+            float(fixed_power_cost),
+            float(surplus_compensation),
+            float(total_cost),
+        )
+
     def calculate_net_cost(
         self,
         energy_df: pd.DataFrame,
@@ -53,21 +95,11 @@ class FixedPriceModel:
         surplus_column: str,
         simulation_days: int,
     ) -> float:
-        if simulation_days <= 0:
-            raise ValueError("Simulation days must be greater than zero")
-
-        return calculate_net_electricity_cost_with_tariff(
-            energy_df,
-            grid_import_column,
-            surplus_column,
-            self.fixed_price_eur_per_kwh,
-            self.fixed_price_eur_per_kwh,
-            self.fixed_price_eur_per_kwh,
-            self.surplus_compensation_price,
-            self.contracted_power_kw,
-            self.power_price_eur_per_kw_year,
-            simulation_days,
+        breakdown = self.calculate_cost_breakdown(
+            energy_df, grid_import_column, surplus_column, simulation_days
         )
+
+        return breakdown.total_cost_eur
 
     def calculate_variable_grid_cost(
         self,
@@ -114,6 +146,39 @@ class TimeOfUsePriceModel:
             if value < 0:
                 raise ValueError(f"{field_name} cannot be negative")
 
+    def calculate_cost_breakdown(
+        self,
+        energy_df: pd.DataFrame,
+        grid_import_column: str,
+        surplus_column: str,
+        simulation_days: int,
+    ) -> ElectricityCostBreakdown:
+        if simulation_days <= 0:
+            raise ValueError("Simulation days must be greater than zero")
+
+        variable_energy_cost = self.calculate_variable_grid_cost(
+            energy_df, grid_import_column
+        )
+
+        fixed_power_cost = calculate_fixed_power_cost(
+            self.contracted_power_kw, self.power_price_eur_per_kw_year, simulation_days
+        )
+
+        surplus_compensation = calculate_surplus_compensation(
+            energy_df, surplus_column, self.surplus_compensation_price
+        )
+
+        total_cost = max(
+            variable_energy_cost + fixed_power_cost - surplus_compensation, 0.0
+        )
+
+        return ElectricityCostBreakdown(
+            float(variable_energy_cost),
+            float(fixed_power_cost),
+            float(surplus_compensation),
+            float(total_cost),
+        )
+
     def calculate_net_cost(
         self,
         energy_df: pd.DataFrame,
@@ -121,21 +186,11 @@ class TimeOfUsePriceModel:
         surplus_column: str,
         simulation_days: int,
     ) -> float:
-        if simulation_days <= 0:
-            raise ValueError("Simulation days must be greater than zero")
-
-        return calculate_net_electricity_cost_with_tariff(
-            energy_df,
-            grid_import_column,
-            surplus_column,
-            self.peak_price_eur_per_kwh,
-            self.flat_price_eur_per_kwh,
-            self.off_peak_price_eur_per_kwh,
-            self.surplus_compensation_price,
-            self.contracted_power_kw,
-            self.power_price_eur_per_kw_year,
-            simulation_days,
+        breakdown = self.calculate_cost_breakdown(
+            energy_df, grid_import_column, surplus_column, simulation_days
         )
+
+        return breakdown.total_cost_eur
 
     def calculate_variable_grid_cost(
         self,
@@ -229,6 +284,39 @@ class HourlyPriceModel:
 
         object.__setattr__(self, "price_df", prepared_price_df)
 
+    def calculate_cost_breakdown(
+        self,
+        energy_df: pd.DataFrame,
+        grid_import_column: str,
+        surplus_column: str,
+        simulation_days: int,
+    ) -> ElectricityCostBreakdown:
+        if simulation_days <= 0:
+            raise ValueError("Simulation days must be greater than zero")
+
+        variable_energy_cost = self.calculate_variable_grid_cost(
+            energy_df, grid_import_column
+        )
+
+        fixed_power_cost = calculate_fixed_power_cost(
+            self.contracted_power_kw, self.power_price_eur_per_kw_year, simulation_days
+        )
+
+        surplus_compensation = calculate_surplus_compensation(
+            energy_df, surplus_column, self.surplus_compensation_price
+        )
+
+        total_cost = max(
+            variable_energy_cost + fixed_power_cost - surplus_compensation, 0.0
+        )
+
+        return ElectricityCostBreakdown(
+            float(variable_energy_cost),
+            float(fixed_power_cost),
+            float(surplus_compensation),
+            float(total_cost),
+        )
+
     def calculate_net_cost(
         self,
         energy_df: pd.DataFrame,
@@ -236,32 +324,11 @@ class HourlyPriceModel:
         surplus_column: str,
         simulation_days: int,
     ) -> float:
-        if simulation_days <= 0:
-            raise ValueError("Simulation days must be greater than zero")
-
-        variable_grid_cost = self.calculate_variable_grid_cost(
-            energy_df=energy_df,
-            grid_import_column=(grid_import_column),
+        breakdown = self.calculate_cost_breakdown(
+            energy_df, grid_import_column, surplus_column, simulation_days
         )
 
-        surplus_compensation = calculate_surplus_compensation(
-            df=energy_df,
-            surplus_column=surplus_column,
-            surplus_compensation_price=(self.surplus_compensation_price),
-        )
-
-        fixed_power_cost = calculate_fixed_power_cost(
-            contracted_power_kw=(self.contracted_power_kw),
-            power_price_eur_per_kw_year=(self.power_price_eur_per_kw_year),
-            simulation_days=simulation_days,
-        )
-
-        net_cost = variable_grid_cost + fixed_power_cost - surplus_compensation
-
-        return max(
-            float(net_cost),
-            0.0,
-        )
+        return breakdown.total_cost_eur
 
     def calculate_variable_grid_cost(
         self,

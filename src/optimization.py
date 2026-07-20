@@ -32,12 +32,14 @@ def run_economic_grid_search(
     base_cost_df["grid_import_kwh"] = base_cost_df["consumption_kwh"]
     base_cost_df["solar_surplus_kwh"] = 0.0
 
-    base_net_cost = price_model.calculate_net_cost(
+    base_cost_breakdown = price_model.calculate_cost_breakdown(
         energy_df=base_cost_df,
         grid_import_column="grid_import_kwh",
         surplus_column="solar_surplus_kwh",
         simulation_days=simulation_days,
     )
+
+    base_net_cost = base_cost_breakdown.total_cost_eur
 
     for solar_peak_power_kw in solar_peak_powers_kw:
         if pvgis_df is None:
@@ -72,12 +74,14 @@ def run_economic_grid_search(
 
             simulation_df["solar_generation_kwh"] = solar_generation_kwh
 
-            scenario_net_cost = price_model.calculate_net_cost(
+            scenario_cost_breakdown = price_model.calculate_cost_breakdown(
                 energy_df=simulation_df,
                 grid_import_column="grid_import_kwh",
                 surplus_column="solar_surplus_kwh",
                 simulation_days=simulation_days,
             )
+
+            scenario_net_cost = scenario_cost_breakdown.total_cost_eur
 
             period_savings = base_net_cost - scenario_net_cost
 
@@ -110,7 +114,25 @@ def run_economic_grid_search(
                     "solar_peak_power_kw": solar_peak_power_kw,
                     "battery_capacity_kwh": battery_capacity_kwh,
                     "investment_cost_eur": investment_cost,
+                    "base_variable_energy_cost_eur": (
+                        base_cost_breakdown.variable_energy_cost_eur
+                    ),
+                    "base_fixed_power_cost_eur": (
+                        base_cost_breakdown.fixed_power_cost_eur
+                    ),
+                    "base_surplus_compensation_eur": (
+                        base_cost_breakdown.surplus_compensation_eur
+                    ),
                     "base_net_cost_eur": base_net_cost,
+                    "scenario_variable_energy_cost_eur": (
+                        scenario_cost_breakdown.variable_energy_cost_eur
+                    ),
+                    "scenario_fixed_power_cost_eur": (
+                        scenario_cost_breakdown.fixed_power_cost_eur
+                    ),
+                    "scenario_surplus_compensation_eur": (
+                        scenario_cost_breakdown.surplus_compensation_eur
+                    ),
                     "scenario_net_cost_eur": scenario_net_cost,
                     "annual_savings_eur": annual_savings,
                     "payback_years": payback_years,

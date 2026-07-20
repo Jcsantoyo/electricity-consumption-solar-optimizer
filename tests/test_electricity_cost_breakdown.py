@@ -22,7 +22,6 @@ def test_electricity_cost_breakdown_stores_components() -> None:
 @pytest.mark.parametrize(
     ("field_name", "field_value"),
     [
-        ("variable_energy_cost_eur", -1.0),
         ("fixed_power_cost_eur", -1.0),
         ("surplus_compensation_eur", -1.0),
         ("total_cost_eur", -1.0),
@@ -47,6 +46,7 @@ def test_electricity_cost_breakdown_rejects_negative_values(
     ):
         ElectricityCostBreakdown(**values)
 
+
 def test_electricity_cost_breakdown_rejects_inconsistent_total() -> None:
     with pytest.raises(
         ValueError,
@@ -58,3 +58,15 @@ def test_electricity_cost_breakdown_rejects_inconsistent_total() -> None:
             surplus_compensation_eur=10.0,
             total_cost_eur=50.0,
         )
+
+
+def test_electricity_cost_breakdown_allows_negative_variable_cost() -> None:
+    breakdown = ElectricityCostBreakdown(
+        variable_energy_cost_eur=-0.05,
+        fixed_power_cost_eur=0.0,
+        surplus_compensation_eur=0.0,
+        total_cost_eur=0.0,
+    )
+
+    assert breakdown.variable_energy_cost_eur == pytest.approx(-0.05)
+    assert breakdown.total_cost_eur == pytest.approx(0.0)

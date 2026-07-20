@@ -5,6 +5,7 @@ from electricity_price_models import (
     FixedPriceModel,
     HourlyPriceModel,
     TimeOfUsePriceModel,
+    ElectricityPriceModel,
 )
 from optimization import (
     run_economic_grid_search,
@@ -31,7 +32,7 @@ def build_consumption_dataframe() -> pd.DataFrame:
 
 
 def run_test_grid_search(
-    price_model: object,
+    price_model: ElectricityPriceModel,
 ) -> pd.DataFrame:
     return run_economic_grid_search(
         consumption_df=(build_consumption_dataframe()),
@@ -210,3 +211,81 @@ def test_grid_search_allows_negative_hourly_prices() -> None:
         0,
         "scenario_net_cost_eur",
     ] == pytest.approx(0.0)
+
+
+def test_grid_search_stores_fixed_price_cost_breakdown() -> None:
+    price_model = FixedPriceModel(
+        fixed_price_eur_per_kwh=0.20,
+        surplus_compensation_price=0.05,
+        contracted_power_kw=4.6,
+        power_price_eur_per_kw_year=35.0,
+    )
+
+    results_df = run_test_grid_search(price_model)
+
+    expected_variable_cost = 6.0 * 0.20
+    expected_fixed_power_cost = 4.6 * 35.0 / 365
+
+    assert results_df.loc[
+        0,
+        "base_variable_energy_cost_eur",
+    ] == pytest.approx(expected_variable_cost)
+
+    assert results_df.loc[
+        0,
+        "base_fixed_power_cost_eur",
+    ] == pytest.approx(expected_fixed_power_cost)
+
+    assert results_df.loc[
+        0,
+        "base_surplus_compensation_eur",
+    ] == pytest.approx(0.0)
+
+    assert results_df.loc[
+        0,
+        "base_net_cost_eur",
+    ] == pytest.approx(expected_variable_cost + expected_fixed_power_cost)
+
+    assert results_df.loc[
+        0,
+        "scenario_variable_energy_cost_eur",
+    ] == pytest.approx(expected_variable_cost)
+
+    assert results_df.loc[
+        0,
+        "scenario_fixed_power_cost_eur",
+    ] == pytest.approx(expected_fixed_power_cost)
+
+    assert results_df.loc[
+        0,
+        "scenario_surplus_compensation_eur",
+    ] == pytest.approx(0.0)
+
+    assert results_df.loc[
+        0,
+        "scenario_net_cost_eur",
+    ] == pytest.approx(expected_variable_cost + expected_fixed_power_cost)
+
+
+def test_grid_search_includes_cost_breakdown_columns() -> None:
+    price_model = FixedPriceModel(
+        fixed_price_eur_per_kwh=0.20,
+        surplus_compensation_price=0.0,
+        contracted_power_kw=0.0,
+        power_price_eur_per_kw_year=0.0,
+    )
+
+    results_df = run_test_grid_search(price_model)
+
+    expected_columns = {
+        "base_variable_energy_cost_eur",
+        "base_fixed_power_cost_eur",
+        "base_surplus_compensation_eur",
+        "base_net_cost_eur",
+        "scenario_variable_energy_cost_eur",
+        "scenario_fixed_power_cost_eur",
+        "scenario_surplus_compensation_eur",
+        "scenario_net_cost_eur",
+    }
+
+    assert expected_columns.issubset(results_df.columns)

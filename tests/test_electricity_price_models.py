@@ -670,3 +670,184 @@ def test_hourly_price_model_rejects_missing_energy_column() -> None:
             energy_df=energy_df,
             grid_import_column=("grid_import_kwh"),
         )
+
+
+def test_fixed_price_model_returns_cost_breakdown() -> None:
+    energy_df = pd.DataFrame(
+        {
+            "datetime": pd.to_datetime(
+                [
+                    "2026-06-01 00:00:00",
+                    "2026-06-01 01:00:00",
+                ]
+            ),
+            "grid_import_kwh": [
+                1.0,
+                2.0,
+            ],
+            "solar_surplus_kwh": [
+                1.0,
+                1.0,
+            ],
+        }
+    )
+
+    model = FixedPriceModel(
+        fixed_price_eur_per_kwh=0.20,
+        surplus_compensation_price=0.05,
+        contracted_power_kw=0.0,
+        power_price_eur_per_kw_year=0.0,
+    )
+
+    breakdown = model.calculate_cost_breakdown(
+        energy_df=energy_df,
+        grid_import_column="grid_import_kwh",
+        surplus_column="solar_surplus_kwh",
+        simulation_days=1,
+    )
+
+    assert breakdown.variable_energy_cost_eur == pytest.approx(0.60)
+    assert breakdown.fixed_power_cost_eur == pytest.approx(0.0)
+    assert breakdown.surplus_compensation_eur == pytest.approx(0.10)
+    assert breakdown.total_cost_eur == pytest.approx(0.50)
+
+
+def test_time_of_use_model_returns_cost_breakdown() -> None:
+    energy_df = pd.DataFrame(
+        {
+            "datetime": pd.to_datetime(
+                [
+                    "2026-06-01 02:00:00",
+                    "2026-06-01 11:00:00",
+                    "2026-06-01 15:00:00",
+                ]
+            ),
+            "grid_import_kwh": [
+                1.0,
+                2.0,
+                3.0,
+            ],
+            "solar_surplus_kwh": [
+                1.0,
+                0.0,
+                1.0,
+            ],
+        }
+    )
+
+    model = TimeOfUsePriceModel(
+        peak_price_eur_per_kwh=0.25,
+        flat_price_eur_per_kwh=0.18,
+        off_peak_price_eur_per_kwh=0.12,
+        surplus_compensation_price=0.05,
+        contracted_power_kw=0.0,
+        power_price_eur_per_kw_year=0.0,
+    )
+
+    breakdown = model.calculate_cost_breakdown(
+        energy_df=energy_df,
+        grid_import_column="grid_import_kwh",
+        surplus_column="solar_surplus_kwh",
+        simulation_days=1,
+    )
+
+    assert breakdown.variable_energy_cost_eur == pytest.approx(1.16)
+    assert breakdown.fixed_power_cost_eur == pytest.approx(0.0)
+    assert breakdown.surplus_compensation_eur == pytest.approx(0.10)
+    assert breakdown.total_cost_eur == pytest.approx(1.06)
+
+
+def test_hourly_price_model_returns_cost_breakdown() -> None:
+    energy_df = pd.DataFrame(
+        {
+            "datetime": pd.to_datetime(
+                [
+                    "2026-06-01 00:00:00",
+                    "2026-06-01 01:00:00",
+                ]
+            ),
+            "grid_import_kwh": [
+                1.0,
+                2.0,
+            ],
+            "solar_surplus_kwh": [
+                1.0,
+                1.0,
+            ],
+        }
+    )
+
+    price_df = pd.DataFrame(
+        {
+            "datetime": pd.to_datetime(
+                [
+                    "2026-06-01 00:00:00",
+                    "2026-06-01 01:00:00",
+                ]
+            ),
+            "price_eur_per_kwh": [
+                0.10,
+                0.20,
+            ],
+        }
+    )
+
+    model = HourlyPriceModel(
+        price_df=price_df,
+        surplus_compensation_price=0.05,
+        contracted_power_kw=0.0,
+        power_price_eur_per_kw_year=0.0,
+    )
+
+    breakdown = model.calculate_cost_breakdown(
+        energy_df=energy_df,
+        grid_import_column="grid_import_kwh",
+        surplus_column="solar_surplus_kwh",
+        simulation_days=1,
+    )
+
+    assert breakdown.variable_energy_cost_eur == pytest.approx(0.50)
+    assert breakdown.fixed_power_cost_eur == pytest.approx(0.0)
+    assert breakdown.surplus_compensation_eur == pytest.approx(0.10)
+    assert breakdown.total_cost_eur == pytest.approx(0.40)
+
+
+def test_net_cost_matches_breakdown_total() -> None:
+    energy_df = pd.DataFrame(
+        {
+            "datetime": pd.to_datetime(
+                [
+                    "2026-06-01 00:00:00",
+                ]
+            ),
+            "grid_import_kwh": [
+                1.0,
+            ],
+            "solar_surplus_kwh": [
+                0.5,
+            ],
+        }
+    )
+
+    model = FixedPriceModel(
+        fixed_price_eur_per_kwh=0.20,
+        surplus_compensation_price=0.05,
+        contracted_power_kw=0.0,
+        power_price_eur_per_kw_year=0.0,
+    )
+
+    breakdown = model.calculate_cost_breakdown(
+        energy_df=energy_df,
+        grid_import_column="grid_import_kwh",
+        surplus_column="solar_surplus_kwh",
+        simulation_days=1,
+    )
+
+    net_cost = model.calculate_net_cost(
+        energy_df=energy_df,
+        grid_import_column="grid_import_kwh",
+        surplus_column="solar_surplus_kwh",
+        simulation_days=1,
+    )
+
+    assert net_cost == pytest.approx(breakdown.total_cost_eur)
