@@ -19,10 +19,7 @@ def build_omie_file_text(
     for period in range(1, 97):
         price = base_price + period
 
-        lines.append(
-            f"{year};{month:02d};{day:02d};"
-            f"{period};{price};{price};"
-        )
+        lines.append(f"{year};{month:02d};{day:02d};{period};{price};{price};")
 
     lines.append("*")
 
@@ -100,18 +97,11 @@ def test_prepare_omie_prices_writes_output_csv(
     tmp_path,
 ) -> None:
     input_directory = tmp_path / "raw"
-    output_file = (
-        tmp_path
-        / "processed"
-        / "omie_hourly_prices.csv"
-    )
+    output_file = tmp_path / "processed" / "omie_hourly_prices.csv"
 
     input_directory.mkdir()
 
-    omie_file = (
-        input_directory
-        / "marginalpdbc_20260705.1"
-    )
+    omie_file = input_directory / "marginalpdbc_20260705.1"
 
     omie_file.write_text(
         build_omie_file_text(

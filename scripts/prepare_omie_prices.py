@@ -20,12 +20,13 @@ DEFAULT_INPUT_DIRECTORY = "data/raw"
 DEFAULT_OUTPUT_PATH = "data/processed/omie_hourly_prices.csv"
 OMIE_FILE_PATTERN = "marginalpdbc_*.1"
 
+
 def find_omie_files(input_directory: str) -> list[Path]:
     input_path = Path(input_directory)
 
     if not input_path.exists():
         raise FileNotFoundError(f"OMIE input directory not found: {input_directory}")
-    
+
     omie_files = sorted(input_path.glob(OMIE_FILE_PATTERN))
 
     if not omie_files:
@@ -33,8 +34,9 @@ def find_omie_files(input_directory: str) -> list[Path]:
             "No OMIE files found in "
             f"{input_directory} using pattern {OMIE_FILE_PATTERN}"
         )
-    
+
     return omie_files
+
 
 def build_hourly_omie_price_dataframe(omie_files: list[Path]) -> pd.DataFrame:
     hourly_dataframes = []
@@ -50,10 +52,7 @@ def build_hourly_omie_price_dataframe(omie_files: list[Path]) -> pd.DataFrame:
 
     combined_df = combined_df.sort_values("datetime")
 
-    combined_df = combined_df.drop_duplicates(
-        subset=["datetime"],
-        keep="last"
-    )
+    combined_df = combined_df.drop_duplicates(subset=["datetime"], keep="last")
 
     combined_df = combined_df.reset_index(drop=True)
 
@@ -62,9 +61,9 @@ def build_hourly_omie_price_dataframe(omie_files: list[Path]) -> pd.DataFrame:
 
 def prepare_omie_prices(
     input_directory: str = DEFAULT_INPUT_DIRECTORY,
-    output_path: str = DEFAULT_OUTPUT_PATH
+    output_path: str = DEFAULT_OUTPUT_PATH,
 ) -> pd.DataFrame:
-    
+
     omie_files = find_omie_files(input_directory)
 
     hourly_price_df = build_hourly_omie_price_dataframe(omie_files)
@@ -76,6 +75,7 @@ def prepare_omie_prices(
     hourly_price_df.to_csv(output_file, index=False)
 
     return hourly_price_df
+
 
 def main() -> None:
     hourly_price_df = prepare_omie_prices()

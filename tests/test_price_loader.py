@@ -7,7 +7,7 @@ from price_loader import (
     prepare_hourly_price_data,
     validate_hourly_price_columns,
     load_hourly_prices_if_enabled,
-    validate_hourly_price_coverage
+    validate_hourly_price_coverage,
 )
 
 
@@ -113,6 +113,7 @@ def test_load_hourly_prices_raises_error_for_missing_file() -> None:
     with pytest.raises(FileNotFoundError, match="Hourly price file not found"):
         load_hourly_prices("missing_hourly_prices.csv")
 
+
 def test_hourly_price_configuration_exists() -> None:
     assert isinstance(config.USE_HOURLY_PRICE_DATA, bool)
     assert isinstance(config.HOURLY_PRICE_DATA_PATH, str)
@@ -125,6 +126,7 @@ def test_hourly_price_data_configuration_is_boolean() -> None:
 def test_hourly_price_data_path_points_to_csv_file() -> None:
     assert config.HOURLY_PRICE_DATA_PATH.startswith("data/")
     assert config.HOURLY_PRICE_DATA_PATH.endswith(".csv")
+
 
 def test_load_hourly_prices_if_enabled_returns_none_when_disabled() -> None:
     price_df = load_hourly_prices_if_enabled(
@@ -153,6 +155,7 @@ def test_load_hourly_prices_if_enabled_loads_file_when_enabled(tmp_path) -> None
     assert price_df is not None
     assert len(price_df) == 2
     assert list(price_df["price_eur_per_kwh"]) == [0.12, 0.11]
+
 
 def test_validate_hourly_price_coverage_accepts_complete_coverage() -> None:
     consumption_df = pd.DataFrame(
@@ -252,6 +255,7 @@ def test_validate_hourly_price_coverage_ignores_extra_price_timestamps() -> None
         price_df=price_df,
     )
 
+
 def test_prepare_hourly_price_data_allows_negative_prices_when_enabled() -> None:
     price_df = pd.DataFrame(
         {
@@ -278,6 +282,7 @@ def test_prepare_hourly_price_data_allows_negative_prices_when_enabled() -> None
         ]
     )
 
+
 def test_load_hourly_prices_allows_negative_prices_when_enabled(
     tmp_path,
 ) -> None:
@@ -297,6 +302,7 @@ def test_load_hourly_prices_allows_negative_prices_when_enabled(
 
     assert len(price_df) == 2
     assert price_df["price_eur_per_kwh"].min() < 0
+
 
 def test_negative_hourly_price_configuration_exists() -> None:
     assert isinstance(

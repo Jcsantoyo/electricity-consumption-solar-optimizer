@@ -17,10 +17,7 @@ def build_electricity_price_mode_description(
         )
 
     if price_mode == "fixed":
-        return (
-            "Fixed electricity price from tariff profile "
-            f"'{tariff_profile_name}'"
-        )
+        return f"Fixed electricity price from tariff profile '{tariff_profile_name}'"
 
     if price_mode == "time_of_use":
         return (

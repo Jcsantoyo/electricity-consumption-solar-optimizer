@@ -22,10 +22,7 @@ def build_consumption_df(
                 periods=periods,
                 freq="h",
             ),
-            "consumption_kwh": [
-                1.0
-            ]
-            * periods,
+            "consumption_kwh": [1.0] * periods,
         }
     )
 
@@ -40,18 +37,13 @@ def build_price_df(
                 periods=periods,
                 freq="h",
             ),
-            "price_eur_per_kwh": [
-                0.10
-            ]
-            * periods,
+            "price_eur_per_kwh": [0.10] * periods,
         }
     )
 
 
 def test_consumption_validation_accepts_hourly_data() -> None:
-    summary = validate_consumption_time_series(
-        build_consumption_df()
-    )
+    summary = validate_consumption_time_series(build_consumption_df())
 
     assert summary.rows == 48
     assert summary.unique_timestamps == 48
@@ -73,25 +65,17 @@ def test_consumption_validation_rejects_duplicates() -> None:
         ValueError,
         match="duplicated timestamps",
     ):
-        validate_consumption_time_series(
-            consumption_df
-        )
+        validate_consumption_time_series(consumption_df)
 
 
 def test_consumption_validation_rejects_hourly_gap() -> None:
-    consumption_df = (
-        build_consumption_df()
-        .drop(index=10)
-        .reset_index(drop=True)
-    )
+    consumption_df = build_consumption_df().drop(index=10).reset_index(drop=True)
 
     with pytest.raises(
         ValueError,
         match="not continuous hourly data",
     ):
-        validate_consumption_time_series(
-            consumption_df
-        )
+        validate_consumption_time_series(consumption_df)
 
 
 def test_consumption_validation_rejects_negative_values() -> None:
@@ -106,9 +90,7 @@ def test_consumption_validation_rejects_negative_values() -> None:
         ValueError,
         match="negative consumption",
     ):
-        validate_consumption_time_series(
-            consumption_df
-        )
+        validate_consumption_time_series(consumption_df)
 
 
 def test_calculate_backtest_rows_matches_forecast_split() -> None:
@@ -124,15 +106,9 @@ def test_calculate_backtest_rows_matches_forecast_split() -> None:
 def test_project_scenario_validation_accepts_complete_data(
     tmp_path,
 ) -> None:
-    consumption_path = (
-        tmp_path / "consumption.csv"
-    )
-    price_path = (
-        tmp_path / "prices.csv"
-    )
-    solar_path = (
-        tmp_path / "solar.csv"
-    )
+    consumption_path = tmp_path / "consumption.csv"
+    price_path = tmp_path / "prices.csv"
+    solar_path = tmp_path / "solar.csv"
 
     consumption_df = build_consumption_df()
     price_df = build_price_df()
@@ -151,18 +127,10 @@ def test_project_scenario_validation_accepts_complete_data(
     )
 
     scenario = replace(
-        get_project_scenario(
-            "uci_omie_june_2026"
-        ),
-        consumption_data_path=str(
-            consumption_path
-        ),
-        hourly_price_data_path=str(
-            price_path
-        ),
-        pvgis_solar_data_path=str(
-            solar_path
-        ),
+        get_project_scenario("uci_omie_june_2026"),
+        consumption_data_path=str(consumption_path),
+        hourly_price_data_path=str(price_path),
+        pvgis_solar_data_path=str(solar_path),
     )
 
     report = validate_project_scenario_data(
@@ -179,20 +147,12 @@ def test_project_scenario_validation_accepts_complete_data(
 def test_project_scenario_validation_rejects_missing_prices(
     tmp_path,
 ) -> None:
-    consumption_path = (
-        tmp_path / "consumption.csv"
-    )
-    price_path = (
-        tmp_path / "prices.csv"
-    )
-    solar_path = (
-        tmp_path / "solar.csv"
-    )
+    consumption_path = tmp_path / "consumption.csv"
+    price_path = tmp_path / "prices.csv"
+    solar_path = tmp_path / "solar.csv"
 
     consumption_df = build_consumption_df()
-    price_df = build_price_df(
-        periods=47
-    )
+    price_df = build_price_df(periods=47)
 
     consumption_df.to_csv(
         consumption_path,
@@ -208,18 +168,10 @@ def test_project_scenario_validation_rejects_missing_prices(
     )
 
     scenario = replace(
-        get_project_scenario(
-            "uci_omie_june_2026"
-        ),
-        consumption_data_path=str(
-            consumption_path
-        ),
-        hourly_price_data_path=str(
-            price_path
-        ),
-        pvgis_solar_data_path=str(
-            solar_path
-        ),
+        get_project_scenario("uci_omie_june_2026"),
+        consumption_data_path=str(consumption_path),
+        hourly_price_data_path=str(price_path),
+        pvgis_solar_data_path=str(solar_path),
     )
 
     with pytest.raises(
@@ -236,15 +188,9 @@ def test_project_scenario_validation_rejects_missing_prices(
 def test_validation_report_contains_main_information(
     tmp_path,
 ) -> None:
-    consumption_path = (
-        tmp_path / "consumption.csv"
-    )
-    price_path = (
-        tmp_path / "prices.csv"
-    )
-    solar_path = (
-        tmp_path / "solar.csv"
-    )
+    consumption_path = tmp_path / "consumption.csv"
+    price_path = tmp_path / "prices.csv"
+    solar_path = tmp_path / "solar.csv"
 
     consumption_df = build_consumption_df()
     price_df = build_price_df()
@@ -263,18 +209,10 @@ def test_validation_report_contains_main_information(
     )
 
     scenario = replace(
-        get_project_scenario(
-            "uci_omie_june_2026"
-        ),
-        consumption_data_path=str(
-            consumption_path
-        ),
-        hourly_price_data_path=str(
-            price_path
-        ),
-        pvgis_solar_data_path=str(
-            solar_path
-        ),
+        get_project_scenario("uci_omie_june_2026"),
+        consumption_data_path=str(consumption_path),
+        hourly_price_data_path=str(price_path),
+        pvgis_solar_data_path=str(solar_path),
     )
 
     report = validate_project_scenario_data(
@@ -283,9 +221,7 @@ def test_validation_report_contains_main_information(
         price_df=price_df,
     )
 
-    text = format_validation_report(
-        report
-    )
+    text = format_validation_report(report)
 
     assert "Scenario validation" in text
     assert "Status: valid" in text

@@ -72,12 +72,10 @@ def build_best_scenarios_dataframe(
                     5000.0,
                 ],
                 "annual_savings_eur": [
-                    300.0
-                    * savings_multiplier,
+                    300.0 * savings_multiplier,
                 ],
                 "payback_years": [
-                    16.67
-                    / savings_multiplier,
+                    16.67 / savings_multiplier,
                 ],
                 "self_sufficiency": [
                     0.30,
@@ -104,9 +102,7 @@ def write_scenario_results(
     scenario_name: str,
     dataframe: pd.DataFrame,
 ) -> None:
-    scenario_directory = (
-        reports_root / scenario_name
-    )
+    scenario_directory = reports_root / scenario_name
 
     scenario_directory.mkdir(
         parents=True,
@@ -114,18 +110,13 @@ def write_scenario_results(
     )
 
     dataframe.to_csv(
-        scenario_directory
-        / "best_scenarios.csv",
+        scenario_directory / "best_scenarios.csv",
         index=False,
     )
 
 
 def test_validate_accepts_dynamic_criteria() -> None:
-    dataframe = (
-        build_best_scenarios_dataframe(
-            include_extra_criterion=True
-        )
-    )
+    dataframe = build_best_scenarios_dataframe(include_extra_criterion=True)
 
     validate_best_scenarios_dataframe(
         dataframe=dataframe,
@@ -134,13 +125,10 @@ def test_validate_accepts_dynamic_criteria() -> None:
 
 
 def test_validate_rejects_missing_required_column() -> None:
-    dataframe = (
-        build_best_scenarios_dataframe()
-        .drop(
-            columns=[
-                "criterion",
-            ]
-        )
+    dataframe = build_best_scenarios_dataframe().drop(
+        columns=[
+            "criterion",
+        ]
     )
 
     with pytest.raises(
@@ -154,9 +142,7 @@ def test_validate_rejects_missing_required_column() -> None:
 
 
 def test_validate_rejects_duplicated_criteria() -> None:
-    dataframe = (
-        build_best_scenarios_dataframe()
-    )
+    dataframe = build_best_scenarios_dataframe()
 
     dataframe = pd.concat(
         [
@@ -184,33 +170,23 @@ def test_discover_available_scenarios(
     write_scenario_results(
         reports_root=reports_root,
         scenario_name="scenario_b",
-        dataframe=(
-            build_best_scenarios_dataframe()
-        ),
+        dataframe=(build_best_scenarios_dataframe()),
     )
 
     write_scenario_results(
         reports_root=reports_root,
         scenario_name="scenario_a",
-        dataframe=(
-            build_best_scenarios_dataframe()
-        ),
+        dataframe=(build_best_scenarios_dataframe()),
     )
 
-    unrelated_directory = (
-        reports_root / "other_output"
-    )
+    unrelated_directory = reports_root / "other_output"
 
     unrelated_directory.mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    discovered = (
-        discover_available_scenarios(
-            reports_root=str(reports_root)
-        )
-    )
+    discovered = discover_available_scenarios(reports_root=str(reports_root))
 
     assert discovered == [
         "scenario_a",
@@ -226,9 +202,7 @@ def test_load_best_scenarios_adds_name(
     write_scenario_results(
         reports_root=reports_root,
         scenario_name="scenario_a",
-        dataframe=(
-            build_best_scenarios_dataframe()
-        ),
+        dataframe=(build_best_scenarios_dataframe()),
     )
 
     loaded_df = load_best_scenarios(
@@ -236,11 +210,7 @@ def test_load_best_scenarios_adds_name(
         reports_root=str(reports_root),
     )
 
-    assert (
-        loaded_df["scenario_name"]
-        .eq("scenario_a")
-        .all()
-    )
+    assert loaded_df["scenario_name"].eq("scenario_a").all()
 
 
 def test_combine_scenarios_supports_extra_criteria(
@@ -251,11 +221,7 @@ def test_combine_scenarios_supports_extra_criteria(
     write_scenario_results(
         reports_root=reports_root,
         scenario_name="scenario_a",
-        dataframe=(
-            build_best_scenarios_dataframe(
-                include_extra_criterion=True
-            )
-        ),
+        dataframe=(build_best_scenarios_dataframe(include_extra_criterion=True)),
     )
 
     write_scenario_results(
@@ -279,9 +245,7 @@ def test_combine_scenarios_supports_extra_criteria(
 
     assert len(comparison_df) == 6
 
-    assert set(
-        discover_criteria(comparison_df)
-    ) == {
+    assert set(discover_criteria(comparison_df)) == {
         "best_payback",
         "best_self_sufficiency",
         "best_annual_savings",
@@ -297,16 +261,10 @@ def test_discover_numeric_metrics_includes_new_metric() -> None:
                 1200.0,
             ]
         )
-        .assign(
-            scenario_name="example"
-        )
+        .assign(scenario_name="example")
     )
 
-    metrics = (
-        discover_numeric_metric_columns(
-            dataframe
-        )
-    )
+    metrics = discover_numeric_metric_columns(dataframe)
 
     assert "annual_savings_eur" in metrics
     assert "payback_years" in metrics
@@ -317,8 +275,7 @@ def test_reference_differences_are_dynamic() -> None:
     comparison_df = pd.concat(
         [
             (
-                build_best_scenarios_dataframe()
-                .assign(
+                build_best_scenarios_dataframe().assign(
                     scenario_name="reference",
                     net_present_value_eur=[
                         1000.0,
@@ -327,10 +284,7 @@ def test_reference_differences_are_dynamic() -> None:
                 )
             ),
             (
-                build_best_scenarios_dataframe(
-                    savings_multiplier=2.0
-                )
-                .assign(
+                build_best_scenarios_dataframe(savings_multiplier=2.0).assign(
                     scenario_name="alternative",
                     net_present_value_eur=[
                         1700.0,
@@ -348,39 +302,24 @@ def test_reference_differences_are_dynamic() -> None:
     )
 
     alternative_payback = result_df[
-        (
-            result_df["scenario_name"]
-            == "alternative"
-        )
-        & (
-            result_df["criterion"]
-            == "best_payback"
-        )
+        (result_df["scenario_name"] == "alternative")
+        & (result_df["criterion"] == "best_payback")
     ].iloc[0]
 
-    assert (
-        alternative_payback[
-            "annual_savings_eur_difference_vs_reference"
-        ]
-        == pytest.approx(250.0)
-    )
+    assert alternative_payback[
+        "annual_savings_eur_difference_vs_reference"
+    ] == pytest.approx(250.0)
 
-    assert (
-        alternative_payback[
-            "net_present_value_eur_difference_vs_reference"
-        ]
-        == pytest.approx(700.0)
-    )
+    assert alternative_payback[
+        "net_present_value_eur_difference_vs_reference"
+    ] == pytest.approx(700.0)
 
 
 def test_markdown_includes_dynamic_criterion() -> None:
     comparison_df = pd.concat(
         [
             (
-                build_best_scenarios_dataframe(
-                    include_extra_criterion=True
-                )
-                .assign(
+                build_best_scenarios_dataframe(include_extra_criterion=True).assign(
                     scenario_name="reference"
                 )
             ),
@@ -388,10 +327,7 @@ def test_markdown_includes_dynamic_criterion() -> None:
                 build_best_scenarios_dataframe(
                     savings_multiplier=2.0,
                     include_extra_criterion=True,
-                )
-                .assign(
-                    scenario_name="alternative"
-                )
+                ).assign(scenario_name="alternative")
             ),
         ],
         ignore_index=True,
@@ -402,13 +338,9 @@ def test_markdown_includes_dynamic_criterion() -> None:
         reference_scenario_name="reference",
     )
 
-    markdown = (
-        build_scenario_comparison_markdown(
-            comparison_df=comparison_df,
-            reference_scenario_name=(
-                "reference"
-            ),
-        )
+    markdown = build_scenario_comparison_markdown(
+        comparison_df=comparison_df,
+        reference_scenario_name=("reference"),
     )
 
     assert "# Project scenario comparison" in markdown

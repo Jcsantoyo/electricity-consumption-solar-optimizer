@@ -28,23 +28,13 @@ from visualization import (  # noqa: E402
 
 REPORTS_ROOT = "reports"
 
-COMPARISON_REPORTS_DIRECTORY = (
-    "reports/scenario_comparison"
-)
+COMPARISON_REPORTS_DIRECTORY = "reports/scenario_comparison"
 
-COMPARISON_IMAGES_DIRECTORY = (
-    "images/scenario_comparison"
-)
+COMPARISON_IMAGES_DIRECTORY = "images/scenario_comparison"
 
-COMPARISON_CSV_PATH = (
-    f"{COMPARISON_REPORTS_DIRECTORY}/"
-    "scenario_comparison.csv"
-)
+COMPARISON_CSV_PATH = f"{COMPARISON_REPORTS_DIRECTORY}/scenario_comparison.csv"
 
-COMPARISON_MARKDOWN_PATH = (
-    f"{COMPARISON_REPORTS_DIRECTORY}/"
-    "scenario_comparison.md"
-)
+COMPARISON_MARKDOWN_PATH = f"{COMPARISON_REPORTS_DIRECTORY}/scenario_comparison.md"
 
 PLOTTABLE_METRICS = [
     "annual_savings_eur",
@@ -56,10 +46,7 @@ PLOTTABLE_METRICS = [
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description=(
-            "Compare optimization results from "
-            "multiple project scenarios."
-        )
+        description=("Compare optimization results from multiple project scenarios.")
     )
 
     parser.add_argument(
@@ -84,9 +71,7 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument(
         "--reports-root",
         default=REPORTS_ROOT,
-        help=(
-            "Root directory containing scenario reports."
-        ),
+        help=("Root directory containing scenario reports."),
     )
 
     return parser.parse_args()
@@ -99,11 +84,7 @@ def resolve_scenario_names(
     if requested_scenarios:
         return requested_scenarios
 
-    discovered_scenarios = (
-        discover_available_scenarios(
-            reports_root=reports_root
-        )
-    )
+    discovered_scenarios = discover_available_scenarios(reports_root=reports_root)
 
     if len(discovered_scenarios) < 2:
         raise ValueError(
@@ -116,16 +97,12 @@ def resolve_scenario_names(
 
 
 def create_output_directories() -> None:
-    Path(
-        COMPARISON_REPORTS_DIRECTORY
-    ).mkdir(
+    Path(COMPARISON_REPORTS_DIRECTORY).mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    Path(
-        COMPARISON_IMAGES_DIRECTORY
-    ).mkdir(
+    Path(COMPARISON_IMAGES_DIRECTORY).mkdir(
         parents=True,
         exist_ok=True,
     )
@@ -136,31 +113,16 @@ def print_comparison_summary(
     scenario_names: list[str],
     reference_scenario_name: str,
 ) -> None:
-    criteria = discover_criteria(
-        comparison_df
-    )
+    criteria = discover_criteria(comparison_df)
 
-    print(
-        "\nProject scenario comparison"
-    )
-    print(
-        "==========================="
-    )
+    print("\nProject scenario comparison")
+    print("===========================")
 
-    print(
-        "Scenarios: "
-        + ", ".join(scenario_names)
-    )
+    print("Scenarios: " + ", ".join(scenario_names))
 
-    print(
-        "Reference scenario: "
-        f"{reference_scenario_name}"
-    )
+    print(f"Reference scenario: {reference_scenario_name}")
 
-    print(
-        "Criteria: "
-        + ", ".join(criteria)
-    )
+    print("Criteria: " + ", ".join(criteria))
 
     preferred_columns = [
         "scenario_name",
@@ -173,40 +135,23 @@ def print_comparison_summary(
     ]
 
     available_columns = [
-        column
-        for column in preferred_columns
-        if column in comparison_df.columns
+        column for column in preferred_columns if column in comparison_df.columns
     ]
 
-    print(
-        "\nComparison data:"
-    )
+    print("\nComparison data:")
 
-    print(
-        comparison_df[
-            available_columns
-        ].to_string(
-            index=False
-        )
-    )
+    print(comparison_df[available_columns].to_string(index=False))
 
 
 def main() -> None:
     arguments = parse_arguments()
 
     scenario_names = resolve_scenario_names(
-        requested_scenarios=(
-            arguments.scenarios
-        ),
-        reports_root=(
-            arguments.reports_root
-        ),
+        requested_scenarios=(arguments.scenarios),
+        reports_root=(arguments.reports_root),
     )
 
-    reference_scenario_name = (
-        arguments.reference
-        or scenario_names[0]
-    )
+    reference_scenario_name = arguments.reference or scenario_names[0]
 
     create_output_directories()
 
@@ -217,9 +162,7 @@ def main() -> None:
 
     comparison_df = add_reference_differences(
         comparison_df=comparison_df,
-        reference_scenario_name=(
-            reference_scenario_name
-        ),
+        reference_scenario_name=(reference_scenario_name),
     )
 
     save_scenario_comparison_csv(
@@ -229,43 +172,27 @@ def main() -> None:
 
     save_scenario_comparison_markdown(
         comparison_df=comparison_df,
-        reference_scenario_name=(
-            reference_scenario_name
-        ),
+        reference_scenario_name=(reference_scenario_name),
         output_path=COMPARISON_MARKDOWN_PATH,
     )
 
-    generated_plot_paths = (
-        generate_scenario_metric_plots(
-            comparison_df=comparison_df,
-            metric_columns=PLOTTABLE_METRICS,
-            output_directory=(
-                COMPARISON_IMAGES_DIRECTORY
-            ),
-        )
+    generated_plot_paths = generate_scenario_metric_plots(
+        comparison_df=comparison_df,
+        metric_columns=PLOTTABLE_METRICS,
+        output_directory=(COMPARISON_IMAGES_DIRECTORY),
     )
 
     print_comparison_summary(
         comparison_df=comparison_df,
         scenario_names=scenario_names,
-        reference_scenario_name=(
-            reference_scenario_name
-        ),
+        reference_scenario_name=(reference_scenario_name),
     )
 
-    print(
-        f"\nCSV saved to: "
-        f"{COMPARISON_CSV_PATH}"
-    )
+    print(f"\nCSV saved to: {COMPARISON_CSV_PATH}")
 
-    print(
-        "Markdown report saved to: "
-        f"{COMPARISON_MARKDOWN_PATH}"
-    )
+    print(f"Markdown report saved to: {COMPARISON_MARKDOWN_PATH}")
 
-    print(
-        "\nGenerated plots:"
-    )
+    print("\nGenerated plots:")
 
     for path in generated_plot_paths:
         print(f"- {path}")

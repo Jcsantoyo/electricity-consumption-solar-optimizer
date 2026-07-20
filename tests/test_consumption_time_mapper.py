@@ -18,10 +18,7 @@ def build_consumption_dataframe(
                 periods=number_of_hours,
                 freq="h",
             ),
-            "consumption_kwh": [
-                float(index + 1)
-                for index in range(number_of_hours)
-            ],
+            "consumption_kwh": [float(index + 1) for index in range(number_of_hours)],
         }
     )
 
@@ -113,9 +110,7 @@ def test_remap_consumption_timestamps_keeps_original_dates() -> None:
         target_start_datetime="2026-06-01 17:00:00",
     )
 
-    assert list(remapped_df["original_datetime"]) == list(
-        consumption_df["datetime"]
-    )
+    assert list(remapped_df["original_datetime"]) == list(consumption_df["datetime"])
 
 
 def test_remap_consumption_timestamps_keeps_consumption_values() -> None:
@@ -145,9 +140,5 @@ def test_build_recent_consumption_scenario_combines_selection_and_remap() -> Non
     )
 
     assert len(scenario_df) == 720
-    assert scenario_df.iloc[0]["datetime"] == pd.Timestamp(
-        "2026-06-01 17:00:00"
-    )
-    assert scenario_df.iloc[-1]["datetime"] == pd.Timestamp(
-        "2026-07-01 16:00:00"
-    )
+    assert scenario_df.iloc[0]["datetime"] == pd.Timestamp("2026-06-01 17:00:00")
+    assert scenario_df.iloc[-1]["datetime"] == pd.Timestamp("2026-07-01 16:00:00")

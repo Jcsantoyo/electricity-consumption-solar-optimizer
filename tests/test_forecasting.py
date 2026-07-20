@@ -8,7 +8,7 @@ from forecasting import (
     prepare_forecasting_dataset,
     split_train_test_by_time,
     get_feature_importance,
-    build_forecasted_consumption_dataframe
+    build_forecasted_consumption_dataframe,
 )
 
 
@@ -75,9 +75,7 @@ def test_prepare_forecasting_dataset_returns_features_target_and_datetimes() -> 
         "consumption_kwh_lag_24",
     ]
 
-    assert datetimes.iloc[0] == pd.Timestamp(
-        "2025-01-02 00:00:00"
-    )
+    assert datetimes.iloc[0] == pd.Timestamp("2025-01-02 00:00:00")
 
 
 def test_split_train_test_by_time_preserves_order() -> None:
@@ -111,9 +109,7 @@ def test_split_train_test_by_time_preserves_order() -> None:
         test_size_ratio=0.2,
     )
 
-    assert X_train["feature"].tolist() == list(
-        range(8)
-    )
+    assert X_train["feature"].tolist() == list(range(8))
     assert X_test["feature"].tolist() == [
         8,
         9,
@@ -122,12 +118,8 @@ def test_split_train_test_by_time_preserves_order() -> None:
     assert y_train.tolist() == list(range(8))
     assert y_test.tolist() == [8, 9]
 
-    assert datetime_train.iloc[-1] == pd.Timestamp(
-        "2025-01-01 07:00:00"
-    )
-    assert datetime_test.iloc[0] == pd.Timestamp(
-        "2025-01-01 08:00:00"
-    )
+    assert datetime_train.iloc[-1] == pd.Timestamp("2025-01-01 07:00:00")
+    assert datetime_test.iloc[0] == pd.Timestamp("2025-01-01 08:00:00")
 
 
 def test_get_feature_importance_returns_sorted_dataframe() -> None:
@@ -196,6 +188,7 @@ def test_build_forecasted_consumption_dataframe_in_future_mode() -> None:
         1.3,
     ]
 
+
 def test_build_forecasted_consumption_dataframe_in_backtest_mode() -> None:
     original_df = pd.DataFrame(
         {
@@ -233,21 +226,18 @@ def test_build_forecasted_consumption_dataframe_in_backtest_mode() -> None:
         forecast_mode="backtest",
     )
 
-    assert forecast_df["datetime"].tolist() == list(
-        forecast_results_df["datetime"]
-    )
+    assert forecast_df["datetime"].tolist() == list(forecast_results_df["datetime"])
 
     assert forecast_df["consumption_kwh"].tolist() == [
         0.9,
         1.1,
     ]
 
+
 def test_build_forecasted_consumption_dataframe_rejects_invalid_mode() -> None:
     original_df = pd.DataFrame(
         {
-            "datetime": pd.to_datetime(
-                ["2024-01-01 00:00:00"]
-            ),
+            "datetime": pd.to_datetime(["2024-01-01 00:00:00"]),
             "consumption_kwh": [
                 1.0,
             ],
@@ -272,12 +262,11 @@ def test_build_forecasted_consumption_dataframe_rejects_invalid_mode() -> None:
             forecast_mode="unknown",
         )
 
+
 def test_backtest_mode_requires_datetime_column() -> None:
     original_df = pd.DataFrame(
         {
-            "datetime": pd.to_datetime(
-                ["2024-01-01 00:00:00"]
-            ),
+            "datetime": pd.to_datetime(["2024-01-01 00:00:00"]),
             "consumption_kwh": [
                 1.0,
             ],

@@ -79,28 +79,17 @@ def split_train_test_by_time(
     pd.Series,
 ]:
     if not 0 < test_size_ratio < 1:
+        raise ValueError("Test size ratio must be between 0 and 1")
+
+    if not (len(X) == len(y) == len(datetimes)):
         raise ValueError(
-            "Test size ratio must be between 0 and 1"
+            "Features, target and datetimes must have the same number of rows"
         )
 
-    if not (
-        len(X)
-        == len(y)
-        == len(datetimes)
-    ):
-        raise ValueError(
-            "Features, target and datetimes must have "
-            "the same number of rows"
-        )
-
-    split_index = int(
-        len(X) * (1 - test_size_ratio)
-    )
+    split_index = int(len(X) * (1 - test_size_ratio))
 
     if split_index <= 0 or split_index >= len(X):
-        raise ValueError(
-            "Train/test split produces an empty partition"
-        )
+        raise ValueError("Train/test split produces an empty partition")
 
     X_train = X.iloc[:split_index]
     X_test = X.iloc[split_index:]
@@ -159,7 +148,7 @@ def run_consumption_forecast(
     df: pd.DataFrame,
     target_column: str = "consumption_kwh",
     test_size_ratio: float = 0.2,
-    random_state: int = 42
+    random_state: int = 42,
 ) -> dict:
 
     X, y, datetimes = prepare_forecasting_dataset(df, target_column=target_column)
@@ -182,12 +171,8 @@ def run_consumption_forecast(
         "datetime",
         datetime_test.values,
     )
-    results_df["actual_consumption_kwh"] = (
-        y_test.values
-    )
-    results_df["predicted_consumption_kwh"] = (
-        y_pred
-    )
+    results_df["actual_consumption_kwh"] = y_test.values
+    results_df["predicted_consumption_kwh"] = y_pred
 
     return {
         "model": model,
@@ -216,7 +201,7 @@ def compare_forecasting_models(
     df: pd.DataFrame,
     target_column: str = "consumption_kwh",
     test_size_ratio: float = 0.2,
-    random_state: int = 42
+    random_state: int = 42,
 ) -> pd.DataFrame:
 
     X, y, datetimes = prepare_forecasting_dataset(df, target_column=target_column)
@@ -227,7 +212,9 @@ def compare_forecasting_models(
 
     models = {
         "Linear_Regression": train_linear_regression_model(X_train, y_train),
-        "Random Forest": train_random_forest_model(X_train, y_train, random_state=random_state),
+        "Random Forest": train_random_forest_model(
+            X_train, y_train, random_state=random_state
+        ),
     }
 
     rows = []
@@ -256,16 +243,11 @@ def build_forecasted_consumption_dataframe(
     forecast_mode: str = "backtest",
 ) -> pd.DataFrame:
     if "predicted_consumption_kwh" not in forecast_results_df.columns:
-        raise ValueError(
-            "Forecast results are missing "
-            "predicted_consumption_kwh"
-        )
+        raise ValueError("Forecast results are missing predicted_consumption_kwh")
 
     if forecast_mode == "backtest":
         if "datetime" not in forecast_results_df.columns:
-            raise ValueError(
-                "Backtest forecast results must contain datetime"
-            )
+            raise ValueError("Backtest forecast results must contain datetime")
 
         forecast_datetimes = pd.to_datetime(
             forecast_results_df["datetime"],
@@ -274,36 +256,26 @@ def build_forecasted_consumption_dataframe(
 
         if forecast_datetimes.isna().any():
             raise ValueError(
-                "Backtest forecast results contain "
-                "invalid datetime values"
+                "Backtest forecast results contain invalid datetime values"
             )
 
     elif forecast_mode == "future":
-        last_datetime = pd.to_datetime(
-            original_df["datetime"]
-        ).max()
+        last_datetime = pd.to_datetime(original_df["datetime"]).max()
 
         forecast_datetimes = pd.date_range(
-            start=(
-                last_datetime
-                + pd.Timedelta(hours=1)
-            ),
+            start=(last_datetime + pd.Timedelta(hours=1)),
             periods=len(forecast_results_df),
             freq="h",
         )
 
     else:
-        raise ValueError(
-            f"Invalid forecast mode: {forecast_mode}"
-        )
+        raise ValueError(f"Invalid forecast mode: {forecast_mode}")
 
     return pd.DataFrame(
         {
             "datetime": forecast_datetimes,
             "consumption_kwh": (
-                forecast_results_df[
-                    "predicted_consumption_kwh"
-                ].values
+                forecast_results_df["predicted_consumption_kwh"].values
             ),
         }
     )

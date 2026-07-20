@@ -36,9 +36,7 @@ def test_load_energy_data_reads_required_columns(
         "grid_import_kwh",
     ]
 
-    assert energy_df.iloc[0][
-        "grid_import_kwh"
-    ] == pytest.approx(1.5)
+    assert energy_df.iloc[0]["grid_import_kwh"] == pytest.approx(1.5)
 
 
 def test_load_energy_data_raises_error_for_missing_column(
@@ -93,12 +91,8 @@ def test_build_price_mode_comparison_markdown() -> None:
     markdown = build_price_mode_comparison_markdown(
         comparison_df=comparison_df,
         fixed_price_eur_per_kwh=0.20,
-        energy_data_path=(
-            "reports/best_scenario_timeseries.csv"
-        ),
-        hourly_price_data_path=(
-            "data/processed/omie_hourly_prices.csv"
-        ),
+        energy_data_path=("reports/best_scenario_timeseries.csv"),
+        hourly_price_data_path=("data/processed/omie_hourly_prices.csv"),
     )
 
     assert "# Electricity Price Mode Comparison" in markdown

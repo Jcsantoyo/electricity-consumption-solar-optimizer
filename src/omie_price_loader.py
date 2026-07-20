@@ -2,12 +2,13 @@ from pathlib import Path
 
 import pandas as pd
 
+
 def load_omie_quarter_hour_prices(file_path: str) -> pd.DataFrame:
     omie_path = Path(file_path)
 
     if not omie_path.exists():
         raise FileNotFoundError(f"OMIE price file not found: {file_path}")
-    
+
     raw_df = pd.read_csv(
         omie_path,
         sep=";",
@@ -20,8 +21,8 @@ def load_omie_quarter_hour_prices(file_path: str) -> pd.DataFrame:
             "period",
             "spain_price_eur_per_mwh",
             "portugal_price_eur_per_mwh",
-            "empty_column"
-        ]
+            "empty_column",
+        ],
     )
 
     raw_df = raw_df[raw_df["year"] != "*"].copy()
@@ -54,16 +55,11 @@ def load_omie_quarter_hour_prices(file_path: str) -> pd.DataFrame:
     validate_omie_quarter_hour_data(raw_df)
 
     base_datetime = pd.to_datetime(
-        {
-            "year": raw_df["year"],
-            "month": raw_df["month"],
-            "day": raw_df["day"]
-        }
+        {"year": raw_df["year"], "month": raw_df["month"], "day": raw_df["day"]}
     )
 
     raw_df["datetime"] = base_datetime + pd.to_timedelta(
-        (raw_df["period"] - 1) * 15,
-        unit="minutes"
+        (raw_df["period"] - 1) * 15, unit="minutes"
     )
 
     raw_df["price_eur_per_kwh"] = raw_df["spain_price_eur_per_mwh"] / 1000
@@ -74,6 +70,7 @@ def load_omie_quarter_hour_prices(file_path: str) -> pd.DataFrame:
     results_df = results_df.reset_index(drop=True)
 
     return results_df
+
 
 def validate_omie_quarter_hour_data(omie_df: pd.DataFrame) -> None:
     required_columns = {
@@ -87,20 +84,22 @@ def validate_omie_quarter_hour_data(omie_df: pd.DataFrame) -> None:
     missing_columns = required_columns - set(omie_df.columns)
 
     if missing_columns:
-        raise ValueError(
-            "Missing required OMIE columns: "
-            f"{sorted(missing_columns)}"
-        )
+        raise ValueError(f"Missing required OMIE columns: {sorted(missing_columns)}")
 
-    if omie_df[
-        [
-            "year",
-            "month",
-            "day",
-            "period",
-            "spain_price_eur_per_mwh",
+    if (
+        omie_df[
+            [
+                "year",
+                "month",
+                "day",
+                "period",
+                "spain_price_eur_per_mwh",
+            ]
         ]
-    ].isna().any().any():
+        .isna()
+        .any()
+        .any()
+    ):
         raise ValueError("OMIE price data contains invalid values")
 
     if not omie_df["period"].between(1, 96).all():
@@ -108,7 +107,8 @@ def validate_omie_quarter_hour_data(omie_df: pd.DataFrame) -> None:
 
     if omie_df["period"].nunique() != 96:
         raise ValueError("OMIE price data must contain 96 quarter-hour periods")
-    
+
+
 def aggregate_omie_prices_to_hourly(
     quarter_hour_df: pd.DataFrame,
 ) -> pd.DataFrame:
@@ -116,12 +116,9 @@ def aggregate_omie_prices_to_hourly(
 
     hourly_df["datetime"] = hourly_df["datetime"].dt.floor("h")
 
-    hourly_df = (
-        hourly_df.groupby(
-            "datetime",
-            as_index=False,
-        )["price_eur_per_kwh"]
-        .mean()
-    )
+    hourly_df = hourly_df.groupby(
+        "datetime",
+        as_index=False,
+    )["price_eur_per_kwh"].mean()
 
     return hourly_df

@@ -34,9 +34,7 @@ def run_test_grid_search(
     price_model: object,
 ) -> pd.DataFrame:
     return run_economic_grid_search(
-        consumption_df=(
-            build_consumption_dataframe()
-        ),
+        consumption_df=(build_consumption_dataframe()),
         solar_peak_powers_kw=[
             0.0,
         ],
@@ -64,29 +62,21 @@ def test_grid_search_uses_fixed_price_model() -> None:
         power_price_eur_per_kw_year=0.0,
     )
 
-    results_df = run_test_grid_search(
-        price_model
-    )
+    results_df = run_test_grid_search(price_model)
 
     assert len(results_df) == 1
 
-    expected_cost = (
-        6.0 * 0.20
-    )
+    expected_cost = 6.0 * 0.20
 
     assert results_df.loc[
         0,
         "base_net_cost_eur",
-    ] == pytest.approx(
-        expected_cost
-    )
+    ] == pytest.approx(expected_cost)
 
     assert results_df.loc[
         0,
         "scenario_net_cost_eur",
-    ] == pytest.approx(
-        expected_cost
-    )
+    ] == pytest.approx(expected_cost)
 
 
 def test_grid_search_uses_time_of_use_model() -> None:
@@ -99,29 +89,19 @@ def test_grid_search_uses_time_of_use_model() -> None:
         power_price_eur_per_kw_year=0.0,
     )
 
-    results_df = run_test_grid_search(
-        price_model
-    )
+    results_df = run_test_grid_search(price_model)
 
-    expected_cost = (
-        1.0 * 0.12
-        + 2.0 * 0.25
-        + 3.0 * 0.18
-    )
+    expected_cost = 1.0 * 0.12 + 2.0 * 0.25 + 3.0 * 0.18
 
     assert results_df.loc[
         0,
         "base_net_cost_eur",
-    ] == pytest.approx(
-        expected_cost
-    )
+    ] == pytest.approx(expected_cost)
 
     assert results_df.loc[
         0,
         "scenario_net_cost_eur",
-    ] == pytest.approx(
-        expected_cost
-    )
+    ] == pytest.approx(expected_cost)
 
 
 def test_grid_search_uses_hourly_price_model() -> None:
@@ -149,29 +129,19 @@ def test_grid_search_uses_hourly_price_model() -> None:
         power_price_eur_per_kw_year=0.0,
     )
 
-    results_df = run_test_grid_search(
-        price_model
-    )
+    results_df = run_test_grid_search(price_model)
 
-    expected_cost = (
-        1.0 * 0.10
-        + 2.0 * 0.20
-        + 3.0 * 0.15
-    )
+    expected_cost = 1.0 * 0.10 + 2.0 * 0.20 + 3.0 * 0.15
 
     assert results_df.loc[
         0,
         "base_net_cost_eur",
-    ] == pytest.approx(
-        expected_cost
-    )
+    ] == pytest.approx(expected_cost)
 
     assert results_df.loc[
         0,
         "scenario_net_cost_eur",
-    ] == pytest.approx(
-        expected_cost
-    )
+    ] == pytest.approx(expected_cost)
 
 
 def test_grid_search_allows_negative_hourly_prices() -> None:
@@ -234,13 +204,9 @@ def test_grid_search_allows_negative_hourly_prices() -> None:
     assert results_df.loc[
         0,
         "base_net_cost_eur",
-    ] == pytest.approx(
-        0.0
-    )
+    ] == pytest.approx(0.0)
 
     assert results_df.loc[
         0,
         "scenario_net_cost_eur",
-    ] == pytest.approx(
-        0.0
-    )
+    ] == pytest.approx(0.0)

@@ -25,9 +25,7 @@ def calculate_flat_grid_import_cost(
     flat_price_eur_per_kwh: float,
 ) -> float:
     price_model = FixedPriceModel(
-        fixed_price_eur_per_kwh=(
-            flat_price_eur_per_kwh
-        ),
+        fixed_price_eur_per_kwh=(flat_price_eur_per_kwh),
         surplus_compensation_price=0.0,
         contracted_power_kw=0.0,
         power_price_eur_per_kw_year=0.0,
@@ -46,9 +44,7 @@ def compare_flat_vs_hourly_price_cost(
     allow_negative_hourly_prices: bool = False,
 ) -> dict:
     fixed_model = FixedPriceModel(
-        fixed_price_eur_per_kwh=(
-            flat_price_eur_per_kwh
-        ),
+        fixed_price_eur_per_kwh=(flat_price_eur_per_kwh),
         surplus_compensation_price=0.0,
         contracted_power_kw=0.0,
         power_price_eur_per_kw_year=0.0,
@@ -59,9 +55,7 @@ def compare_flat_vs_hourly_price_cost(
         surplus_compensation_price=0.0,
         contracted_power_kw=0.0,
         power_price_eur_per_kw_year=0.0,
-        allow_negative_prices=(
-            allow_negative_hourly_prices
-        ),
+        allow_negative_prices=(allow_negative_hourly_prices),
     )
 
     flat_cost = calculate_variable_cost_with_model(
@@ -92,15 +86,9 @@ def compare_tariff_vs_hourly_price_cost(
     allow_negative_hourly_prices: bool = False,
 ) -> dict:
     tariff_model = TimeOfUsePriceModel(
-        peak_price_eur_per_kwh=(
-            peak_price_eur_per_kwh
-        ),
-        flat_price_eur_per_kwh=(
-            flat_price_eur_per_kwh
-        ),
-        off_peak_price_eur_per_kwh=(
-            off_peak_price_eur_per_kwh
-        ),
+        peak_price_eur_per_kwh=(peak_price_eur_per_kwh),
+        flat_price_eur_per_kwh=(flat_price_eur_per_kwh),
+        off_peak_price_eur_per_kwh=(off_peak_price_eur_per_kwh),
         surplus_compensation_price=0.0,
         contracted_power_kw=0.0,
         power_price_eur_per_kw_year=0.0,
@@ -111,9 +99,7 @@ def compare_tariff_vs_hourly_price_cost(
         surplus_compensation_price=0.0,
         contracted_power_kw=0.0,
         power_price_eur_per_kw_year=0.0,
-        allow_negative_prices=(
-            allow_negative_hourly_prices
-        ),
+        allow_negative_prices=(allow_negative_hourly_prices),
     )
 
     tariff_cost = calculate_variable_cost_with_model(
@@ -146,23 +132,15 @@ def compare_all_price_modes(
 ) -> pd.DataFrame:
     models = {
         "flat_fixed": FixedPriceModel(
-            fixed_price_eur_per_kwh=(
-                fixed_price_eur_per_kwh
-            ),
+            fixed_price_eur_per_kwh=(fixed_price_eur_per_kwh),
             surplus_compensation_price=0.0,
             contracted_power_kw=0.0,
             power_price_eur_per_kw_year=0.0,
         ),
         "spanish_2_0td": TimeOfUsePriceModel(
-            peak_price_eur_per_kwh=(
-                peak_price_eur_per_kwh
-            ),
-            flat_price_eur_per_kwh=(
-                flat_price_eur_per_kwh
-            ),
-            off_peak_price_eur_per_kwh=(
-                off_peak_price_eur_per_kwh
-            ),
+            peak_price_eur_per_kwh=(peak_price_eur_per_kwh),
+            flat_price_eur_per_kwh=(flat_price_eur_per_kwh),
+            off_peak_price_eur_per_kwh=(off_peak_price_eur_per_kwh),
             surplus_compensation_price=0.0,
             contracted_power_kw=0.0,
             power_price_eur_per_kw_year=0.0,
@@ -172,63 +150,43 @@ def compare_all_price_modes(
             surplus_compensation_price=0.0,
             contracted_power_kw=0.0,
             power_price_eur_per_kw_year=0.0,
-            allow_negative_prices=(
-                allow_negative_hourly_prices
-            ),
+            allow_negative_prices=(allow_negative_hourly_prices),
         ),
     }
 
     rows = []
 
     for price_mode, price_model in models.items():
-        variable_grid_cost = (
-            calculate_variable_cost_with_model(
-                energy_df=energy_df,
-                price_model=price_model,
-            )
+        variable_grid_cost = calculate_variable_cost_with_model(
+            energy_df=energy_df,
+            price_model=price_model,
         )
 
         rows.append(
             {
                 "price_mode": price_mode,
-                "variable_grid_cost_eur": (
-                    variable_grid_cost
-                ),
+                "variable_grid_cost_eur": (variable_grid_cost),
             }
         )
 
-    comparison_df = pd.DataFrame(
-        rows
-    )
+    comparison_df = pd.DataFrame(rows)
 
     fixed_cost = comparison_df.loc[
-        comparison_df["price_mode"]
-        == "flat_fixed",
+        comparison_df["price_mode"] == "flat_fixed",
         "variable_grid_cost_eur",
     ].iloc[0]
 
     tariff_cost = comparison_df.loc[
-        comparison_df["price_mode"]
-        == "spanish_2_0td",
+        comparison_df["price_mode"] == "spanish_2_0td",
         "variable_grid_cost_eur",
     ].iloc[0]
 
-    comparison_df[
-        "difference_vs_flat_eur"
-    ] = (
-        comparison_df[
-            "variable_grid_cost_eur"
-        ]
-        - fixed_cost
+    comparison_df["difference_vs_flat_eur"] = (
+        comparison_df["variable_grid_cost_eur"] - fixed_cost
     )
 
-    comparison_df[
-        "difference_vs_2_0td_eur"
-    ] = (
-        comparison_df[
-            "variable_grid_cost_eur"
-        ]
-        - tariff_cost
+    comparison_df["difference_vs_2_0td_eur"] = (
+        comparison_df["variable_grid_cost_eur"] - tariff_cost
     )
 
     return comparison_df

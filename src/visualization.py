@@ -340,9 +340,7 @@ def plot_price_mode_comparison(
 
     if missing_columns:
         missing_text = ", ".join(sorted(missing_columns))
-        raise ValueError(
-            f"Missing required comparison columns: {missing_text}"
-        )
+        raise ValueError(f"Missing required comparison columns: {missing_text}")
 
     display_names = {
         "flat_fixed": "Fixed tariff",
@@ -353,9 +351,7 @@ def plot_price_mode_comparison(
     plot_df = comparison_df.copy()
 
     plot_df["price_mode_label"] = (
-        plot_df["price_mode"]
-        .map(display_names)
-        .fillna(plot_df["price_mode"])
+        plot_df["price_mode"].map(display_names).fillna(plot_df["price_mode"])
     )
 
     output_file = Path(output_path)
@@ -371,9 +367,7 @@ def plot_price_mode_comparison(
         plot_df["variable_grid_cost_eur"],
     )
 
-    axis.set_title(
-        "Variable Grid-Import Cost by Price Mode"
-    )
+    axis.set_title("Variable Grid-Import Cost by Price Mode")
     axis.set_xlabel("Electricity price mode")
     axis.set_ylabel("Variable grid cost (EUR)")
     axis.grid(axis="y", alpha=0.3)
@@ -395,12 +389,7 @@ def plot_price_mode_comparison(
 def format_scenario_metric_name(
     metric_column: str,
 ) -> str:
-    return (
-        metric_column
-        .replace("_", " ")
-        .strip()
-        .title()
-    )
+    return metric_column.replace("_", " ").strip().title()
 
 
 def prepare_scenario_metric_values(
@@ -416,24 +405,16 @@ def prepare_scenario_metric_values(
         )
 
     metric_labels = {
-        "annual_savings_eur": (
-            "Annual savings (EUR/year)"
-        ),
-        "payback_years": (
-            "Payback period (years)"
-        ),
-        "annual_grid_import_kwh": (
-            "Annual grid import (kWh/year)"
-        ),
+        "annual_savings_eur": ("Annual savings (EUR/year)"),
+        "payback_years": ("Payback period (years)"),
+        "annual_grid_import_kwh": ("Annual grid import (kWh/year)"),
     }
 
     return (
         values,
         metric_labels.get(
             metric_column,
-            format_scenario_metric_name(
-                metric_column
-            ),
+            format_scenario_metric_name(metric_column),
         ),
     )
 
@@ -449,10 +430,7 @@ def plot_scenario_metric_comparison(
         metric_column,
     }
 
-    missing_columns = (
-        required_columns
-        - set(comparison_df.columns)
-    )
+    missing_columns = required_columns - set(comparison_df.columns)
 
     if missing_columns:
         return False
@@ -463,20 +441,16 @@ def plot_scenario_metric_comparison(
             "criterion",
             metric_column,
         ]
-    ].dropna(
-        subset=[metric_column]
-    )
+    ].dropna(subset=[metric_column])
 
     if plotting_df.empty:
         return False
 
     plotting_df = plotting_df.copy()
 
-    values, axis_label = (
-        prepare_scenario_metric_values(
-            dataframe=plotting_df,
-            metric_column=metric_column,
-        )
+    values, axis_label = prepare_scenario_metric_values(
+        dataframe=plotting_df,
+        metric_column=metric_column,
     )
 
     plotting_df["plot_value"] = values
@@ -499,22 +473,15 @@ def plot_scenario_metric_comparison(
     )
 
     axis.set_title(
-        f"{format_scenario_metric_name(metric_column)} "
-        "comparison across scenarios"
+        f"{format_scenario_metric_name(metric_column)} comparison across scenarios"
     )
-    axis.set_xlabel(
-        "Project scenario"
-    )
-    axis.set_ylabel(
-        axis_label
-    )
+    axis.set_xlabel("Project scenario")
+    axis.set_ylabel(axis_label)
     axis.tick_params(
         axis="x",
         rotation=20,
     )
-    axis.legend(
-        title="Criterion"
-    )
+    axis.legend(title="Criterion")
     axis.grid(
         axis="y",
         alpha=0.3,
@@ -546,22 +513,15 @@ def generate_scenario_metric_plots(
     generated_paths = []
 
     for metric_column in metric_columns:
-        output_path = str(
-            Path(output_directory)
-            / f"{metric_column}_comparison.png"
-        )
+        output_path = str(Path(output_directory) / f"{metric_column}_comparison.png")
 
-        generated = (
-            plot_scenario_metric_comparison(
-                comparison_df=comparison_df,
-                metric_column=metric_column,
-                output_path=output_path,
-            )
+        generated = plot_scenario_metric_comparison(
+            comparison_df=comparison_df,
+            metric_column=metric_column,
+            output_path=output_path,
         )
 
         if generated:
-            generated_paths.append(
-                output_path
-            )
+            generated_paths.append(output_path)
 
     return generated_paths

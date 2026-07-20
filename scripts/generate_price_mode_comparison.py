@@ -38,9 +38,7 @@ def build_price_mode_comparison_markdown(
     energy_data_path: str,
     hourly_price_data_path: str,
 ) -> str:
-    cheapest_row = comparison_df.loc[
-        comparison_df["variable_grid_cost_eur"].idxmin()
-    ]
+    cheapest_row = comparison_df.loc[comparison_df["variable_grid_cost_eur"].idxmin()]
 
     lines = [
         "# Electricity Price Mode Comparison",
@@ -54,10 +52,7 @@ def build_price_mode_comparison_markdown(
         "",
         f"- Energy data: `{energy_data_path}`",
         f"- Hourly electricity prices: `{hourly_price_data_path}`",
-        (
-            "- Fixed electricity price: "
-            f"`{fixed_price_eur_per_kwh:.4f} EUR/kWh`"
-        ),
+        (f"- Fixed electricity price: `{fixed_price_eur_per_kwh:.4f} EUR/kWh`"),
         "",
         "## Results",
         "",
@@ -126,9 +121,7 @@ def generate_price_mode_comparison(
     resolved_output_markdown_path = (
         output_markdown_path or paths.price_mode_comparison_markdown
     )
-    resolved_output_plot_path = (
-        output_plot_path or paths.price_mode_comparison_plot
-    )
+    resolved_output_plot_path = output_plot_path or paths.price_mode_comparison_plot
 
     energy_df = load_energy_data(resolved_energy_data_path)
 
@@ -145,9 +138,7 @@ def generate_price_mode_comparison(
         fixed_price_eur_per_kwh=fixed_price_eur_per_kwh,
         peak_price_eur_per_kwh=active_tariff["peak_price_eur_per_kwh"],
         flat_price_eur_per_kwh=active_tariff["flat_price_eur_per_kwh"],
-        off_peak_price_eur_per_kwh=active_tariff[
-            "off_peak_price_eur_per_kwh"
-        ],
+        off_peak_price_eur_per_kwh=active_tariff["off_peak_price_eur_per_kwh"],
         allow_negative_hourly_prices=config.ALLOW_NEGATIVE_HOURLY_PRICES,
     )
 
@@ -188,10 +179,7 @@ def main() -> None:
     print("\nElectricity price mode comparison")
     print(comparison_df.to_string(index=False))
     print(f"\nCSV saved to: {paths.price_mode_comparison_csv}")
-    print(
-        "Markdown report saved to: "
-        f"{paths.price_mode_comparison_markdown}"
-    )
+    print(f"Markdown report saved to: {paths.price_mode_comparison_markdown}")
     print(f"Comparison plot saved to: {paths.price_mode_comparison_plot}")
 
 

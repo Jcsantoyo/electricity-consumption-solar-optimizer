@@ -11,6 +11,7 @@ from scenario_validation import (
 )
 from price_model_factory import HourlyPriceModel
 
+
 def build_reproducible_consumption_data() -> pd.DataFrame:
     datetimes = pd.date_range(
         start="2026-06-01 00:00:00",
@@ -78,15 +79,9 @@ def build_test_scenario(
     consumption_df: pd.DataFrame,
     price_df: pd.DataFrame,
 ):
-    consumption_path = (
-        tmp_path / "consumption.csv"
-    )
-    price_path = (
-        tmp_path / "prices.csv"
-    )
-    solar_path = (
-        tmp_path / "solar.csv"
-    )
+    consumption_path = tmp_path / "consumption.csv"
+    price_path = tmp_path / "prices.csv"
+    solar_path = tmp_path / "solar.csv"
 
     consumption_df.to_csv(
         consumption_path,
@@ -103,19 +98,11 @@ def build_test_scenario(
     )
 
     return replace(
-        get_project_scenario(
-            "uci_omie_june_2026"
-        ),
+        get_project_scenario("uci_omie_june_2026"),
         name="reproducibility_test",
-        consumption_data_path=str(
-            consumption_path
-        ),
-        hourly_price_data_path=str(
-            price_path
-        ),
-        pvgis_solar_data_path=str(
-            solar_path
-        ),
+        consumption_data_path=str(consumption_path),
+        hourly_price_data_path=str(price_path),
+        pvgis_solar_data_path=str(solar_path),
         random_seed=42,
     )
 
@@ -167,9 +154,7 @@ def run_small_optimization(
 
 
 def test_same_forecast_seed_produces_same_results() -> None:
-    consumption_df = (
-        build_reproducible_consumption_data()
-    )
+    consumption_df = build_reproducible_consumption_data()
 
     first_run = run_small_forecast(
         consumption_df=consumption_df,
@@ -186,18 +171,12 @@ def test_same_forecast_seed_produces_same_results() -> None:
         second_run["results_df"],
     )
 
-    assert first_run["metrics"] == (
-        second_run["metrics"]
-    )
+    assert first_run["metrics"] == (second_run["metrics"])
 
 
 def test_same_optimization_inputs_produce_same_results() -> None:
-    consumption_df = (
-        build_reproducible_consumption_data()
-    )
-    price_df = (
-        build_reproducible_price_data()
-    )
+    consumption_df = build_reproducible_consumption_data()
+    price_df = build_reproducible_price_data()
 
     first_results = run_small_optimization(
         consumption_df=consumption_df,
@@ -218,12 +197,8 @@ def test_same_optimization_inputs_produce_same_results() -> None:
 def test_small_project_scenario_is_valid_and_reproducible(
     tmp_path,
 ) -> None:
-    consumption_df = (
-        build_reproducible_consumption_data()
-    )
-    price_df = (
-        build_reproducible_price_data()
-    )
+    consumption_df = build_reproducible_consumption_data()
+    price_df = build_reproducible_price_data()
 
     scenario = build_test_scenario(
         tmp_path=tmp_path,
@@ -231,12 +206,10 @@ def test_small_project_scenario_is_valid_and_reproducible(
         price_df=price_df,
     )
 
-    validation_report = (
-        validate_project_scenario_data(
-            scenario=scenario,
-            consumption_df=consumption_df,
-            price_df=price_df,
-        )
+    validation_report = validate_project_scenario_data(
+        scenario=scenario,
+        consumption_df=consumption_df,
+        price_df=price_df,
     )
 
     forecast_results = run_small_forecast(
@@ -244,11 +217,9 @@ def test_small_project_scenario_is_valid_and_reproducible(
         random_seed=scenario.random_seed,
     )
 
-    optimization_results = (
-        run_small_optimization(
-            consumption_df=consumption_df,
-            price_df=price_df,
-        )
+    optimization_results = run_small_optimization(
+        consumption_df=consumption_df,
+        price_df=price_df,
     )
 
     assert validation_report.is_valid is True
@@ -256,8 +227,7 @@ def test_small_project_scenario_is_valid_and_reproducible(
     assert validation_report.prices is not None
 
     assert (
-        forecast_results["results_df"]
-        ["datetime"]
+        forecast_results["results_df"]["datetime"]
         .between(
             consumption_df["datetime"].min(),
             consumption_df["datetime"].max(),

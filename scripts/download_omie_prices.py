@@ -9,8 +9,7 @@ DEFAULT_END_DATE = "2026-06-30"
 DEFAULT_OUTPUT_DIRECTORY = "data/raw"
 
 OMIE_DOWNLOAD_URL_TEMPLATE = (
-    "https://www.omie.es/en/file-download"
-    "?filename={filename}&parents=marginalpdbc"
+    "https://www.omie.es/en/file-download?filename={filename}&parents=marginalpdbc"
 )
 
 
@@ -27,11 +26,7 @@ def parse_date(date_text: str) -> date:
 
 
 def build_omie_filename(target_date: date) -> str:
-    return (
-        "marginalpdbc_"
-        f"{target_date.strftime('%Y%m%d')}"
-        ".1"
-    )
+    return f"marginalpdbc_{target_date.strftime('%Y%m%d')}.1"
 
 
 def build_omie_download_url(target_date: date) -> str:
@@ -47,15 +42,12 @@ def generate_date_range(
     end_date: date,
 ) -> list[date]:
     if end_date < start_date:
-        raise ValueError(
-            "End date cannot be earlier than start date"
-        )
+        raise ValueError("End date cannot be earlier than start date")
 
     number_of_days = (end_date - start_date).days + 1
 
     return [
-        start_date + timedelta(days=day_offset)
-        for day_offset in range(number_of_days)
+        start_date + timedelta(days=day_offset) for day_offset in range(number_of_days)
     ]
 
 
@@ -69,14 +61,10 @@ def validate_downloaded_omie_content(
     )
 
     if not decoded_content.startswith("MARGINALPDBC;"):
-        raise ValueError(
-            f"Downloaded file is not a valid OMIE price file: {filename}"
-        )
+        raise ValueError(f"Downloaded file is not a valid OMIE price file: {filename}")
 
     if not decoded_content.rstrip().endswith("*"):
-        raise ValueError(
-            f"Downloaded OMIE file has no closing marker: {filename}"
-        )
+        raise ValueError(f"Downloaded OMIE file has no closing marker: {filename}")
 
 
 def download_omie_file(
@@ -103,13 +91,9 @@ def download_omie_file(
         with urlopen(url, timeout=30) as response:
             content = response.read()
     except HTTPError as error:
-        raise RuntimeError(
-            f"OMIE returned HTTP {error.code} for {filename}"
-        ) from error
+        raise RuntimeError(f"OMIE returned HTTP {error.code} for {filename}") from error
     except URLError as error:
-        raise RuntimeError(
-            f"Could not download {filename}: {error.reason}"
-        ) from error
+        raise RuntimeError(f"Could not download {filename}: {error.reason}") from error
 
     validate_downloaded_omie_content(
         content=content,

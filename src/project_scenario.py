@@ -34,37 +34,26 @@ class ProjectScenario:
 
     def validate(self) -> None:
         if not self.name.strip():
-            raise ValueError(
-                "Scenario name cannot be empty"
-            )
+            raise ValueError("Scenario name cannot be empty")
 
         if self.price_mode not in VALID_PRICE_MODES:
-            raise ValueError(
-                f"Invalid price mode: {self.price_mode}"
-            )
+            raise ValueError(f"Invalid price mode: {self.price_mode}")
 
         if self.forecast_mode not in VALID_FORECAST_MODES:
-            raise ValueError(
-                f"Invalid forecast mode: {self.forecast_mode}"
-            )
+            raise ValueError(f"Invalid forecast mode: {self.forecast_mode}")
 
         if not 0 < self.forecast_test_size_ratio < 1:
-            raise ValueError(
-                "Forecast test size ratio must be between 0 and 1"
-            )
+            raise ValueError("Forecast test size ratio must be between 0 and 1")
 
         if self.random_seed < 0:
-            raise ValueError(
-                "Random seed cannot be negative"
-            )
+            raise ValueError("Random seed cannot be negative")
 
         if (
             self.price_mode == "wholesale_hourly"
             and self.hourly_price_data_path is None
         ):
             raise ValueError(
-                "Wholesale hourly price mode requires "
-                "an hourly price data path"
+                "Wholesale hourly price mode requires an hourly price data path"
             )
 
         if (
@@ -86,30 +75,21 @@ class ProjectScenario:
         ]
 
         if self.use_pvgis_solar_data:
-            paths.append(
-                self.pvgis_solar_data_path
-            )
+            paths.append(self.pvgis_solar_data_path)
 
         if self.hourly_price_data_path is not None:
-            paths.append(
-                self.hourly_price_data_path
-            )
+            paths.append(self.hourly_price_data_path)
 
         return paths
 
     def validate_input_files_exist(self) -> None:
         missing_paths = [
-            path
-            for path in self.input_paths()
-            if not Path(path).is_file()
+            path for path in self.input_paths() if not Path(path).is_file()
         ]
 
         if missing_paths:
-            missing_text = ", ".join(
-                missing_paths
-            )
+            missing_text = ", ".join(missing_paths)
 
             raise FileNotFoundError(
-                "Scenario input files do not exist: "
-                f"{missing_text}"
+                f"Scenario input files do not exist: {missing_text}"
             )

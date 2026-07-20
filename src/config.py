@@ -13,13 +13,9 @@ ACTIVE_PROJECT_SCENARIO_NAME = os.getenv(
     DEFAULT_PROJECT_SCENARIO_NAME,
 )
 
-ACTIVE_PROJECT_SCENARIO = get_project_scenario(
-    ACTIVE_PROJECT_SCENARIO_NAME
-)
+ACTIVE_PROJECT_SCENARIO = get_project_scenario(ACTIVE_PROJECT_SCENARIO_NAME)
 
-OUTPUT_PATHS = build_scenario_output_paths(
-    ACTIVE_PROJECT_SCENARIO_NAME
-)
+OUTPUT_PATHS = build_scenario_output_paths(ACTIVE_PROJECT_SCENARIO_NAME)
 
 
 # Input files
@@ -37,16 +33,10 @@ BEST_SCENARIOS_PATH = OUTPUT_PATHS.best_scenarios
 SUMMARY_REPORT_PATH = OUTPUT_PATHS.summary_report
 PAYBACK_PLOT_PATH = OUTPUT_PATHS.payback_plot
 SELF_SUFFICIENCY_PLOT_PATH = OUTPUT_PATHS.self_sufficiency_plot
-BEST_SCENARIOS_COMPARISON_PLOT_PATH = (
-    OUTPUT_PATHS.best_scenarios_comparison_plot
-)
-BEST_SCENARIO_TIMESERIES_PLOT_PATH = (
-    OUTPUT_PATHS.best_scenario_timeseries_plot
-)
+BEST_SCENARIOS_COMPARISON_PLOT_PATH = OUTPUT_PATHS.best_scenarios_comparison_plot
+BEST_SCENARIO_TIMESERIES_PLOT_PATH = OUTPUT_PATHS.best_scenario_timeseries_plot
 BEST_SCENARIO_TIMESERIES_PATH = OUTPUT_PATHS.best_scenario_timeseries
-BEST_SCENARIO_BATTERY_STATE_PLOT_PATH = (
-    OUTPUT_PATHS.best_scenario_battery_state_plot
-)
+BEST_SCENARIO_BATTERY_STATE_PLOT_PATH = OUTPUT_PATHS.best_scenario_battery_state_plot
 BEST_SCENARIO_CUMULATIVE_ENERGY_PLOT_PATH = (
     OUTPUT_PATHS.best_scenario_cumulative_energy_plot
 )
@@ -121,9 +111,7 @@ ACTIVE_TARIFF_PROFILE = ACTIVE_PROJECT_SCENARIO.tariff_profile_name
 # Hourly electricity price data
 USE_HOURLY_PRICE_DATA = ACTIVE_PROJECT_SCENARIO.uses_hourly_prices
 HOURLY_PRICE_DATA_PATH = ACTIVE_PROJECT_SCENARIO.hourly_price_data_path
-ALLOW_NEGATIVE_HOURLY_PRICES = (
-    ACTIVE_PROJECT_SCENARIO.allow_negative_hourly_prices
-)
+ALLOW_NEGATIVE_HOURLY_PRICES = ACTIVE_PROJECT_SCENARIO.allow_negative_hourly_prices
 
 
 # Forecast settings

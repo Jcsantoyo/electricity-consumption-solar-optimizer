@@ -47,12 +47,8 @@ def test_build_dataset_metadata() -> None:
     assert metadata["path"] == "consumption.csv"
     assert metadata["rows"] == 48
     assert metadata["unique_timestamps"] == 48
-    assert metadata["start"] == (
-        "2026-06-01T00:00:00"
-    )
-    assert metadata["end"] == (
-        "2026-06-02T23:00:00"
-    )
+    assert metadata["start"] == ("2026-06-01T00:00:00")
+    assert metadata["end"] == ("2026-06-02T23:00:00")
 
 
 def test_build_dataset_metadata_rejects_missing_datetime() -> None:
@@ -75,9 +71,7 @@ def test_build_dataset_metadata_rejects_missing_datetime() -> None:
 def test_build_run_manifest_contains_scenario_data(
     tmp_path,
 ) -> None:
-    consumption_path = (
-        tmp_path / "consumption.csv"
-    )
+    consumption_path = tmp_path / "consumption.csv"
     price_path = tmp_path / "prices.csv"
     solar_path = tmp_path / "solar.csv"
 
@@ -95,18 +89,10 @@ def test_build_run_manifest_contains_scenario_data(
     )
 
     scenario = replace(
-        get_project_scenario(
-            "uci_omie_june_2026"
-        ),
-        consumption_data_path=str(
-            consumption_path
-        ),
-        hourly_price_data_path=str(
-            price_path
-        ),
-        pvgis_solar_data_path=str(
-            solar_path
-        ),
+        get_project_scenario("uci_omie_june_2026"),
+        consumption_data_path=str(consumption_path),
+        hourly_price_data_path=str(price_path),
+        pvgis_solar_data_path=str(solar_path),
     )
 
     manifest = build_run_manifest(
@@ -134,9 +120,7 @@ def test_build_run_manifest_contains_scenario_data(
     )
 
     assert manifest["manifest_version"] == 1
-    assert manifest["scenario"]["name"] == (
-        "uci_omie_june_2026"
-    )
+    assert manifest["scenario"]["name"] == ("uci_omie_june_2026")
     assert manifest["scenario"]["random_seed"] == 42
     assert manifest["datasets"]["consumption"]["rows"] == 48
     assert manifest["datasets"]["hourly_prices"]["rows"] == 48
@@ -150,9 +134,7 @@ def test_build_run_manifest_contains_scenario_data(
 def test_write_run_manifest_creates_json_file(
     tmp_path,
 ) -> None:
-    output_path = (
-        tmp_path / "run_manifest.json"
-    )
+    output_path = tmp_path / "run_manifest.json"
 
     manifest = {
         "manifest_version": 1,
@@ -166,10 +148,6 @@ def test_write_run_manifest_creates_json_file(
         output_path=str(output_path),
     )
 
-    loaded_manifest = json.loads(
-        output_path.read_text(
-            encoding="utf-8"
-        )
-    )
+    loaded_manifest = json.loads(output_path.read_text(encoding="utf-8"))
 
     assert loaded_manifest == manifest

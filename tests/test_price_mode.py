@@ -24,9 +24,7 @@ def test_price_mode_description_for_fixed_tariff() -> None:
         tariff_profile_name="flat_price",
     )
 
-    assert description == (
-        "Fixed electricity price from tariff profile 'flat_price'"
-    )
+    assert description == ("Fixed electricity price from tariff profile 'flat_price'")
 
 
 def test_price_mode_description_for_time_of_use_tariff() -> None:
@@ -37,8 +35,7 @@ def test_price_mode_description_for_time_of_use_tariff() -> None:
     )
 
     assert description == (
-        "Time-of-use electricity prices from tariff profile "
-        "'spanish_2_0td_example'"
+        "Time-of-use electricity prices from tariff profile 'spanish_2_0td_example'"
     )
 
 

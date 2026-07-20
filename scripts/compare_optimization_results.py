@@ -102,14 +102,8 @@ def main() -> None:
     print(f"Historical results: {historical_path}")
     print(f"Forecast-based results: {forecast_path}")
     print(f"Comparison saved to: {output_path}")
-    print(
-        "Payback plot saved to: "
-        f"{paths.historical_vs_forecast_payback_plot}"
-    )
-    print(
-        "Savings plot saved to: "
-        f"{paths.historical_vs_forecast_savings_plot}"
-    )
+    print(f"Payback plot saved to: {paths.historical_vs_forecast_payback_plot}")
+    print(f"Savings plot saved to: {paths.historical_vs_forecast_savings_plot}")
     print(
         "Self-sufficiency plot saved to: "
         f"{paths.historical_vs_forecast_self_sufficiency_plot}"
@@ -118,10 +112,7 @@ def main() -> None:
         "Investment cost plot saved to: "
         f"{paths.historical_vs_forecast_investment_cost_plot}"
     )
-    print(
-        "Grid import plot saved to: "
-        f"{paths.historical_vs_forecast_grid_import_plot}"
-    )
+    print(f"Grid import plot saved to: {paths.historical_vs_forecast_grid_import_plot}")
 
     print("\nComparison:")
     print(comparison_df.to_string(index=False))

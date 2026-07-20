@@ -101,18 +101,10 @@ def build_scenario_output_paths(scenario_name: str) -> ScenarioOutputPaths:
         configuration_summary=str(reports / "configuration_summary.md"),
         run_manifest=str(reports / "run_manifest.json"),
         payback_plot=str(images / "main_payback_grid_search.png"),
-        self_sufficiency_plot=str(
-            images / "main_self_sufficiency_grid_search.png"
-        ),
-        best_scenarios_comparison_plot=str(
-            images / "best_scenarios_comparison.png"
-        ),
-        best_scenario_timeseries_plot=str(
-            images / "best_scenario_timeseries.png"
-        ),
-        best_scenario_timeseries=str(
-            reports / "best_scenario_timeseries.csv"
-        ),
+        self_sufficiency_plot=str(images / "main_self_sufficiency_grid_search.png"),
+        best_scenarios_comparison_plot=str(images / "best_scenarios_comparison.png"),
+        best_scenario_timeseries_plot=str(images / "best_scenario_timeseries.png"),
+        best_scenario_timeseries=str(reports / "best_scenario_timeseries.csv"),
         best_scenario_battery_state_plot=str(
             images / "best_scenario_battery_state.png"
         ),
@@ -120,15 +112,9 @@ def build_scenario_output_paths(scenario_name: str) -> ScenarioOutputPaths:
             images / "best_scenario_cumulative_energy.png"
         ),
         forecast_results=str(reports / "forecast_results.csv"),
-        forecast_feature_importance=str(
-            reports / "forecast_feature_importance.csv"
-        ),
-        forecast_model_comparison=str(
-            reports / "forecast_model_comparison.csv"
-        ),
-        forecast_model_comparison_plot=str(
-            images / "forecast_model_comparison.png"
-        ),
+        forecast_feature_importance=str(reports / "forecast_feature_importance.csv"),
+        forecast_model_comparison=str(reports / "forecast_model_comparison.csv"),
+        forecast_model_comparison_plot=str(images / "forecast_model_comparison.png"),
         forecast_actual_vs_predicted_plot=str(
             images / "consumption_forecast_actual_vs_predicted.png"
         ),

@@ -5,7 +5,7 @@ from price_comparison import (
     calculate_flat_grid_import_cost,
     compare_flat_vs_hourly_price_cost,
     compare_tariff_vs_hourly_price_cost,
-    compare_all_price_modes
+    compare_all_price_modes,
 )
 
 
@@ -98,7 +98,9 @@ def test_calculate_flat_grid_import_cost_raises_error_for_invalid_grid_import() 
         )
 
 
-def test_calculate_flat_grid_import_cost_raises_error_for_negative_grid_import() -> None:
+def test_calculate_flat_grid_import_cost_raises_error_for_negative_grid_import() -> (
+    None
+):
     energy_df = pd.DataFrame(
         {
             "grid_import_kwh": [
@@ -173,6 +175,7 @@ def test_compare_tariff_vs_hourly_price_cost_returns_expected_values() -> None:
     assert comparison["hourly_cost_eur"] == pytest.approx(0.95)
     assert comparison["difference_eur"] == pytest.approx(-0.21)
 
+
 def test_compare_all_price_modes_returns_expected_costs() -> None:
     energy_df = pd.DataFrame(
         {
@@ -219,9 +222,7 @@ def test_compare_all_price_modes_returns_expected_costs() -> None:
         "hourly",
     ]
 
-    assert comparison_df[
-        "variable_grid_cost_eur"
-    ].tolist() == pytest.approx(
+    assert comparison_df["variable_grid_cost_eur"].tolist() == pytest.approx(
         [
             1.20,
             1.16,
@@ -229,9 +230,7 @@ def test_compare_all_price_modes_returns_expected_costs() -> None:
         ]
     )
 
-    assert comparison_df[
-        "difference_vs_flat_eur"
-    ].tolist() == pytest.approx(
+    assert comparison_df["difference_vs_flat_eur"].tolist() == pytest.approx(
         [
             0.00,
             -0.04,
@@ -239,15 +238,14 @@ def test_compare_all_price_modes_returns_expected_costs() -> None:
         ]
     )
 
-    assert comparison_df[
-        "difference_vs_2_0td_eur"
-    ].tolist() == pytest.approx(
+    assert comparison_df["difference_vs_2_0td_eur"].tolist() == pytest.approx(
         [
             0.04,
             0.00,
             -0.21,
         ]
     )
+
 
 def test_compare_all_price_modes_allows_negative_hourly_prices() -> None:
     energy_df = pd.DataFrame(
@@ -282,10 +280,6 @@ def test_compare_all_price_modes_allows_negative_hourly_prices() -> None:
         allow_negative_hourly_prices=True,
     )
 
-    hourly_row = comparison_df[
-        comparison_df["price_mode"] == "hourly"
-    ].iloc[0]
+    hourly_row = comparison_df[comparison_df["price_mode"] == "hourly"].iloc[0]
 
-    assert hourly_row[
-        "variable_grid_cost_eur"
-    ] == pytest.approx(-0.02)
+    assert hourly_row["variable_grid_cost_eur"] == pytest.approx(-0.02)

@@ -10,12 +10,8 @@ def test_collect_generated_output_paths_includes_existing_files(
 ) -> None:
     monkeypatch.chdir(tmp_path)
 
-    report_path = Path(
-        config.OUTPUT_PATHS.historical_vs_forecast_comparison
-    )
-    plot_path = Path(
-        config.OUTPUT_PATHS.historical_vs_forecast_payback_plot
-    )
+    report_path = Path(config.OUTPUT_PATHS.historical_vs_forecast_comparison)
+    plot_path = Path(config.OUTPUT_PATHS.historical_vs_forecast_payback_plot)
 
     report_path.parent.mkdir(parents=True, exist_ok=True)
     plot_path.parent.mkdir(parents=True, exist_ok=True)

@@ -8,9 +8,7 @@ def run_config_check(
 ) -> str:
     environment = os.environ.copy()
 
-    environment["PROJECT_SCENARIO"] = (
-        scenario_name
-    )
+    environment["PROJECT_SCENARIO"] = scenario_name
 
     environment["PYTHONPATH"] = "src"
 
@@ -35,9 +33,7 @@ def run_config_check(
 
 
 def test_config_loads_omie_scenario_from_environment() -> None:
-    output = run_config_check(
-        "uci_omie_june_2026"
-    )
+    output = run_config_check("uci_omie_june_2026")
 
     assert "uci_omie_june_2026" in output
     assert "wholesale_hourly" in output
@@ -45,9 +41,7 @@ def test_config_loads_omie_scenario_from_environment() -> None:
 
 
 def test_config_loads_fixed_scenario_from_environment() -> None:
-    output = run_config_check(
-        "uci_fixed_tariff"
-    )
+    output = run_config_check("uci_fixed_tariff")
 
     assert "uci_fixed_tariff" in output
     assert "fixed" in output

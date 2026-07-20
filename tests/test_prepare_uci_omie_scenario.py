@@ -18,10 +18,7 @@ def test_prepare_uci_omie_scenario_writes_output_csv(
                 periods=48,
                 freq="h",
             ),
-            "consumption_kwh": [
-                float(index + 1)
-                for index in range(48)
-            ],
+            "consumption_kwh": [float(index + 1) for index in range(48)],
         }
     )
 
@@ -54,10 +51,7 @@ def test_prepare_uci_omie_scenario_remaps_dates(
                 periods=24,
                 freq="h",
             ),
-            "consumption_kwh": [
-                1.0
-                for _ in range(24)
-            ],
+            "consumption_kwh": [1.0 for _ in range(24)],
         }
     )
 
@@ -73,13 +67,9 @@ def test_prepare_uci_omie_scenario_remaps_dates(
         target_start_datetime="2026-06-01 00:00:00",
     )
 
-    assert scenario_df.iloc[0]["datetime"] == pd.Timestamp(
-        "2026-06-01 00:00:00"
-    )
+    assert scenario_df.iloc[0]["datetime"] == pd.Timestamp("2026-06-01 00:00:00")
 
-    assert scenario_df.iloc[-1]["datetime"] == pd.Timestamp(
-        "2026-06-01 23:00:00"
-    )
+    assert scenario_df.iloc[-1]["datetime"] == pd.Timestamp("2026-06-01 23:00:00")
 
 
 def test_prepare_uci_omie_scenario_keeps_original_dates(
@@ -97,10 +87,7 @@ def test_prepare_uci_omie_scenario_keeps_original_dates(
     consumption_df = pd.DataFrame(
         {
             "datetime": original_dates,
-            "consumption_kwh": [
-                1.0
-                for _ in range(24)
-            ],
+            "consumption_kwh": [1.0 for _ in range(24)],
         }
     )
 
@@ -116,8 +103,6 @@ def test_prepare_uci_omie_scenario_keeps_original_dates(
         target_start_datetime="2026-06-01 00:00:00",
     )
 
-    assert list(
-        pd.to_datetime(
-            scenario_df["original_datetime"]
-        )
-    ) == list(original_dates)
+    assert list(pd.to_datetime(scenario_df["original_datetime"])) == list(
+        original_dates
+    )

@@ -50,17 +50,12 @@ def main() -> None:
     print("\nFeature importance:")
     print(feature_importance_df.to_string(index=False))
 
-    feature_importance_report_path = (
-        config.OUTPUT_PATHS.forecast_feature_importance
-    )
+    feature_importance_report_path = config.OUTPUT_PATHS.forecast_feature_importance
     feature_importance_df.to_csv(
         feature_importance_report_path,
         index=False,
     )
-    print(
-        "Feature importance report saved to: "
-        f"{feature_importance_report_path}"
-    )
+    print(f"Feature importance report saved to: {feature_importance_report_path}")
 
     comparison_df = compare_forecasting_models(
         df=df,
@@ -71,44 +66,27 @@ def main() -> None:
     print("\nModel comparison:")
     print(comparison_df.to_string(index=False))
 
-    model_comparison_report_path = (
-        config.OUTPUT_PATHS.forecast_model_comparison
-    )
+    model_comparison_report_path = config.OUTPUT_PATHS.forecast_model_comparison
     comparison_df.to_csv(model_comparison_report_path, index=False)
-    print(
-        "Model comparison report saved to: "
-        f"{model_comparison_report_path}"
-    )
+    print(f"Model comparison report saved to: {model_comparison_report_path}")
 
-    model_comparison_output_path = (
-        config.OUTPUT_PATHS.forecast_model_comparison_plot
-    )
+    model_comparison_output_path = config.OUTPUT_PATHS.forecast_model_comparison_plot
     plot_forecasting_model_comparison(
         comparison_df,
         model_comparison_output_path,
     )
-    print(
-        "Model comparison plot saved to: "
-        f"{model_comparison_output_path}"
-    )
+    print(f"Model comparison plot saved to: {model_comparison_output_path}")
 
-    forecast_plot_path = (
-        config.OUTPUT_PATHS.forecast_actual_vs_predicted_plot
-    )
+    forecast_plot_path = config.OUTPUT_PATHS.forecast_actual_vs_predicted_plot
     plot_forecast_actual_vs_predicted(results_df, forecast_plot_path)
     print(f"\nForecast plot saved to: {forecast_plot_path}")
 
-    feature_importance_plot_path = (
-        config.OUTPUT_PATHS.forecast_feature_importance_plot
-    )
+    feature_importance_plot_path = config.OUTPUT_PATHS.forecast_feature_importance_plot
     plot_feature_importance(
         feature_importance_df,
         feature_importance_plot_path,
     )
-    print(
-        "Feature importance plot saved to: "
-        f"{feature_importance_plot_path}"
-    )
+    print(f"Feature importance plot saved to: {feature_importance_plot_path}")
 
 
 if __name__ == "__main__":

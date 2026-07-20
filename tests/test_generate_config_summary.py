@@ -42,27 +42,19 @@ def test_configuration_summary_contains_active_tariff_values():
     assert str(active_tariff["contracted_power_kw"]) in summary
     assert str(active_tariff["power_price_eur_per_kw_year"]) in summary
 
+
 def test_configuration_summary_includes_hourly_price_settings() -> None:
     summary = build_configuration_summary()
 
     assert "## Electricity price data" in summary
 
-    assert (
-        f"Use hourly electricity prices: "
-        f"`{config.USE_HOURLY_PRICE_DATA}`"
-        in summary
-    )
+    assert f"Use hourly electricity prices: `{config.USE_HOURLY_PRICE_DATA}`" in summary
 
-    assert (
-        f"Hourly price data path: "
-        f"`{config.HOURLY_PRICE_DATA_PATH}`"
-        in summary
-    )
+    assert f"Hourly price data path: `{config.HOURLY_PRICE_DATA_PATH}`" in summary
 
     assert (
         f"Allow negative hourly prices: "
-        f"`{config.ALLOW_NEGATIVE_HOURLY_PRICES}`"
-        in summary
+        f"`{config.ALLOW_NEGATIVE_HOURLY_PRICES}`" in summary
     )
 
     assert "Electricity price mode:" in summary
@@ -71,14 +63,8 @@ def test_configuration_summary_includes_hourly_price_settings() -> None:
 def test_configuration_summary_explains_hourly_price_mode() -> None:
     summary = build_configuration_summary()
 
-    assert (
-        "variable cost of imported electricity"
-        in summary
-    )
+    assert "variable cost of imported electricity" in summary
 
-    assert (
-        "fixed power costs and surplus compensation"
-        in summary
-    )
+    assert "fixed power costs and surplus compensation" in summary
 
     assert "wholesale market prices" in summary

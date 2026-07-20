@@ -9,6 +9,7 @@ sys.path.append(str(SRC_PATH))
 import config
 from price_mode import build_electricity_price_mode_description
 
+
 def format_list(values: list) -> str:
     return ", ".join(str(value) for value in values)
 
@@ -37,10 +38,7 @@ def build_configuration_summary() -> str:
         "",
         f"- Use hourly electricity prices: `{config.USE_HOURLY_PRICE_DATA}`",
         f"- Hourly price data path: `{config.HOURLY_PRICE_DATA_PATH}`",
-        (
-            "- Allow negative hourly prices: "
-            f"`{config.ALLOW_NEGATIVE_HOURLY_PRICES}`"
-        ),
+        (f"- Allow negative hourly prices: `{config.ALLOW_NEGATIVE_HOURLY_PRICES}`"),
         f"- Electricity price mode: {electricity_price_mode}",
         "",
         "## Simulation settings",
@@ -112,6 +110,7 @@ def build_configuration_summary() -> str:
     )
 
     return "\n".join(lines)
+
 
 def main() -> None:
     config.OUTPUT_PATHS.create_directories()

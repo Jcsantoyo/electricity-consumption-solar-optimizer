@@ -20,25 +20,14 @@ from scenario_validation import (
 
 
 def main() -> None:
-    scenario = (
-        config.ACTIVE_PROJECT_SCENARIO
-    )
+    scenario = config.ACTIVE_PROJECT_SCENARIO
 
-    consumption_df = load_consumption_data(
-        scenario.consumption_data_path
-    )
+    consumption_df = load_consumption_data(scenario.consumption_data_path)
 
     price_df = load_hourly_prices_if_enabled(
-        use_hourly_price_data=(
-            scenario.uses_hourly_prices
-        ),
-        file_path=(
-            scenario.hourly_price_data_path
-            or ""
-        ),
-        allow_negative_prices=(
-            scenario.allow_negative_hourly_prices
-        ),
+        use_hourly_price_data=(scenario.uses_hourly_prices),
+        file_path=(scenario.hourly_price_data_path or ""),
+        allow_negative_prices=(scenario.allow_negative_hourly_prices),
     )
 
     report = validate_project_scenario_data(
@@ -48,11 +37,7 @@ def main() -> None:
     )
 
     print()
-    print(
-        format_validation_report(
-            report
-        )
-    )
+    print(format_validation_report(report))
 
 
 if __name__ == "__main__":

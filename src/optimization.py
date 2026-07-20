@@ -190,7 +190,7 @@ def build_scenario_summary_text(
     best_payback_scenario: pd.Series,
     best_self_sufficiency_scenario: pd.Series,
     solar_data_source: str,
-    electricity_price_mode: str
+    electricity_price_mode: str,
 ) -> str:
     text = ""
 
@@ -284,7 +284,9 @@ def build_best_scenarios_dataframe(
     return pd.DataFrame(rows)
 
 
-def build_outputs_index_text(solar_data_source: str, electricity_price_mode: str) -> str:
+def build_outputs_index_text(
+    solar_data_source: str, electricity_price_mode: str
+) -> str:
     text = ""
 
     text += "# Project outputs\n\n"
