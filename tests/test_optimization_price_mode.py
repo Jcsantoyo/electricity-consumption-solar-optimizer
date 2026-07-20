@@ -7,9 +7,7 @@ from electricity_price_models import (
     TimeOfUsePriceModel,
     ElectricityPriceModel,
 )
-from optimization import (
-    run_economic_grid_search,
-)
+from optimization import run_economic_grid_search, build_best_scenarios_dataframe
 
 
 def build_consumption_dataframe() -> pd.DataFrame:
@@ -289,3 +287,74 @@ def test_grid_search_includes_cost_breakdown_columns() -> None:
     }
 
     assert expected_columns.issubset(results_df.columns)
+
+
+def test_best_scenarios_dataframe_preserves_cost_breakdown() -> None:
+    price_model = FixedPriceModel(
+        fixed_price_eur_per_kwh=0.20,
+        surplus_compensation_price=0.05,
+        contracted_power_kw=4.6,
+        power_price_eur_per_kw_year=35.0,
+    )
+
+    results_df = run_test_grid_search(price_model)
+
+    scenario = results_df.iloc[0]
+
+    best_scenarios_df = build_best_scenarios_dataframe(
+        best_payback_scenario=scenario,
+        best_self_sufficiency_scenario=scenario,
+    )
+
+    expected_columns = {
+        "base_variable_energy_cost_eur",
+        "base_fixed_power_cost_eur",
+        "base_surplus_compensation_eur",
+        "base_net_cost_eur",
+        "scenario_variable_energy_cost_eur",
+        "scenario_fixed_power_cost_eur",
+        "scenario_surplus_compensation_eur",
+        "scenario_net_cost_eur",
+    }
+
+    assert expected_columns.issubset(best_scenarios_df.columns)
+
+    assert best_scenarios_df["criterion"].tolist() == [
+        "best_payback",
+        "best_self_sufficiency",
+    ]
+
+    assert best_scenarios_df.loc[
+        0,
+        "scenario_net_cost_eur",
+    ] == pytest.approx(scenario["scenario_net_cost_eur"])
+
+    assert best_scenarios_df.loc[
+        1,
+        "scenario_net_cost_eur",
+    ] == pytest.approx(scenario["scenario_net_cost_eur"])
+
+
+def test_best_scenarios_dataframe_preserves_extra_columns() -> None:
+    scenario = pd.Series(
+        {
+            "solar_peak_power_kw": 3.0,
+            "battery_capacity_kwh": 2.0,
+            "annual_savings_eur": 500.0,
+            "custom_future_metric": 42.0,
+        }
+    )
+
+    result_df = build_best_scenarios_dataframe(
+        best_payback_scenario=scenario,
+        best_self_sufficiency_scenario=scenario,
+    )
+
+    assert "custom_future_metric" in result_df.columns
+
+    assert result_df["custom_future_metric"].tolist() == pytest.approx(
+        [
+            42.0,
+            42.0,
+        ]
+    )

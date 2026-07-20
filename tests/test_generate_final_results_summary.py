@@ -4,12 +4,15 @@ import pytest
 
 from scripts.generate_final_results_summary import (
     build_final_results_summary,
-    get_scenario,
-    format_percent,
-    format_years,
+    format_cost_breakdown_lines,
     format_eur,
     format_eur_per_year,
     format_kwh_per_year,
+    format_percent,
+    format_scenario_section,
+    format_years,
+    get_scenario,
+    has_cost_breakdown,
 )
 
 
@@ -117,3 +120,73 @@ def test_build_final_results_summary_contains_key_values():
     assert "865.36 EUR/year" in summary
     assert "31.58%" in summary
     assert "49.96%" in summary
+
+
+def test_has_cost_breakdown_detects_complete_breakdown() -> None:
+    scenario = pd.Series(
+        {
+            "base_variable_energy_cost_eur": 100.0,
+            "base_fixed_power_cost_eur": 10.0,
+            "base_surplus_compensation_eur": 0.0,
+            "base_net_cost_eur": 110.0,
+            "scenario_variable_energy_cost_eur": 60.0,
+            "scenario_fixed_power_cost_eur": 10.0,
+            "scenario_surplus_compensation_eur": 5.0,
+            "scenario_net_cost_eur": 65.0,
+        }
+    )
+
+    assert has_cost_breakdown(scenario)
+
+
+def test_has_cost_breakdown_rejects_incomplete_breakdown() -> None:
+    scenario = pd.Series(
+        {
+            "base_net_cost_eur": 110.0,
+            "scenario_net_cost_eur": 65.0,
+        }
+    )
+
+    assert not has_cost_breakdown(scenario)
+
+
+def test_format_cost_breakdown_lines_contains_cost_components() -> None:
+    scenario = pd.Series(
+        {
+            "base_variable_energy_cost_eur": 100.0,
+            "base_fixed_power_cost_eur": 10.0,
+            "base_surplus_compensation_eur": 0.0,
+            "base_net_cost_eur": 110.0,
+            "scenario_variable_energy_cost_eur": 60.0,
+            "scenario_fixed_power_cost_eur": 10.0,
+            "scenario_surplus_compensation_eur": 5.0,
+            "scenario_net_cost_eur": 65.0,
+        }
+    )
+
+    lines = format_cost_breakdown_lines(scenario)
+
+    text = "\n".join(lines)
+
+    assert "Simulation-period electricity cost breakdown" in text
+    assert "Baseline variable energy cost" in text
+    assert "100.00 EUR" in text
+    assert "Baseline net electricity cost" in text
+    assert "110.00 EUR" in text
+    assert "Optimized surplus compensation" in text
+    assert "5.00 EUR" in text
+    assert "Optimized net electricity cost" in text
+    assert "65.00 EUR" in text
+
+
+def test_format_scenario_section_supports_legacy_rows() -> None:
+    scenario = build_sample_comparison_df().iloc[0]
+
+    section = format_scenario_section(
+        "Legacy scenario",
+        scenario,
+    )
+
+    assert "## Legacy scenario" in section
+    assert "3500.00 EUR" in section
+    assert "Simulation-period electricity cost breakdown" not in section

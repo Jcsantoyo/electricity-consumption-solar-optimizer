@@ -47,25 +47,100 @@ def get_scenario(
     return filtered_df.iloc[0]
 
 
-def format_scenario_section(title: str, scenario_row: pd.Series) -> str:
+COST_BREAKDOWN_COLUMNS = {
+    "base_variable_energy_cost_eur",
+    "base_fixed_power_cost_eur",
+    "base_surplus_compensation_eur",
+    "base_net_cost_eur",
+    "scenario_variable_energy_cost_eur",
+    "scenario_fixed_power_cost_eur",
+    "scenario_surplus_compensation_eur",
+    "scenario_net_cost_eur",
+}
+
+
+def has_cost_breakdown(
+    scenario_row: pd.Series,
+) -> bool:
+    return COST_BREAKDOWN_COLUMNS.issubset(scenario_row.index)
+
+
+def format_cost_breakdown_lines(
+    scenario_row: pd.Series,
+) -> list[str]:
+    if not has_cost_breakdown(scenario_row):
+        return []
+
+    return [
+        "- Simulation-period electricity cost breakdown:",
+        (
+            "  - Baseline variable energy cost: "
+            f"`{format_eur(scenario_row['base_variable_energy_cost_eur'])}`"
+        ),
+        (
+            "  - Baseline fixed power cost: "
+            f"`{format_eur(scenario_row['base_fixed_power_cost_eur'])}`"
+        ),
+        (
+            "  - Baseline surplus compensation: "
+            f"`{format_eur(scenario_row['base_surplus_compensation_eur'])}`"
+        ),
+        (
+            "  - Baseline net electricity cost: "
+            f"`{format_eur(scenario_row['base_net_cost_eur'])}`"
+        ),
+        (
+            "  - Optimized variable energy cost: "
+            f"`{format_eur(scenario_row['scenario_variable_energy_cost_eur'])}`"
+        ),
+        (
+            "  - Optimized fixed power cost: "
+            f"`{format_eur(scenario_row['scenario_fixed_power_cost_eur'])}`"
+        ),
+        (
+            "  - Optimized surplus compensation: "
+            f"`{format_eur(scenario_row['scenario_surplus_compensation_eur'])}`"
+        ),
+        (
+            "  - Optimized net electricity cost: "
+            f"`{format_eur(scenario_row['scenario_net_cost_eur'])}`"
+        ),
+    ]
+
+
+def format_scenario_section(
+    title: str,
+    scenario_row: pd.Series,
+) -> str:
     lines = [
         f"## {title}",
         "",
-        f"- Solar peak power: `{scenario_row['solar_peak_power_kw']:.2f} kW`",
-        f"- Battery capacity: `{scenario_row['battery_capacity_kwh']:.2f} kWh`",
-        f"- Investment cost: `{format_eur(scenario_row['investment_cost_eur'])}`",
+        (f"- Solar peak power: `{scenario_row['solar_peak_power_kw']:.2f} kW`"),
+        (f"- Battery capacity: `{scenario_row['battery_capacity_kwh']:.2f} kWh`"),
+        (f"- Investment cost: `{format_eur(scenario_row['investment_cost_eur'])}`"),
         (
             "- Annual savings: "
             f"`{format_eur_per_year(scenario_row['annual_savings_eur'])}`"
         ),
-        f"- Payback period: `{format_years(scenario_row['payback_years'])}`",
-        f"- Self-sufficiency: `{format_percent(scenario_row['self_sufficiency'])}`",
+        (f"- Payback period: `{format_years(scenario_row['payback_years'])}`"),
+        (f"- Self-sufficiency: `{format_percent(scenario_row['self_sufficiency'])}`"),
         (
             "- Annual grid import: "
             f"`{format_kwh_per_year(scenario_row['annual_grid_import_kwh'])}`"
         ),
-        "",
     ]
+
+    cost_breakdown_lines = format_cost_breakdown_lines(scenario_row)
+
+    if cost_breakdown_lines:
+        lines.extend(
+            [
+                "",
+                *cost_breakdown_lines,
+            ]
+        )
+
+    lines.append("")
 
     return "\n".join(lines)
 

@@ -1,5 +1,5 @@
 import pandas as pd
-
+import pytest
 
 from scripts.compare_optimization_results import (
     load_best_scenarios,
@@ -118,3 +118,97 @@ def test_build_comparison_plot_labels_creates_readable_labels():
         "Forecast Payback",
         "Forecast Self-suff.",
     ]
+
+
+def test_build_optimization_comparison_preserves_cost_breakdown() -> None:
+    historical_df = pd.DataFrame(
+        [
+            {
+                "optimization_type": "historical",
+                "scenario": "best_payback",
+                "solar_peak_power_kw": 3.0,
+                "battery_capacity_kwh": 0.0,
+                "investment_cost_eur": 3500.0,
+                "base_variable_energy_cost_eur": 200.0,
+                "base_fixed_power_cost_eur": 15.0,
+                "base_surplus_compensation_eur": 0.0,
+                "base_net_cost_eur": 215.0,
+                "scenario_variable_energy_cost_eur": 120.0,
+                "scenario_fixed_power_cost_eur": 15.0,
+                "scenario_surplus_compensation_eur": 10.0,
+                "scenario_net_cost_eur": 125.0,
+                "annual_savings_eur": 1095.0,
+                "payback_years": 3.2,
+                "self_sufficiency": 0.30,
+                "annual_grid_import_kwh": 5000.0,
+            }
+        ]
+    )
+
+    forecast_df = historical_df.copy()
+    forecast_df["optimization_type"] = "forecast_based"
+
+    result_df = build_optimization_comparison(
+        historical_df=historical_df,
+        forecast_df=forecast_df,
+    )
+
+    expected_columns = {
+        "base_variable_energy_cost_eur",
+        "base_fixed_power_cost_eur",
+        "base_surplus_compensation_eur",
+        "base_net_cost_eur",
+        "scenario_variable_energy_cost_eur",
+        "scenario_fixed_power_cost_eur",
+        "scenario_surplus_compensation_eur",
+        "scenario_net_cost_eur",
+    }
+
+    assert expected_columns.issubset(result_df.columns)
+
+    assert result_df.loc[
+        0,
+        "scenario_net_cost_eur",
+    ] == pytest.approx(125.0)
+
+    assert result_df.loc[
+        1,
+        "scenario_net_cost_eur",
+    ] == pytest.approx(125.0)
+
+
+def test_build_optimization_comparison_supports_legacy_columns() -> None:
+    historical_df = pd.DataFrame(
+        [
+            {
+                "optimization_type": "historical",
+                "scenario": "best_payback",
+                "solar_peak_power_kw": 3.0,
+                "battery_capacity_kwh": 0.0,
+                "investment_cost_eur": 3500.0,
+                "annual_savings_eur": 700.0,
+                "payback_years": 5.0,
+                "self_sufficiency": 0.30,
+                "annual_grid_import_kwh": 5000.0,
+            }
+        ]
+    )
+
+    forecast_df = historical_df.copy()
+    forecast_df["optimization_type"] = "forecast_based"
+
+    result_df = build_optimization_comparison(
+        historical_df=historical_df,
+        forecast_df=forecast_df,
+    )
+
+    assert len(result_df) == 2
+
+    assert "base_net_cost_eur" not in (result_df.columns)
+
+    assert result_df["annual_savings_eur"].tolist() == pytest.approx(
+        [
+            700.0,
+            700.0,
+        ]
+    )

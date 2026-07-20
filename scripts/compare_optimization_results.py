@@ -37,21 +37,46 @@ def build_optimization_comparison(
     historical_df: pd.DataFrame,
     forecast_df: pd.DataFrame,
 ) -> pd.DataFrame:
-    comparison_df = pd.concat([historical_df, forecast_df], ignore_index=True)
+    comparison_df = pd.concat(
+        [
+            historical_df,
+            forecast_df,
+        ],
+        ignore_index=True,
+        sort=False,
+    )
 
-    columns = [
+    priority_columns = [
         "optimization_type",
         "scenario",
         "solar_peak_power_kw",
         "battery_capacity_kwh",
         "investment_cost_eur",
+        "base_variable_energy_cost_eur",
+        "base_fixed_power_cost_eur",
+        "base_surplus_compensation_eur",
+        "base_net_cost_eur",
+        "scenario_variable_energy_cost_eur",
+        "scenario_fixed_power_cost_eur",
+        "scenario_surplus_compensation_eur",
+        "scenario_net_cost_eur",
         "annual_savings_eur",
         "payback_years",
         "self_sufficiency",
+        "grid_import_kwh",
         "annual_grid_import_kwh",
+        "solar_surplus_kwh",
     ]
 
-    return comparison_df[columns]
+    ordered_columns = [
+        column for column in priority_columns if column in comparison_df.columns
+    ]
+
+    remaining_columns = [
+        column for column in comparison_df.columns if column not in ordered_columns
+    ]
+
+    return comparison_df[ordered_columns + remaining_columns]
 
 
 def main() -> None:
