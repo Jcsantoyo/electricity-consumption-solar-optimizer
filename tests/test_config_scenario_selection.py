@@ -1,6 +1,8 @@
 import os
 import subprocess
 import sys
+import pytest
+from financial_assumptions import FinancialAssumptions
 
 
 def run_config_check(
@@ -46,3 +48,16 @@ def test_config_loads_fixed_scenario_from_environment() -> None:
     assert "uci_fixed_tariff" in output
     assert "fixed" in output
     assert "False" in output
+
+
+def test_standard_financial_profile_is_valid() -> None:
+    import config
+
+    assumptions = config.get_active_financial_assumptions()
+
+    assert isinstance(
+        assumptions,
+        FinancialAssumptions,
+    )
+    assert assumptions.project_lifetime_years == 25
+    assert assumptions.discount_rate == pytest.approx(0.05)
