@@ -25,6 +25,7 @@ class ProjectScenario:
 
     price_mode: str
     tariff_profile_name: str
+    financial_profile_name: str
     hourly_price_data_path: str | None
     allow_negative_hourly_prices: bool
 
@@ -44,6 +45,9 @@ class ProjectScenario:
 
         if not 0 < self.forecast_test_size_ratio < 1:
             raise ValueError("Forecast test size ratio must be between 0 and 1")
+
+        if not self.financial_profile_name.strip():
+            raise ValueError("Financial profile name cannot be empty")
 
         if self.random_seed < 0:
             raise ValueError("Random seed cannot be negative")

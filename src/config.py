@@ -107,7 +107,7 @@ FINANCIAL_PROFILES = {
     ),
 }
 
-ACTIVE_FINANCIAL_PROFILE_NAME = "residential_standard"
+ACTIVE_FINANCIAL_PROFILE_NAME = ACTIVE_PROJECT_SCENARIO.financial_profile_name
 
 
 def get_active_financial_assumptions() -> FinancialAssumptions:

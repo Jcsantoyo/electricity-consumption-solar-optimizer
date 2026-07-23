@@ -57,3 +57,15 @@ def test_financial_assumptions_rejects_invalid_values(
             annual_electricity_price_growth_rate=(electricity_price_growth_rate),
             annual_operating_cost_growth_rate=(operating_cost_growth_rate),
         )
+
+
+def test_active_financial_assumptions_match_scenario_profile() -> None:
+    import config
+
+    assumptions = config.get_active_financial_assumptions()
+
+    expected_assumptions = config.FINANCIAL_PROFILES[
+        config.ACTIVE_PROJECT_SCENARIO.financial_profile_name
+    ]
+
+    assert assumptions == expected_assumptions

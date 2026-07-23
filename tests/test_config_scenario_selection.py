@@ -3,6 +3,7 @@ import subprocess
 import sys
 import pytest
 from financial_assumptions import FinancialAssumptions
+import config
 
 
 def run_config_check(
@@ -51,8 +52,6 @@ def test_config_loads_fixed_scenario_from_environment() -> None:
 
 
 def test_standard_financial_profile_is_valid() -> None:
-    import config
-
     assumptions = config.get_active_financial_assumptions()
 
     assert isinstance(
@@ -61,3 +60,10 @@ def test_standard_financial_profile_is_valid() -> None:
     )
     assert assumptions.project_lifetime_years == 25
     assert assumptions.discount_rate == pytest.approx(0.05)
+
+
+def test_active_scenario_selects_financial_profile() -> None:
+    assert (
+        config.ACTIVE_FINANCIAL_PROFILE_NAME
+        == config.ACTIVE_PROJECT_SCENARIO.financial_profile_name
+    )

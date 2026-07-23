@@ -24,6 +24,7 @@ def build_test_scenario(
         pvgis_solar_data_path=("data/solar.csv"),
         price_mode=price_mode,
         tariff_profile_name="test_tariff",
+        financial_profile_name="residential_standard",
         hourly_price_data_path=(hourly_price_data_path),
         allow_negative_hourly_prices=(allow_negative_hourly_prices),
         forecast_mode="backtest",
