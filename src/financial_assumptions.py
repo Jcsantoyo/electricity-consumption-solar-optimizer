@@ -37,12 +37,14 @@ class FinancialAssumptions:
         if self.battery_replacement_cost_fraction < 0:
             raise ValueError("Battery replacement cost fraction cannot be negative")
 
-        rates = {
-            "Solar degradation rate": self.annual_solar_degradation_rate,
+        if not 0 <= self.annual_solar_degradation_rate < 1:
+            raise ValueError("Solar degradation rate must be between zero and one")
+
+        growth_rates = {
             "Electricity price growth rate": self.annual_electricity_price_growth_rate,
             "Operating cost growth rate": self.annual_operating_cost_growth_rate,
         }
 
-        for rate_name, rate_value in rates.items():
+        for rate_name, rate_value in growth_rates.items():
             if rate_value <= -1:
                 raise ValueError(f"{rate_name} must be greater than -1")

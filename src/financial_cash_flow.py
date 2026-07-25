@@ -55,7 +55,7 @@ def build_annual_cash_flows(
     annual_operating_cost_eur: float = 0.0,
 ) -> list[AnnualCashFlow]:
     if initial_investment_cost_eur < 0:
-        raise ValueError("Initial investment cost cannto be negative")
+        raise ValueError("Initial investment cost cannot be negative")
 
     if project_lifetime_years <= 0:
         raise ValueError("Project lifetime must be greater than zero")
@@ -110,13 +110,15 @@ def build_projected_annual_cash_flows(
     if annual_operating_cost_eur < 0:
         raise ValueError("Annual operating cost cannot be negative")
 
-    rates = {
-        "Solar degradation rate": annual_solar_degradation_rate,
+    if not 0 <= annual_solar_degradation_rate < 1:
+        raise ValueError("Solar degradation rate must be between zero and one")
+
+    growth_rates = {
         "Electricity price growth rate": annual_electricity_price_growth_rate,
         "Operating cost growth rate": annual_operating_cost_growth_rate,
     }
 
-    for rate_name, rate_value in rates.items():
+    for rate_name, rate_value in growth_rates.items():
         if rate_value <= -1:
             raise ValueError(f"{rate_name} must be greater than -1")
 

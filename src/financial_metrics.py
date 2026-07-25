@@ -83,7 +83,7 @@ def calculate_discounted_payback_years(
 
 
 def _calculate_net_present_value_for_rate(
-    cash_flows: Sequence[AnnualCashFlow], rate: bool
+    cash_flows: Sequence[AnnualCashFlow], rate: float
 ) -> float:
     if rate <= -1:
         raise ValueError("Rate must be greater than -1")
