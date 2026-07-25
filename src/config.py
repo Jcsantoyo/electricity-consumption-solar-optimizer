@@ -104,6 +104,8 @@ FINANCIAL_PROFILES = {
         annual_solar_degradation_rate=0.005,
         annual_electricity_price_growth_rate=0.02,
         annual_operating_cost_growth_rate=0.02,
+        battery_replacement_year=12,
+        battery_replacement_cost_fraction=0.70,
     ),
 }
 

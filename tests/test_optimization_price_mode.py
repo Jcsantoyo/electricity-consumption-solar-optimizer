@@ -9,6 +9,8 @@ from electricity_price_models import (
 )
 from optimization import run_economic_grid_search, build_best_scenarios_dataframe
 
+from financial_assumptions import FinancialAssumptions
+
 
 def build_consumption_dataframe() -> pd.DataFrame:
     return pd.DataFrame(
@@ -26,6 +28,22 @@ def build_consumption_dataframe() -> pd.DataFrame:
                 3.0,
             ],
         }
+    )
+
+
+def build_test_financial_assumptions(
+    battery_replacement_year: int | None = None,
+    battery_replacement_cost_fraction: float = 1.0,
+) -> FinancialAssumptions:
+    return FinancialAssumptions(
+        project_lifetime_years=20,
+        discount_rate=0.05,
+        annual_operating_cost_eur=0.0,
+        annual_solar_degradation_rate=0.0,
+        annual_electricity_price_growth_rate=0.0,
+        annual_operating_cost_growth_rate=0.0,
+        battery_replacement_year=(battery_replacement_year),
+        battery_replacement_cost_fraction=(battery_replacement_cost_fraction),
     )
 
 
@@ -356,5 +374,225 @@ def test_best_scenarios_dataframe_preserves_extra_columns() -> None:
         [
             42.0,
             42.0,
+        ]
+    )
+
+
+def test_grid_search_leaves_financial_metrics_empty_without_assumptions() -> None:
+    price_model = FixedPriceModel(
+        fixed_price_eur_per_kwh=0.20,
+        surplus_compensation_price=0.0,
+        contracted_power_kw=0.0,
+        power_price_eur_per_kw_year=0.0,
+    )
+
+    results_df = run_test_grid_search(price_model)
+
+    assert pd.isna(
+        results_df.loc[
+            0,
+            "net_present_value_eur",
+        ]
+    )
+
+    assert pd.isna(
+        results_df.loc[
+            0,
+            "discounted_payback_years",
+        ]
+    )
+
+    assert pd.isna(
+        results_df.loc[
+            0,
+            "internal_rate_of_return",
+        ]
+    )
+
+
+def test_grid_search_calculates_financial_metrics() -> None:
+    consumption_df = pd.DataFrame(
+        {
+            "datetime": pd.to_datetime(
+                [
+                    "2026-06-01 12:00:00",
+                ]
+            ),
+            "consumption_kwh": [
+                1.0,
+            ],
+        }
+    )
+
+    price_model = FixedPriceModel(
+        fixed_price_eur_per_kwh=1.0,
+        surplus_compensation_price=0.0,
+        contracted_power_kw=0.0,
+        power_price_eur_per_kw_year=0.0,
+    )
+
+    results_df = run_economic_grid_search(
+        consumption_df=consumption_df,
+        solar_peak_powers_kw=[1.0],
+        battery_capacities_kwh=[0.0],
+        battery_efficiency=0.90,
+        max_charge_power_kw=1.0,
+        max_discharge_power_kw=1.0,
+        initial_battery_state_kwh=0.0,
+        fixed_installation_cost=0.0,
+        solar_cost_per_kw=100.0,
+        battery_cost_per_kwh=0.0,
+        price_model=price_model,
+        simulation_days=1,
+        pvgis_df=None,
+        financial_assumptions=(build_test_financial_assumptions()),
+    )
+
+    assert len(results_df) == 1
+
+    assert (
+        results_df.loc[
+            0,
+            "net_present_value_eur",
+        ]
+        > 0
+    )
+
+    assert pd.notna(
+        results_df.loc[
+            0,
+            "discounted_payback_years",
+        ]
+    )
+
+    assert pd.notna(
+        results_df.loc[
+            0,
+            "internal_rate_of_return",
+        ]
+    )
+
+
+def test_grid_search_has_no_replacement_cost_without_battery() -> None:
+    price_model = FixedPriceModel(
+        fixed_price_eur_per_kwh=0.20,
+        surplus_compensation_price=0.0,
+        contracted_power_kw=0.0,
+        power_price_eur_per_kw_year=0.0,
+    )
+
+    results_df = run_economic_grid_search(
+        consumption_df=build_consumption_dataframe(),
+        solar_peak_powers_kw=[0.0],
+        battery_capacities_kwh=[0.0],
+        battery_efficiency=0.90,
+        max_charge_power_kw=1.0,
+        max_discharge_power_kw=1.0,
+        initial_battery_state_kwh=0.0,
+        fixed_installation_cost=0.0,
+        solar_cost_per_kw=0.0,
+        battery_cost_per_kwh=500.0,
+        price_model=price_model,
+        simulation_days=1,
+        pvgis_df=None,
+        financial_assumptions=(
+            build_test_financial_assumptions(
+                battery_replacement_year=10,
+                battery_replacement_cost_fraction=0.70,
+            )
+        ),
+    )
+
+    assert results_df.loc[
+        0,
+        "battery_replacement_cost_eur",
+    ] == pytest.approx(0.0)
+
+
+def test_grid_search_calculates_battery_replacement_cost() -> None:
+    price_model = FixedPriceModel(
+        fixed_price_eur_per_kwh=0.20,
+        surplus_compensation_price=0.0,
+        contracted_power_kw=0.0,
+        power_price_eur_per_kw_year=0.0,
+    )
+
+    results_df = run_economic_grid_search(
+        consumption_df=build_consumption_dataframe(),
+        solar_peak_powers_kw=[0.0],
+        battery_capacities_kwh=[5.0],
+        battery_efficiency=0.90,
+        max_charge_power_kw=1.0,
+        max_discharge_power_kw=1.0,
+        initial_battery_state_kwh=0.0,
+        fixed_installation_cost=0.0,
+        solar_cost_per_kw=0.0,
+        battery_cost_per_kwh=500.0,
+        price_model=price_model,
+        simulation_days=1,
+        pvgis_df=None,
+        financial_assumptions=(
+            build_test_financial_assumptions(
+                battery_replacement_year=10,
+                battery_replacement_cost_fraction=0.70,
+            )
+        ),
+    )
+
+    expected_replacement_cost = 5.0 * 500.0 * 0.70
+
+    assert results_df.loc[
+        0,
+        "battery_replacement_cost_eur",
+    ] == pytest.approx(expected_replacement_cost)
+
+
+def test_battery_replacement_cost_reduces_net_present_value() -> None:
+    price_model = FixedPriceModel(
+        fixed_price_eur_per_kwh=0.20,
+        surplus_compensation_price=0.0,
+        contracted_power_kw=0.0,
+        power_price_eur_per_kw_year=0.0,
+    )
+
+    common_arguments = {
+        "consumption_df": build_consumption_dataframe(),
+        "solar_peak_powers_kw": [1.0],
+        "battery_capacities_kwh": [2.0],
+        "battery_efficiency": 0.90,
+        "max_charge_power_kw": 1.0,
+        "max_discharge_power_kw": 1.0,
+        "initial_battery_state_kwh": 0.0,
+        "fixed_installation_cost": 0.0,
+        "solar_cost_per_kw": 100.0,
+        "battery_cost_per_kwh": 500.0,
+        "price_model": price_model,
+        "simulation_days": 1,
+        "pvgis_df": None,
+    }
+
+    without_replacement_df = run_economic_grid_search(
+        **common_arguments,
+        financial_assumptions=(build_test_financial_assumptions()),
+    )
+
+    with_replacement_df = run_economic_grid_search(
+        **common_arguments,
+        financial_assumptions=(
+            build_test_financial_assumptions(
+                battery_replacement_year=10,
+                battery_replacement_cost_fraction=0.70,
+            )
+        ),
+    )
+
+    assert (
+        with_replacement_df.loc[
+            0,
+            "net_present_value_eur",
+        ]
+        < without_replacement_df.loc[
+            0,
+            "net_present_value_eur",
         ]
     )

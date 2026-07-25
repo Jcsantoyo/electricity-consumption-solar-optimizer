@@ -95,6 +95,8 @@ def main() -> None:
         tariff_profile_name=(config.ACTIVE_TARIFF_PROFILE),
     )
 
+    financial_assumptions = config.get_active_financial_assumptions()
+
     results_df = run_economic_grid_search(
         consumption_df=(forecasted_consumption_df),
         solar_peak_powers_kw=(config.SOLAR_PEAK_POWERS_KW),
@@ -109,6 +111,7 @@ def main() -> None:
         price_model=price_model,
         simulation_days=simulation_days,
         pvgis_df=pvgis_df,
+        financial_assumptions=financial_assumptions,
     )
 
     optimization_results_path = config.OUTPUT_PATHS.forecast_optimization_results

@@ -69,3 +69,44 @@ def test_active_financial_assumptions_match_scenario_profile() -> None:
     ]
 
     assert assumptions == expected_assumptions
+
+
+@pytest.mark.parametrize(
+    "replacement_year",
+    [
+        0,
+        -1,
+        26,
+    ],
+)
+def test_financial_assumptions_rejects_invalid_replacement_year(
+    replacement_year: int,
+) -> None:
+    with pytest.raises(ValueError):
+        FinancialAssumptions(
+            project_lifetime_years=25,
+            discount_rate=0.05,
+            annual_operating_cost_eur=100.0,
+            annual_solar_degradation_rate=0.005,
+            annual_electricity_price_growth_rate=0.02,
+            annual_operating_cost_growth_rate=0.02,
+            battery_replacement_year=replacement_year,
+            battery_replacement_cost_fraction=0.70,
+        )
+
+
+def test_financial_assumptions_rejects_negative_replacement_fraction() -> None:
+    with pytest.raises(
+        ValueError,
+        match="fraction cannot be negative",
+    ):
+        FinancialAssumptions(
+            project_lifetime_years=25,
+            discount_rate=0.05,
+            annual_operating_cost_eur=100.0,
+            annual_solar_degradation_rate=0.005,
+            annual_electricity_price_growth_rate=0.02,
+            annual_operating_cost_growth_rate=0.02,
+            battery_replacement_year=12,
+            battery_replacement_cost_fraction=-0.1,
+        )

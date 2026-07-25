@@ -1,14 +1,22 @@
 import pandas as pd
 
-from solar import generate_solar_profile_for_timestamps
-from economics import (
-    calculate_total_installation_cost,
-    calculate_simple_payback_years,
-)
-
-from solar_data_loader import get_pvgis_generation_for_timestamps
 from battery import simulate_battery
-from electricity_price_models import ElectricityPriceModel
+from economics import (
+    calculate_simple_payback_years,
+    calculate_total_installation_cost,
+)
+from electricity_price_models import (
+    ElectricityPriceModel,
+)
+from financial_assumptions import FinancialAssumptions
+from financial_cash_flow import build_projected_annual_cash_flows, ReplacementCost
+from financial_metrics import (
+    calculate_financial_metrics,
+)
+from solar import generate_solar_profile_for_timestamps
+from solar_data_loader import (
+    get_pvgis_generation_for_timestamps,
+)
 
 
 def run_economic_grid_search(
@@ -25,6 +33,7 @@ def run_economic_grid_search(
     price_model: ElectricityPriceModel,
     simulation_days: int,
     pvgis_df: pd.DataFrame | None = None,
+    financial_assumptions: FinancialAssumptions | None = None,
 ) -> pd.DataFrame:
     results = []
 
@@ -99,6 +108,64 @@ def run_economic_grid_search(
                 investment_cost, annual_savings
             )
 
+            battery_replacement_cost = 0.0
+
+            net_present_value_eur = None
+            discounted_payback_years = None
+            internal_rate_of_return = None
+
+            if financial_assumptions is not None:
+                replacement_costs: list[ReplacementCost] = []
+
+                if (
+                    battery_capacity_kwh > 0
+                    and financial_assumptions.battery_replacement_year is not None
+                ):
+                    battery_replacement_cost = (
+                        battery_capacity_kwh
+                        * battery_cost_per_kwh
+                        * financial_assumptions.battery_replacement_cost_fraction
+                    )
+
+                    replacement_costs.append(
+                        ReplacementCost(
+                            year=financial_assumptions.battery_replacement_year,
+                            cost_eur=battery_replacement_cost,
+                        )
+                    )
+
+                cash_flows = build_projected_annual_cash_flows(
+                    initial_investment_cost_eur=investment_cost,
+                    first_year_energy_savings_eur=annual_savings,
+                    project_lifetime_years=(
+                        financial_assumptions.project_lifetime_years
+                    ),
+                    annual_operating_cost_eur=(
+                        financial_assumptions.annual_operating_cost_eur
+                    ),
+                    annual_solar_degradation_rate=(
+                        financial_assumptions.annual_solar_degradation_rate
+                    ),
+                    annual_electricity_price_growth_rate=(
+                        financial_assumptions.annual_electricity_price_growth_rate
+                    ),
+                    annual_operating_cost_growth_rate=(
+                        financial_assumptions.annual_operating_cost_growth_rate
+                    ),
+                    replacement_costs=replacement_costs,
+                )
+
+                financial_metrics = calculate_financial_metrics(
+                    cash_flows=cash_flows,
+                    discount_rate=financial_assumptions.discount_rate,
+                )
+
+                net_present_value_eur = financial_metrics.net_present_value_eur
+
+                discounted_payback_years = financial_metrics.discounted_payback_years
+
+                internal_rate_of_return = financial_metrics.internal_rate_of_return
+
             total_consumption_kwh = simulation_df["consumption_kwh"].sum()
 
             total_grid_import_kwh = simulation_df["grid_import_kwh"].sum()
@@ -114,6 +181,7 @@ def run_economic_grid_search(
                     "solar_peak_power_kw": solar_peak_power_kw,
                     "battery_capacity_kwh": battery_capacity_kwh,
                     "investment_cost_eur": investment_cost,
+                    "battery_replacement_cost_eur": battery_replacement_cost,
                     "base_variable_energy_cost_eur": (
                         base_cost_breakdown.variable_energy_cost_eur
                     ),
@@ -136,6 +204,9 @@ def run_economic_grid_search(
                     "scenario_net_cost_eur": scenario_net_cost,
                     "annual_savings_eur": annual_savings,
                     "payback_years": payback_years,
+                    "net_present_value_eur": net_present_value_eur,
+                    "discounted_payback_years": discounted_payback_years,
+                    "internal_rate_of_return": internal_rate_of_return,
                     "self_sufficiency": self_sufficiency,
                     "grid_import_kwh": total_grid_import_kwh,
                     "solar_surplus_kwh": total_solar_surplus_kwh,

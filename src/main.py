@@ -127,6 +127,8 @@ def main() -> None:
 
     initial_battery_state_kwh = config.INITIAL_BATTERY_STATE_KWH
 
+    financial_assumptions = config.get_active_financial_assumptions()
+
     results_df = run_economic_grid_search(
         consumption_df=df_consumption,
         solar_peak_powers_kw=(config.SOLAR_PEAK_POWERS_KW),
@@ -141,6 +143,7 @@ def main() -> None:
         price_model=price_model,
         simulation_days=simulation_days,
         pvgis_df=pvgis_df,
+        financial_assumptions=financial_assumptions,
     )
 
     results_output_path = config.GRID_SEARCH_RESULTS_PATH

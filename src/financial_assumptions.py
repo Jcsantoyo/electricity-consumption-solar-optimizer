@@ -9,6 +9,8 @@ class FinancialAssumptions:
     annual_solar_degradation_rate: float
     annual_electricity_price_growth_rate: float
     annual_operating_cost_growth_rate: float
+    battery_replacement_year: int | None = None
+    battery_replacement_cost_fraction: float = 1.0
 
     def __post_init__(self) -> None:
         if self.project_lifetime_years <= 0:
@@ -19,6 +21,21 @@ class FinancialAssumptions:
 
         if self.annual_operating_cost_eur < 0:
             raise ValueError("Annual operating cost cannot be negative")
+
+        if (
+            self.battery_replacement_year is not None
+            and self.battery_replacement_year <= 0
+        ):
+            raise ValueError("Battery replacement year must be greater than zero")
+
+        if (
+            self.battery_replacement_year is not None
+            and self.battery_replacement_year > self.project_lifetime_years
+        ):
+            raise ValueError("Battery replacement year cannot exceed project lifetime")
+
+        if self.battery_replacement_cost_fraction < 0:
+            raise ValueError("Battery replacement cost fraction cannot be negative")
 
         rates = {
             "Solar degradation rate": self.annual_solar_degradation_rate,
