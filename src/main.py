@@ -6,6 +6,7 @@ from optimization import (
     build_best_scenarios_dataframe,
     build_outputs_index_text,
     build_scenario_summary_text,
+    get_best_scenario_by_net_present_value,
     get_best_scenario_by_payback,
     get_best_scenario_by_self_sufficiency,
     print_scenario_comparison,
@@ -157,6 +158,8 @@ def main() -> None:
 
     best_self_sufficiency_scenario = get_best_scenario_by_self_sufficiency(results_df)
 
+    best_net_present_value_scenario = get_best_scenario_by_net_present_value(results_df)
+
     if pvgis_df is None:
         solar_data_source = "Synthetic solar profile"
     else:
@@ -167,6 +170,7 @@ def main() -> None:
         best_self_sufficiency_scenario,
         solar_data_source,
         electricity_price_mode,
+        best_net_present_value_scenario,
     )
 
     summary_output_path = config.SUMMARY_REPORT_PATH
@@ -181,6 +185,7 @@ def main() -> None:
     best_scenarios_df = build_best_scenarios_dataframe(
         best_payback_scenario,
         best_self_sufficiency_scenario,
+        best_net_present_value_scenario,
     )
 
     best_peak_power_kw = best_payback_scenario["solar_peak_power_kw"]
@@ -316,6 +321,11 @@ def main() -> None:
     print_scenario_summary(
         "Best scenario by self-sufficiency",
         best_self_sufficiency_scenario,
+    )
+
+    print_scenario_summary(
+        "Best scenario by net present value",
+        best_net_present_value_scenario,
     )
 
     print_scenario_comparison(

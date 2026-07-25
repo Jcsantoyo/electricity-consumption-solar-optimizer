@@ -17,6 +17,8 @@ from optimization import (
     get_best_scenario_by_payback,
     get_best_scenario_by_self_sufficiency,
     run_economic_grid_search,
+    get_best_scenario_by_net_present_value,
+    print_scenario_summary,
 )
 from price_loader import (
     load_hourly_prices_if_enabled,
@@ -125,9 +127,12 @@ def main() -> None:
 
     best_self_sufficiency_scenario = get_best_scenario_by_self_sufficiency(results_df)
 
+    best_net_present_value_scenario = get_best_scenario_by_net_present_value(results_df)
+
     best_scenarios_df = build_best_scenarios_dataframe(
         best_payback_scenario,
         best_self_sufficiency_scenario,
+        best_net_present_value_scenario,
     )
 
     best_scenarios_path = config.OUTPUT_PATHS.forecast_optimization_best_scenarios
@@ -149,40 +154,19 @@ def main() -> None:
 
     print(f"Best scenarios saved to: {best_scenarios_path}")
 
-    print("\nBest forecast-based scenario by payback:")
-
-    print(f"Solar peak power: {best_payback_scenario['solar_peak_power_kw']:.2f} kW")
-
-    print(f"Battery capacity: {best_payback_scenario['battery_capacity_kwh']:.2f} kWh")
-
-    print(f"Annual savings: {best_payback_scenario['annual_savings_eur']:.2f} EUR/year")
-
-    print(f"Payback: {best_payback_scenario['payback_years']:.2f} years")
-
-    print(f"Self-sufficiency: {best_payback_scenario['self_sufficiency'] * 100:.2f}%")
-
-    print("\nBest forecast-based scenario by self-sufficiency:")
-
-    print(
-        "Solar peak power: "
-        f"{best_self_sufficiency_scenario['solar_peak_power_kw']:.2f} kW"
+    print_scenario_summary(
+        "Best forecast-based scenario by payback",
+        best_payback_scenario,
     )
 
-    print(
-        "Battery capacity: "
-        f"{best_self_sufficiency_scenario['battery_capacity_kwh']:.2f} kWh"
+    print_scenario_summary(
+        "Best forecast-based scenario by self-sufficiency",
+        best_self_sufficiency_scenario,
     )
 
-    print(
-        "Annual savings: "
-        f"{best_self_sufficiency_scenario['annual_savings_eur']:.2f} EUR/year"
-    )
-
-    print(f"Payback: {best_self_sufficiency_scenario['payback_years']:.2f} years")
-
-    print(
-        "Self-sufficiency: "
-        f"{best_self_sufficiency_scenario['self_sufficiency'] * 100:.2f}%"
+    print_scenario_summary(
+        "Best forecast-based scenario by net present value",
+        best_net_present_value_scenario,
     )
 
 

@@ -230,19 +230,77 @@ def get_best_scenario_by_payback(df: pd.DataFrame) -> pd.Series:
     return valid_payback_df.loc[best_index]
 
 
+def get_best_scenario_by_net_present_value(df: pd.DataFrame) -> pd.Series:
+    valid_npv_df = df.dropna(subset=["net_present_value_eur"])
+
+    if valid_npv_df.empty:
+        raise ValueError("No valid net present value values found")
+
+    best_index = valid_npv_df["net_present_value_eur"].idxmax()
+
+    return valid_npv_df.loc[best_index]
+
+
 def get_best_scenario_by_self_sufficiency(df: pd.DataFrame) -> pd.Series:
     best_index = df["self_sufficiency"].idxmax()
 
     return df.loc[best_index]
 
 
-def print_scenario_summary(title: str, scenario: pd.Series) -> None:
+def format_optional_currency(value: float | None) -> str:
+    if value is None or pd.isna(value):
+        return "Not available"
+
+    return f"{value:.2f} EUR"
+
+
+def format_optional_years(value: float | None) -> str:
+    if value is None or pd.isna(value):
+        return "Not achieved"
+
+    return f"{value:.2f} years"
+
+
+def format_optional_percentage(value: float | None) -> str:
+    if value is None or pd.isna(value):
+        return "Not available"
+
+    return f"{value:.2%}"
+
+
+def print_scenario_summary(
+    title: str,
+    scenario: pd.Series,
+) -> None:
+    net_present_value_text = format_optional_currency(
+        scenario.get("net_present_value_eur")
+    )
+
+    discounted_payback_text = format_optional_years(
+        scenario.get("discounted_payback_years")
+    )
+
+    internal_rate_of_return_text = format_optional_percentage(
+        scenario.get("internal_rate_of_return")
+    )
+
     print(f"\n{title}:")
     print(f"Solar peak power: {scenario['solar_peak_power_kw']:.2f} kW")
     print(f"Battery capacity: {scenario['battery_capacity_kwh']:.2f} kWh")
     print(f"Investment cost: {scenario['investment_cost_eur']:.2f} EUR")
+    print(
+        "Battery replacement cost: "
+        f"{
+            scenario.get(
+                'battery_replacement_cost_eur',
+                0.0,
+            ):.2f} EUR"
+    )
     print(f"Annual savings: {scenario['annual_savings_eur']:.2f} EUR/year")
-    print(f"Payback: {scenario['payback_years']:.2f} years")
+    print(f"Simple payback: {scenario['payback_years']:.2f} years")
+    print(f"Net present value: {net_present_value_text}")
+    print(f"Discounted payback: {discounted_payback_text}")
+    print(f"Internal rate of return: {internal_rate_of_return_text}")
     print(f"Self-sufficiency: {scenario['self_sufficiency']:.2%}")
     print(f"Grid import: {scenario['grid_import_kwh']:.2f} kWh")
     print(f"Solar surplus: {scenario['solar_surplus_kwh']:.2f} kWh")
@@ -279,11 +337,54 @@ def print_scenario_comparison(
         )
 
 
+def build_scenario_financial_summary_text(
+    title: str,
+    scenario: pd.Series,
+) -> str:
+    net_present_value_text = format_optional_currency(
+        scenario.get("net_present_value_eur")
+    )
+
+    discounted_payback_text = format_optional_years(
+        scenario.get("discounted_payback_years")
+    )
+
+    internal_rate_of_return_text = format_optional_percentage(
+        scenario.get("internal_rate_of_return")
+    )
+
+    text = ""
+
+    text += f"{title}:\n"
+    text += f"Solar peak power: {scenario['solar_peak_power_kw']:.2f} kW\n"
+    text += f"Battery capacity: {scenario['battery_capacity_kwh']:.2f} kWh\n"
+    text += f"Investment cost: {scenario['investment_cost_eur']:.2f} EUR\n"
+    text += (
+        "Battery replacement cost: "
+        f"{
+            scenario.get(
+                'battery_replacement_cost_eur',
+                0.0,
+            ):.2f} EUR\n"
+    )
+    text += f"Annual savings: {scenario['annual_savings_eur']:.2f} EUR/year\n"
+    text += f"Simple payback: {scenario['payback_years']:.2f} years\n"
+    text += f"Net present value: {net_present_value_text}\n"
+    text += f"Discounted payback: {discounted_payback_text}\n"
+    text += f"Internal rate of return: {internal_rate_of_return_text}\n"
+    text += f"Self-sufficiency: {scenario['self_sufficiency']:.2%}\n"
+    text += f"Grid import: {scenario['grid_import_kwh']:.2f} kWh\n"
+    text += f"Solar surplus: {scenario['solar_surplus_kwh']:.2f} kWh\n"
+
+    return text
+
+
 def build_scenario_summary_text(
     best_payback_scenario: pd.Series,
     best_self_sufficiency_scenario: pd.Series,
     solar_data_source: str,
     electricity_price_mode: str,
+    best_net_present_value_scenario: (pd.Series | None) = None,
 ) -> str:
     text = ""
 
@@ -292,33 +393,25 @@ def build_scenario_summary_text(
 
     text += f"Solar data source: {solar_data_source}\n"
     text += f"Electricity price mode: {electricity_price_mode}\n\n"
-    text += "Best scenario by payback:\n"
-    text += f"Solar peak power: {best_payback_scenario['solar_peak_power_kw']:.2f} kW\n"
-    text += (
-        f"Battery capacity: {best_payback_scenario['battery_capacity_kwh']:.2f} kWh\n"
-    )
-    text += f"Investment cost: {best_payback_scenario['investment_cost_eur']:.2f} EUR\n"
-    text += (
-        f"Annual savings: {best_payback_scenario['annual_savings_eur']:.2f} EUR/year\n"
-    )
-    text += f"Payback: {best_payback_scenario['payback_years']:.2f} years\n"
-    text += f"Self-sufficiency: {best_payback_scenario['self_sufficiency']:.2%}\n"
-    text += f"Grid import: {best_payback_scenario['grid_import_kwh']:.2f} kWh\n"
-    text += f"Solar surplus: {best_payback_scenario['solar_surplus_kwh']:.2f} kWh\n\n"
 
-    text += "Best scenario by self-sufficiency:\n"
-    text += f"Solar peak power: {best_self_sufficiency_scenario['solar_peak_power_kw']:.2f} kW\n"
-    text += f"Battery capacity: {best_self_sufficiency_scenario['battery_capacity_kwh']:.2f} kWh\n"
-    text += f"Investment cost: {best_self_sufficiency_scenario['investment_cost_eur']:.2f} EUR\n"
-    text += f"Annual savings: {best_self_sufficiency_scenario['annual_savings_eur']:.2f} EUR/year\n"
-    text += f"Payback: {best_self_sufficiency_scenario['payback_years']:.2f} years\n"
-    text += (
-        f"Self-sufficiency: {best_self_sufficiency_scenario['self_sufficiency']:.2%}\n"
+    text += build_scenario_financial_summary_text(
+        title="Best scenario by payback",
+        scenario=best_payback_scenario,
     )
-    text += (
-        f"Grid import: {best_self_sufficiency_scenario['grid_import_kwh']:.2f} kWh\n"
+    text += "\n"
+
+    text += build_scenario_financial_summary_text(
+        title="Best scenario by self-sufficiency",
+        scenario=best_self_sufficiency_scenario,
     )
-    text += f"Solar surplus: {best_self_sufficiency_scenario['solar_surplus_kwh']:.2f} kWh\n\n"
+    text += "\n"
+
+    if best_net_present_value_scenario is not None:
+        text += build_scenario_financial_summary_text(
+            title="Best scenario by net present value",
+            scenario=best_net_present_value_scenario,
+        )
+        text += "\n"
 
     if (
         best_payback_scenario["solar_peak_power_kw"]
@@ -326,11 +419,11 @@ def build_scenario_summary_text(
         and best_payback_scenario["battery_capacity_kwh"]
         == best_self_sufficiency_scenario["battery_capacity_kwh"]
     ):
-        text += "Both criteria select the same scenario.\n"
+        text += "The payback and self-sufficiency criteria select the same scenario.\n"
     else:
         text += (
-            "The economically optimal scenario and the energy optimal "
-            "scenario are different.\n"
+            "The economically optimal scenario and "
+            "the energy optimal scenario are different.\n"
         )
 
     return text
@@ -339,6 +432,7 @@ def build_scenario_summary_text(
 def build_best_scenarios_dataframe(
     best_payback_scenario: pd.Series,
     best_self_sufficiency_scenario: pd.Series,
+    best_net_present_value_scenario: (pd.Series | None) = None,
 ) -> pd.DataFrame:
     best_payback_row = best_payback_scenario.copy()
     best_payback_row["criterion"] = "best_payback"
@@ -346,22 +440,25 @@ def build_best_scenarios_dataframe(
     best_self_sufficiency_row = best_self_sufficiency_scenario.copy()
     best_self_sufficiency_row["criterion"] = "best_self_sufficiency"
 
-    best_scenarios_df = pd.DataFrame(
-        [
-            best_payback_row,
-            best_self_sufficiency_row,
-        ]
-    )
+    best_scenario_rows = [
+        best_payback_row,
+        best_self_sufficiency_row,
+    ]
+
+    if best_net_present_value_scenario is not None:
+        best_net_present_value_row = best_net_present_value_scenario.copy()
+        best_net_present_value_row["criterion"] = "best_net_present_value"
+
+        best_scenario_rows.append(best_net_present_value_row)
+
+    best_scenarios_df = pd.DataFrame(best_scenario_rows)
 
     ordered_columns = [
         "criterion",
         *[column for column in best_scenarios_df.columns if column != "criterion"],
     ]
 
-    return best_scenarios_df.loc[
-        :,
-        ordered_columns,
-    ].reset_index(drop=True)
+    return best_scenarios_df[ordered_columns].reset_index(drop=True)
 
 
 def build_outputs_index_text(

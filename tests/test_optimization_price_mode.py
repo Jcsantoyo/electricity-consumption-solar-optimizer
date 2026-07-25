@@ -7,8 +7,15 @@ from electricity_price_models import (
     TimeOfUsePriceModel,
     ElectricityPriceModel,
 )
-from optimization import run_economic_grid_search, build_best_scenarios_dataframe
-
+from optimization import (
+    build_best_scenarios_dataframe,
+    build_scenario_financial_summary_text,
+    format_optional_currency,
+    format_optional_percentage,
+    format_optional_years,
+    get_best_scenario_by_net_present_value,
+    run_economic_grid_search,
+)
 from financial_assumptions import FinancialAssumptions
 
 
@@ -596,3 +603,121 @@ def test_battery_replacement_cost_reduces_net_present_value() -> None:
             "net_present_value_eur",
         ]
     )
+
+
+def test_get_best_scenario_by_net_present_value() -> None:
+    results_df = pd.DataFrame(
+        {
+            "solar_peak_power_kw": [
+                1.0,
+                2.0,
+                3.0,
+            ],
+            "battery_capacity_kwh": [
+                0.0,
+                1.0,
+                2.0,
+            ],
+            "net_present_value_eur": [
+                1000.0,
+                3500.0,
+                2200.0,
+            ],
+        }
+    )
+
+    best_scenario = get_best_scenario_by_net_present_value(results_df)
+
+    assert best_scenario["solar_peak_power_kw"] == pytest.approx(2.0)
+
+    assert best_scenario["battery_capacity_kwh"] == pytest.approx(1.0)
+
+    assert best_scenario["net_present_value_eur"] == pytest.approx(3500.0)
+
+
+def test_get_best_scenario_by_net_present_value_rejects_empty_values() -> None:
+    results_df = pd.DataFrame(
+        {
+            "net_present_value_eur": [
+                None,
+                None,
+            ],
+        }
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="No valid net present value",
+    ):
+        get_best_scenario_by_net_present_value(results_df)
+
+
+def test_best_scenarios_dataframe_includes_net_present_value_criterion() -> None:
+    scenario = pd.Series(
+        {
+            "solar_peak_power_kw": 3.0,
+            "battery_capacity_kwh": 2.0,
+            "net_present_value_eur": 5000.0,
+        }
+    )
+
+    result_df = build_best_scenarios_dataframe(
+        best_payback_scenario=scenario,
+        best_self_sufficiency_scenario=scenario,
+        best_net_present_value_scenario=(scenario),
+    )
+
+    assert result_df["criterion"].tolist() == [
+        "best_payback",
+        "best_self_sufficiency",
+        "best_net_present_value",
+    ]
+
+    assert result_df.loc[
+        2,
+        "net_present_value_eur",
+    ] == pytest.approx(5000.0)
+
+
+def test_optional_financial_metric_formatters() -> None:
+    assert format_optional_currency(1234.567) == "1234.57 EUR"
+
+    assert format_optional_currency(None) == "Not available"
+
+    assert format_optional_years(8.456) == "8.46 years"
+
+    assert format_optional_years(None) == "Not achieved"
+
+    assert format_optional_percentage(0.125) == "12.50%"
+
+    assert format_optional_percentage(None) == "Not available"
+
+
+def test_build_scenario_financial_summary_text() -> None:
+    scenario = pd.Series(
+        {
+            "solar_peak_power_kw": 3.0,
+            "battery_capacity_kwh": 2.0,
+            "investment_cost_eur": 4500.0,
+            "battery_replacement_cost_eur": 700.0,
+            "annual_savings_eur": 800.0,
+            "payback_years": 5.625,
+            "net_present_value_eur": 4200.0,
+            "discounted_payback_years": 7.25,
+            "internal_rate_of_return": 0.14,
+            "self_sufficiency": 0.72,
+            "grid_import_kwh": 1200.0,
+            "solar_surplus_kwh": 450.0,
+        }
+    )
+
+    summary = build_scenario_financial_summary_text(
+        title="Test scenario",
+        scenario=scenario,
+    )
+
+    assert "Test scenario:" in summary
+    assert "Battery replacement cost: 700.00 EUR" in summary
+    assert "Net present value: 4200.00 EUR" in summary
+    assert "Discounted payback: 7.25 years" in summary
+    assert "Internal rate of return: 14.00%" in summary

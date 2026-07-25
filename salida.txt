@@ -1,988 +1,293 @@
-python -m pytest
-============================= test session starts ==============================
-platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0
-rootdir: /home/juan/Escritorio/electricity-consumption-solar-optimizer
-configfile: pyproject.toml
-testpaths: tests
-plugins: anyio-4.14.1
-collected 203 items
-
-tests/test_battery.py .......                                            [  3%]
-tests/test_compare_optimization_results.py ...                           [  4%]
-tests/test_config_scenario_selection.py ..                               [  5%]
-tests/test_consumption_time_mapper.py ........                           [  9%]
-tests/test_download_omie_prices.py .........                             [ 14%]
-tests/test_economics.py ......                                           [ 17%]
-tests/test_electricity_price_models.py ..................                [ 26%]
-tests/test_forecasting.py ..........                                     [ 31%]
-tests/test_generate_config_summary.py .....                              [ 33%]
-tests/test_generate_final_results_summary.py .....                       [ 35%]
-tests/test_generate_price_mode_comparison.py ...                         [ 37%]
-tests/test_generate_run_manifest.py .                                    [ 37%]
-tests/test_hourly_price_calculator.py ........                           [ 41%]
-tests/test_hourly_price_pipeline_integration.py ..                       [ 42%]
-tests/test_makefile.py ....                                              [ 44%]
-tests/test_omie_price_loader.py .....                                    [ 47%]
-tests/test_optimization_price_mode.py ....                               [ 49%]
-tests/test_output_paths.py ....                                          [ 51%]
-tests/test_prepare_omie_prices.py .....                                  [ 53%]
-tests/test_prepare_uci_omie_scenario.py ...                              [ 55%]
-tests/test_price_comparison.py FFFFF.FFF                                 [ 59%]
-tests/test_price_loader.py ...................                           [ 68%]
-tests/test_price_mode.py .....                                           [ 71%]
-tests/test_price_model_factory.py .....                                  [ 73%]
-tests/test_project_scenario.py .......                                   [ 77%]
-tests/test_reproducible_scenario_pipeline.py ...                         [ 78%]
-tests/test_run_full_pipeline.py ..                                       [ 79%]
-tests/test_run_manifest.py ....                                          [ 81%]
-tests/test_scenario_comparison.py .........                              [ 86%]
-tests/test_scenario_registry.py .....                                    [ 88%]
-tests/test_scenario_validation.py ........                               [ 92%]
-tests/test_solar_data_loader.py ......                                   [ 95%]
-tests/test_tariff.py .........                                           [100%]
-
-=================================== FAILURES ===================================
-__________ test_calculate_flat_grid_import_cost_returns_expected_cost __________
-
-self = Index(['grid_import_kwh'], dtype='str'), key = 'datetime'
-
-    def get_loc(self, key):
-        """
-        Get integer location, slice or boolean mask for requested label.
-    
-        Parameters
-        ----------
-        key : label
-            The key to check its location if it is present in the index.
-    
-        Returns
-        -------
-        int if unique index, slice if monotonic index, else mask
-            Integer location, slice or boolean mask.
-    
-        See Also
-        --------
-        Index.get_slice_bound : Calculate slice bound that corresponds to
-            given label.
-        Index.get_indexer : Computes indexer and mask for new index given
-            the current index.
-        Index.get_non_unique : Returns indexer and masks for new index given
-            the current index.
-        Index.get_indexer_for : Returns an indexer even when non-unique.
-    
-        Examples
-        --------
-        >>> unique_index = pd.Index(list("abc"))
-        >>> unique_index.get_loc("b")
-        1
-    
-        >>> monotonic_index = pd.Index(list("abbc"))
-        >>> monotonic_index.get_loc("b")
-        slice(1, 3, None)
-    
-        >>> non_monotonic_index = pd.Index(list("abcb"))
-        >>> non_monotonic_index.get_loc("b")
-        array([False,  True, False,  True])
-        """
-        casted_key = self._maybe_cast_indexer(key)
-        try:
->           return self._engine.get_loc(casted_key)
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-venv/lib/python3.12/site-packages/pandas/core/indexes/base.py:3641: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-pandas/_libs/index.pyx:168: in pandas._libs.index.IndexEngine.get_loc
-    ???
-pandas/_libs/index.pyx:197: in pandas._libs.index.IndexEngine.get_loc
-    ???
-pandas/_libs/hashtable_class_helper.pxi:7668: in pandas._libs.hashtable.PyObjectHashTable.get_item
-    ???
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
->   ???
-E   KeyError: 'datetime'
-
-pandas/_libs/hashtable_class_helper.pxi:7676: KeyError
-
-The above exception was the direct cause of the following exception:
-
-    def test_calculate_flat_grid_import_cost_returns_expected_cost() -> None:
-        energy_df = pd.DataFrame(
-            {
-                "grid_import_kwh": [
-                    1.0,
-                    2.0,
-                    3.0,
-                ],
-            }
-        )
-    
->       cost = calculate_flat_grid_import_cost(
-            energy_df=energy_df,
-            flat_price_eur_per_kwh=0.20,
-        )
-
-tests/test_price_comparison.py:23: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-src/price_comparison.py:36: in calculate_flat_grid_import_cost
-    return calculate_variable_cost_with_model(
-src/price_comparison.py:16: in calculate_variable_cost_with_model
-    price_model.calculate_variable_grid_cost(
-src/electricity_price_models.py:80: in calculate_variable_grid_cost
-    return calculate_variable_grid_cost_with_tariff(
-src/tariff.py:59: in calculate_variable_grid_cost_with_tariff
-    df = add_tariff_period_column(df)
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-src/tariff.py:32: in add_tariff_period_column
-    df["tariff_period"] = df["datetime"].apply(get_spanish_2_0td_period)
-                          ^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/frame.py:4378: in __getitem__
-    indexer = self.columns.get_loc(key)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-self = Index(['grid_import_kwh'], dtype='str'), key = 'datetime'
-
-    def get_loc(self, key):
-        """
-        Get integer location, slice or boolean mask for requested label.
-    
-        Parameters
-        ----------
-        key : label
-            The key to check its location if it is present in the index.
-    
-        Returns
-        -------
-        int if unique index, slice if monotonic index, else mask
-            Integer location, slice or boolean mask.
-    
-        See Also
-        --------
-        Index.get_slice_bound : Calculate slice bound that corresponds to
-            given label.
-        Index.get_indexer : Computes indexer and mask for new index given
-            the current index.
-        Index.get_non_unique : Returns indexer and masks for new index given
-            the current index.
-        Index.get_indexer_for : Returns an indexer even when non-unique.
-    
-        Examples
-        --------
-        >>> unique_index = pd.Index(list("abc"))
-        >>> unique_index.get_loc("b")
-        1
-    
-        >>> monotonic_index = pd.Index(list("abbc"))
-        >>> monotonic_index.get_loc("b")
-        slice(1, 3, None)
-    
-        >>> non_monotonic_index = pd.Index(list("abcb"))
-        >>> non_monotonic_index.get_loc("b")
-        array([False,  True, False,  True])
-        """
-        casted_key = self._maybe_cast_indexer(key)
-        try:
-            return self._engine.get_loc(casted_key)
-        except KeyError as err:
-            if isinstance(casted_key, slice) or (
-                isinstance(casted_key, abc.Iterable)
-                and any(isinstance(x, slice) for x in casted_key)
-            ):
-                raise InvalidIndexError(key) from err
->           raise KeyError(key) from err
-E           KeyError: 'datetime'
-
-venv/lib/python3.12/site-packages/pandas/core/indexes/base.py:3648: KeyError
-________ test_compare_flat_vs_hourly_price_cost_returns_expected_values ________
-
-    def test_compare_flat_vs_hourly_price_cost_returns_expected_values() -> None:
-        energy_df = pd.DataFrame(
-            {
-                "datetime": [
-                    "2025-01-01 00:00:00",
-                    "2025-01-01 01:00:00",
-                ],
-                "grid_import_kwh": [
-                    1.0,
-                    2.0,
-                ],
-            }
-        )
-    
-        price_df = pd.DataFrame(
-            {
-                "datetime": [
-                    "2025-01-01 00:00:00",
-                    "2025-01-01 01:00:00",
-                ],
-                "price_eur_per_kwh": [
-                    0.10,
-                    0.30,
-                ],
-            }
-        )
-    
->       comparison = compare_flat_vs_hourly_price_cost(
-            energy_df=energy_df,
-            price_df=price_df,
-            flat_price_eur_per_kwh=0.20,
-        )
-
-tests/test_price_comparison.py:58: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-src/price_comparison.py:67: in compare_flat_vs_hourly_price_cost
-    flat_cost = calculate_variable_cost_with_model(
-src/price_comparison.py:16: in calculate_variable_cost_with_model
-    price_model.calculate_variable_grid_cost(
-src/electricity_price_models.py:80: in calculate_variable_grid_cost
-    return calculate_variable_grid_cost_with_tariff(
-src/tariff.py:59: in calculate_variable_grid_cost_with_tariff
-    df = add_tariff_period_column(df)
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-src/tariff.py:32: in add_tariff_period_column
-    df["tariff_period"] = df["datetime"].apply(get_spanish_2_0td_period)
-                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/series.py:5084: in apply
-    ).apply()
-      ^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/apply.py:1520: in apply
-    return self.apply_standard()
-           ^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/apply.py:1578: in apply_standard
-    mapped = obj._map_values(mapper=curried)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/base.py:1020: in _map_values
-    return arr.map(mapper, na_action=na_action)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/arrays/base.py:2745: in map
-    return map_array(self, mapper, na_action=na_action)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/algorithms.py:1715: in map_array
-    return lib.map_infer(values, mapper)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-pandas/_libs/lib.pyx:3071: in pandas._libs.lib.map_infer
-    ???
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-timestamp = '2025-01-01 00:00:00'
-
-    def get_spanish_2_0td_period(timestamp: pd.Timestamp) -> str:
->       hour = timestamp.hour
-               ^^^^^^^^^^^^^^
-E       AttributeError: 'str' object has no attribute 'hour'
-
-src/tariff.py:5: AttributeError
-_____ test_calculate_flat_grid_import_cost_raises_error_for_missing_column _____
-
-self = Index(['import_kwh'], dtype='str'), key = 'datetime'
-
-    def get_loc(self, key):
-        """
-        Get integer location, slice or boolean mask for requested label.
-    
-        Parameters
-        ----------
-        key : label
-            The key to check its location if it is present in the index.
-    
-        Returns
-        -------
-        int if unique index, slice if monotonic index, else mask
-            Integer location, slice or boolean mask.
-    
-        See Also
-        --------
-        Index.get_slice_bound : Calculate slice bound that corresponds to
-            given label.
-        Index.get_indexer : Computes indexer and mask for new index given
-            the current index.
-        Index.get_non_unique : Returns indexer and masks for new index given
-            the current index.
-        Index.get_indexer_for : Returns an indexer even when non-unique.
-    
-        Examples
-        --------
-        >>> unique_index = pd.Index(list("abc"))
-        >>> unique_index.get_loc("b")
-        1
-    
-        >>> monotonic_index = pd.Index(list("abbc"))
-        >>> monotonic_index.get_loc("b")
-        slice(1, 3, None)
-    
-        >>> non_monotonic_index = pd.Index(list("abcb"))
-        >>> non_monotonic_index.get_loc("b")
-        array([False,  True, False,  True])
-        """
-        casted_key = self._maybe_cast_indexer(key)
-        try:
->           return self._engine.get_loc(casted_key)
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-venv/lib/python3.12/site-packages/pandas/core/indexes/base.py:3641: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-pandas/_libs/index.pyx:168: in pandas._libs.index.IndexEngine.get_loc
-    ???
-pandas/_libs/index.pyx:197: in pandas._libs.index.IndexEngine.get_loc
-    ???
-pandas/_libs/hashtable_class_helper.pxi:7668: in pandas._libs.hashtable.PyObjectHashTable.get_item
-    ???
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
->   ???
-E   KeyError: 'datetime'
-
-pandas/_libs/hashtable_class_helper.pxi:7676: KeyError
-
-The above exception was the direct cause of the following exception:
-
-    def test_calculate_flat_grid_import_cost_raises_error_for_missing_column() -> None:
-        energy_df = pd.DataFrame(
-            {
-                "import_kwh": [
-                    1.0,
-                ],
-            }
-        )
-    
-        with pytest.raises(ValueError, match="Missing required energy column"):
->           calculate_flat_grid_import_cost(
-                energy_df=energy_df,
-                flat_price_eur_per_kwh=0.20,
-            )
-
-tests/test_price_comparison.py:79: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-src/price_comparison.py:36: in calculate_flat_grid_import_cost
-    return calculate_variable_cost_with_model(
-src/price_comparison.py:16: in calculate_variable_cost_with_model
-    price_model.calculate_variable_grid_cost(
-src/electricity_price_models.py:80: in calculate_variable_grid_cost
-    return calculate_variable_grid_cost_with_tariff(
-src/tariff.py:59: in calculate_variable_grid_cost_with_tariff
-    df = add_tariff_period_column(df)
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-src/tariff.py:32: in add_tariff_period_column
-    df["tariff_period"] = df["datetime"].apply(get_spanish_2_0td_period)
-                          ^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/frame.py:4378: in __getitem__
-    indexer = self.columns.get_loc(key)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-self = Index(['import_kwh'], dtype='str'), key = 'datetime'
-
-    def get_loc(self, key):
-        """
-        Get integer location, slice or boolean mask for requested label.
-    
-        Parameters
-        ----------
-        key : label
-            The key to check its location if it is present in the index.
-    
-        Returns
-        -------
-        int if unique index, slice if monotonic index, else mask
-            Integer location, slice or boolean mask.
-    
-        See Also
-        --------
-        Index.get_slice_bound : Calculate slice bound that corresponds to
-            given label.
-        Index.get_indexer : Computes indexer and mask for new index given
-            the current index.
-        Index.get_non_unique : Returns indexer and masks for new index given
-            the current index.
-        Index.get_indexer_for : Returns an indexer even when non-unique.
-    
-        Examples
-        --------
-        >>> unique_index = pd.Index(list("abc"))
-        >>> unique_index.get_loc("b")
-        1
-    
-        >>> monotonic_index = pd.Index(list("abbc"))
-        >>> monotonic_index.get_loc("b")
-        slice(1, 3, None)
-    
-        >>> non_monotonic_index = pd.Index(list("abcb"))
-        >>> non_monotonic_index.get_loc("b")
-        array([False,  True, False,  True])
-        """
-        casted_key = self._maybe_cast_indexer(key)
-        try:
-            return self._engine.get_loc(casted_key)
-        except KeyError as err:
-            if isinstance(casted_key, slice) or (
-                isinstance(casted_key, abc.Iterable)
-                and any(isinstance(x, slice) for x in casted_key)
-            ):
-                raise InvalidIndexError(key) from err
->           raise KeyError(key) from err
-E           KeyError: 'datetime'
-
-venv/lib/python3.12/site-packages/pandas/core/indexes/base.py:3648: KeyError
-__ test_calculate_flat_grid_import_cost_raises_error_for_invalid_grid_import ___
-
-self = Index(['grid_import_kwh'], dtype='str'), key = 'datetime'
-
-    def get_loc(self, key):
-        """
-        Get integer location, slice or boolean mask for requested label.
-    
-        Parameters
-        ----------
-        key : label
-            The key to check its location if it is present in the index.
-    
-        Returns
-        -------
-        int if unique index, slice if monotonic index, else mask
-            Integer location, slice or boolean mask.
-    
-        See Also
-        --------
-        Index.get_slice_bound : Calculate slice bound that corresponds to
-            given label.
-        Index.get_indexer : Computes indexer and mask for new index given
-            the current index.
-        Index.get_non_unique : Returns indexer and masks for new index given
-            the current index.
-        Index.get_indexer_for : Returns an indexer even when non-unique.
-    
-        Examples
-        --------
-        >>> unique_index = pd.Index(list("abc"))
-        >>> unique_index.get_loc("b")
-        1
-    
-        >>> monotonic_index = pd.Index(list("abbc"))
-        >>> monotonic_index.get_loc("b")
-        slice(1, 3, None)
-    
-        >>> non_monotonic_index = pd.Index(list("abcb"))
-        >>> non_monotonic_index.get_loc("b")
-        array([False,  True, False,  True])
-        """
-        casted_key = self._maybe_cast_indexer(key)
-        try:
->           return self._engine.get_loc(casted_key)
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-venv/lib/python3.12/site-packages/pandas/core/indexes/base.py:3641: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-pandas/_libs/index.pyx:168: in pandas._libs.index.IndexEngine.get_loc
-    ???
-pandas/_libs/index.pyx:197: in pandas._libs.index.IndexEngine.get_loc
-    ???
-pandas/_libs/hashtable_class_helper.pxi:7668: in pandas._libs.hashtable.PyObjectHashTable.get_item
-    ???
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
->   ???
-E   KeyError: 'datetime'
-
-pandas/_libs/hashtable_class_helper.pxi:7676: KeyError
-
-The above exception was the direct cause of the following exception:
-
-    def test_calculate_flat_grid_import_cost_raises_error_for_invalid_grid_import() -> None:
-        energy_df = pd.DataFrame(
-            {
-                "grid_import_kwh": [
-                    "not-a-number",
-                ],
-            }
-        )
-    
-        with pytest.raises(ValueError, match="invalid grid import"):
->           calculate_flat_grid_import_cost(
-                energy_df=energy_df,
-                flat_price_eur_per_kwh=0.20,
-            )
-
-tests/test_price_comparison.py:95: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-src/price_comparison.py:36: in calculate_flat_grid_import_cost
-    return calculate_variable_cost_with_model(
-src/price_comparison.py:16: in calculate_variable_cost_with_model
-    price_model.calculate_variable_grid_cost(
-src/electricity_price_models.py:80: in calculate_variable_grid_cost
-    return calculate_variable_grid_cost_with_tariff(
-src/tariff.py:59: in calculate_variable_grid_cost_with_tariff
-    df = add_tariff_period_column(df)
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-src/tariff.py:32: in add_tariff_period_column
-    df["tariff_period"] = df["datetime"].apply(get_spanish_2_0td_period)
-                          ^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/frame.py:4378: in __getitem__
-    indexer = self.columns.get_loc(key)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-self = Index(['grid_import_kwh'], dtype='str'), key = 'datetime'
-
-    def get_loc(self, key):
-        """
-        Get integer location, slice or boolean mask for requested label.
-    
-        Parameters
-        ----------
-        key : label
-            The key to check its location if it is present in the index.
-    
-        Returns
-        -------
-        int if unique index, slice if monotonic index, else mask
-            Integer location, slice or boolean mask.
-    
-        See Also
-        --------
-        Index.get_slice_bound : Calculate slice bound that corresponds to
-            given label.
-        Index.get_indexer : Computes indexer and mask for new index given
-            the current index.
-        Index.get_non_unique : Returns indexer and masks for new index given
-            the current index.
-        Index.get_indexer_for : Returns an indexer even when non-unique.
-    
-        Examples
-        --------
-        >>> unique_index = pd.Index(list("abc"))
-        >>> unique_index.get_loc("b")
-        1
-    
-        >>> monotonic_index = pd.Index(list("abbc"))
-        >>> monotonic_index.get_loc("b")
-        slice(1, 3, None)
-    
-        >>> non_monotonic_index = pd.Index(list("abcb"))
-        >>> non_monotonic_index.get_loc("b")
-        array([False,  True, False,  True])
-        """
-        casted_key = self._maybe_cast_indexer(key)
-        try:
-            return self._engine.get_loc(casted_key)
-        except KeyError as err:
-            if isinstance(casted_key, slice) or (
-                isinstance(casted_key, abc.Iterable)
-                and any(isinstance(x, slice) for x in casted_key)
-            ):
-                raise InvalidIndexError(key) from err
->           raise KeyError(key) from err
-E           KeyError: 'datetime'
-
-venv/lib/python3.12/site-packages/pandas/core/indexes/base.py:3648: KeyError
-__ test_calculate_flat_grid_import_cost_raises_error_for_negative_grid_import __
-
-self = Index(['grid_import_kwh'], dtype='str'), key = 'datetime'
-
-    def get_loc(self, key):
-        """
-        Get integer location, slice or boolean mask for requested label.
-    
-        Parameters
-        ----------
-        key : label
-            The key to check its location if it is present in the index.
-    
-        Returns
-        -------
-        int if unique index, slice if monotonic index, else mask
-            Integer location, slice or boolean mask.
-    
-        See Also
-        --------
-        Index.get_slice_bound : Calculate slice bound that corresponds to
-            given label.
-        Index.get_indexer : Computes indexer and mask for new index given
-            the current index.
-        Index.get_non_unique : Returns indexer and masks for new index given
-            the current index.
-        Index.get_indexer_for : Returns an indexer even when non-unique.
-    
-        Examples
-        --------
-        >>> unique_index = pd.Index(list("abc"))
-        >>> unique_index.get_loc("b")
-        1
-    
-        >>> monotonic_index = pd.Index(list("abbc"))
-        >>> monotonic_index.get_loc("b")
-        slice(1, 3, None)
-    
-        >>> non_monotonic_index = pd.Index(list("abcb"))
-        >>> non_monotonic_index.get_loc("b")
-        array([False,  True, False,  True])
-        """
-        casted_key = self._maybe_cast_indexer(key)
-        try:
->           return self._engine.get_loc(casted_key)
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-venv/lib/python3.12/site-packages/pandas/core/indexes/base.py:3641: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-pandas/_libs/index.pyx:168: in pandas._libs.index.IndexEngine.get_loc
-    ???
-pandas/_libs/index.pyx:197: in pandas._libs.index.IndexEngine.get_loc
-    ???
-pandas/_libs/hashtable_class_helper.pxi:7668: in pandas._libs.hashtable.PyObjectHashTable.get_item
-    ???
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
->   ???
-E   KeyError: 'datetime'
-
-pandas/_libs/hashtable_class_helper.pxi:7676: KeyError
-
-The above exception was the direct cause of the following exception:
-
-    def test_calculate_flat_grid_import_cost_raises_error_for_negative_grid_import() -> None:
-        energy_df = pd.DataFrame(
-            {
-                "grid_import_kwh": [
-                    -1.0,
-                ],
-            }
-        )
-    
-        with pytest.raises(ValueError, match="negative grid import"):
->           calculate_flat_grid_import_cost(
-                energy_df=energy_df,
-                flat_price_eur_per_kwh=0.20,
-            )
-
-tests/test_price_comparison.py:111: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-src/price_comparison.py:36: in calculate_flat_grid_import_cost
-    return calculate_variable_cost_with_model(
-src/price_comparison.py:16: in calculate_variable_cost_with_model
-    price_model.calculate_variable_grid_cost(
-src/electricity_price_models.py:80: in calculate_variable_grid_cost
-    return calculate_variable_grid_cost_with_tariff(
-src/tariff.py:59: in calculate_variable_grid_cost_with_tariff
-    df = add_tariff_period_column(df)
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-src/tariff.py:32: in add_tariff_period_column
-    df["tariff_period"] = df["datetime"].apply(get_spanish_2_0td_period)
-                          ^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/frame.py:4378: in __getitem__
-    indexer = self.columns.get_loc(key)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-self = Index(['grid_import_kwh'], dtype='str'), key = 'datetime'
-
-    def get_loc(self, key):
-        """
-        Get integer location, slice or boolean mask for requested label.
-    
-        Parameters
-        ----------
-        key : label
-            The key to check its location if it is present in the index.
-    
-        Returns
-        -------
-        int if unique index, slice if monotonic index, else mask
-            Integer location, slice or boolean mask.
-    
-        See Also
-        --------
-        Index.get_slice_bound : Calculate slice bound that corresponds to
-            given label.
-        Index.get_indexer : Computes indexer and mask for new index given
-            the current index.
-        Index.get_non_unique : Returns indexer and masks for new index given
-            the current index.
-        Index.get_indexer_for : Returns an indexer even when non-unique.
-    
-        Examples
-        --------
-        >>> unique_index = pd.Index(list("abc"))
-        >>> unique_index.get_loc("b")
-        1
-    
-        >>> monotonic_index = pd.Index(list("abbc"))
-        >>> monotonic_index.get_loc("b")
-        slice(1, 3, None)
-    
-        >>> non_monotonic_index = pd.Index(list("abcb"))
-        >>> non_monotonic_index.get_loc("b")
-        array([False,  True, False,  True])
-        """
-        casted_key = self._maybe_cast_indexer(key)
-        try:
-            return self._engine.get_loc(casted_key)
-        except KeyError as err:
-            if isinstance(casted_key, slice) or (
-                isinstance(casted_key, abc.Iterable)
-                and any(isinstance(x, slice) for x in casted_key)
-            ):
-                raise InvalidIndexError(key) from err
->           raise KeyError(key) from err
-E           KeyError: 'datetime'
-
-venv/lib/python3.12/site-packages/pandas/core/indexes/base.py:3648: KeyError
-_______ test_compare_tariff_vs_hourly_price_cost_returns_expected_values _______
-
-    def test_compare_tariff_vs_hourly_price_cost_returns_expected_values() -> None:
-        energy_df = pd.DataFrame(
-            {
-                "datetime": [
-                    "2025-01-06 01:00:00",
-                    "2025-01-06 11:00:00",
-                    "2025-01-06 15:00:00",
-                ],
-                "grid_import_kwh": [
-                    1.0,
-                    2.0,
-                    3.0,
-                ],
-            }
-        )
-    
-        price_df = pd.DataFrame(
-            {
-                "datetime": [
-                    "2025-01-06 01:00:00",
-                    "2025-01-06 11:00:00",
-                    "2025-01-06 15:00:00",
-                ],
-                "price_eur_per_kwh": [
-                    0.10,
-                    0.20,
-                    0.15,
-                ],
-            }
-        )
-    
->       comparison = compare_tariff_vs_hourly_price_cost(
-            energy_df=energy_df,
-            price_df=price_df,
-            peak_price_eur_per_kwh=0.25,
-            flat_price_eur_per_kwh=0.18,
-            off_peak_price_eur_per_kwh=0.12,
-        )
-
-tests/test_price_comparison.py:164: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-src/price_comparison.py:119: in compare_tariff_vs_hourly_price_cost
-    tariff_cost = calculate_variable_cost_with_model(
-src/price_comparison.py:16: in calculate_variable_cost_with_model
-    price_model.calculate_variable_grid_cost(
-src/electricity_price_models.py:141: in calculate_variable_grid_cost
-    return calculate_variable_grid_cost_with_tariff(
-src/tariff.py:59: in calculate_variable_grid_cost_with_tariff
-    df = add_tariff_period_column(df)
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-src/tariff.py:32: in add_tariff_period_column
-    df["tariff_period"] = df["datetime"].apply(get_spanish_2_0td_period)
-                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/series.py:5084: in apply
-    ).apply()
-      ^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/apply.py:1520: in apply
-    return self.apply_standard()
-           ^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/apply.py:1578: in apply_standard
-    mapped = obj._map_values(mapper=curried)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/base.py:1020: in _map_values
-    return arr.map(mapper, na_action=na_action)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/arrays/base.py:2745: in map
-    return map_array(self, mapper, na_action=na_action)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/algorithms.py:1715: in map_array
-    return lib.map_infer(values, mapper)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-pandas/_libs/lib.pyx:3071: in pandas._libs.lib.map_infer
-    ???
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-timestamp = '2025-01-06 01:00:00'
-
-    def get_spanish_2_0td_period(timestamp: pd.Timestamp) -> str:
->       hour = timestamp.hour
-               ^^^^^^^^^^^^^^
-E       AttributeError: 'str' object has no attribute 'hour'
-
-src/tariff.py:5: AttributeError
-_____________ test_compare_all_price_modes_returns_expected_costs ______________
-
-    def test_compare_all_price_modes_returns_expected_costs() -> None:
-        energy_df = pd.DataFrame(
-            {
-                "datetime": [
-                    "2025-01-06 01:00:00",
-                    "2025-01-06 11:00:00",
-                    "2025-01-06 15:00:00",
-                ],
-                "grid_import_kwh": [
-                    1.0,
-                    2.0,
-                    3.0,
-                ],
-            }
-        )
-    
-        price_df = pd.DataFrame(
-            {
-                "datetime": [
-                    "2025-01-06 01:00:00",
-                    "2025-01-06 11:00:00",
-                    "2025-01-06 15:00:00",
-                ],
-                "price_eur_per_kwh": [
-                    0.10,
-                    0.20,
-                    0.15,
-                ],
-            }
-        )
-    
->       comparison_df = compare_all_price_modes(
-            energy_df=energy_df,
-            price_df=price_df,
-            fixed_price_eur_per_kwh=0.20,
-            peak_price_eur_per_kwh=0.25,
-            flat_price_eur_per_kwh=0.18,
-            off_peak_price_eur_per_kwh=0.12,
-        )
-
-tests/test_price_comparison.py:207: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-src/price_comparison.py:185: in compare_all_price_modes
-    calculate_variable_cost_with_model(
-src/price_comparison.py:16: in calculate_variable_cost_with_model
-    price_model.calculate_variable_grid_cost(
-src/electricity_price_models.py:80: in calculate_variable_grid_cost
-    return calculate_variable_grid_cost_with_tariff(
-src/tariff.py:59: in calculate_variable_grid_cost_with_tariff
-    df = add_tariff_period_column(df)
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-src/tariff.py:32: in add_tariff_period_column
-    df["tariff_period"] = df["datetime"].apply(get_spanish_2_0td_period)
-                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/series.py:5084: in apply
-    ).apply()
-      ^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/apply.py:1520: in apply
-    return self.apply_standard()
-           ^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/apply.py:1578: in apply_standard
-    mapped = obj._map_values(mapper=curried)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/base.py:1020: in _map_values
-    return arr.map(mapper, na_action=na_action)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/arrays/base.py:2745: in map
-    return map_array(self, mapper, na_action=na_action)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/algorithms.py:1715: in map_array
-    return lib.map_infer(values, mapper)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-pandas/_libs/lib.pyx:3071: in pandas._libs.lib.map_infer
-    ???
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-timestamp = '2025-01-06 01:00:00'
-
-    def get_spanish_2_0td_period(timestamp: pd.Timestamp) -> str:
->       hour = timestamp.hour
-               ^^^^^^^^^^^^^^
-E       AttributeError: 'str' object has no attribute 'hour'
-
-src/tariff.py:5: AttributeError
-__________ test_compare_all_price_modes_allows_negative_hourly_prices __________
-
-    def test_compare_all_price_modes_allows_negative_hourly_prices() -> None:
-        energy_df = pd.DataFrame(
-            {
-                "datetime": [
-                    "2026-06-01 14:00:00",
-                ],
-                "grid_import_kwh": [
-                    2.0,
-                ],
-            }
-        )
-    
-        price_df = pd.DataFrame(
-            {
-                "datetime": [
-                    "2026-06-01 14:00:00",
-                ],
-                "price_eur_per_kwh": [
-                    -0.01,
-                ],
-            }
-        )
-    
->       comparison_df = compare_all_price_modes(
-            energy_df=energy_df,
-            price_df=price_df,
-            fixed_price_eur_per_kwh=0.20,
-            peak_price_eur_per_kwh=0.25,
-            flat_price_eur_per_kwh=0.18,
-            off_peak_price_eur_per_kwh=0.12,
-            allow_negative_hourly_prices=True,
-        )
-
-tests/test_price_comparison.py:275: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-src/price_comparison.py:185: in compare_all_price_modes
-    calculate_variable_cost_with_model(
-src/price_comparison.py:16: in calculate_variable_cost_with_model
-    price_model.calculate_variable_grid_cost(
-src/electricity_price_models.py:80: in calculate_variable_grid_cost
-    return calculate_variable_grid_cost_with_tariff(
-src/tariff.py:59: in calculate_variable_grid_cost_with_tariff
-    df = add_tariff_period_column(df)
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-src/tariff.py:32: in add_tariff_period_column
-    df["tariff_period"] = df["datetime"].apply(get_spanish_2_0td_period)
-                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/series.py:5084: in apply
-    ).apply()
-      ^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/apply.py:1520: in apply
-    return self.apply_standard()
-           ^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/apply.py:1578: in apply_standard
-    mapped = obj._map_values(mapper=curried)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/base.py:1020: in _map_values
-    return arr.map(mapper, na_action=na_action)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/arrays/base.py:2745: in map
-    return map_array(self, mapper, na_action=na_action)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-venv/lib/python3.12/site-packages/pandas/core/algorithms.py:1715: in map_array
-    return lib.map_infer(values, mapper)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-pandas/_libs/lib.pyx:3071: in pandas._libs.lib.map_infer
-    ???
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-timestamp = '2026-06-01 14:00:00'
-
-    def get_spanish_2_0td_period(timestamp: pd.Timestamp) -> str:
->       hour = timestamp.hour
-               ^^^^^^^^^^^^^^
-E       AttributeError: 'str' object has no attribute 'hour'
-
-src/tariff.py:5: AttributeError
-=========================== short test summary info ============================
-FAILED tests/test_price_comparison.py::test_calculate_flat_grid_import_cost_returns_expected_cost
-FAILED tests/test_price_comparison.py::test_compare_flat_vs_hourly_price_cost_returns_expected_values
-FAILED tests/test_price_comparison.py::test_calculate_flat_grid_import_cost_raises_error_for_missing_column
-FAILED tests/test_price_comparison.py::test_calculate_flat_grid_import_cost_raises_error_for_invalid_grid_import
-FAILED tests/test_price_comparison.py::test_calculate_flat_grid_import_cost_raises_error_for_negative_grid_import
-FAILED tests/test_price_comparison.py::test_compare_tariff_vs_hourly_price_cost_returns_expected_values
-FAILED tests/test_price_comparison.py::test_compare_all_price_modes_returns_expected_costs
-FAILED tests/test_price_comparison.py::test_compare_all_price_modes_allows_negative_hourly_prices
-======================== 8 failed, 195 passed in 2.66s =========================
+PROJECT_SCENARIO=uci_omie_june_2026 python scripts/run_full_pipeline.py
+
+Scenario validation
+===================
+
+Scenario: uci_omie_june_2026
+Status: valid
+
+Consumption data:
+- Rows: 720
+- Unique timestamps: 720
+- Start: 2026-06-01 00:00:00
+- End: 2026-06-30 23:00:00
+- Frequency: hourly
+
+Forecast mode: backtest
+Forecast test rows: 140
+
+Hourly price data:
+- Rows: 720
+- Unique timestamps: 720
+- Start: 2026-06-01 00:00:00
+- End: 2026-06-30 23:00:00
+- Frequency: hourly
+- Consumption coverage: complete
+
+Configuration summary generated
+Output file: reports/uci_omie_june_2026/configuration_summary.md
+Hourly electricity price data loaded: 720 rows
+
+Electricity Consumption Solar Optimizer
+Input file: data/processed/uci_consumption_omie_scenario.csv
+Solar data source: PVGIS (data/raw/pvgis_hourly_linares_1kw_2020.csv)
+Electricity price mode: Hourly wholesale electricity prices (data/processed/omie_hourly_prices.csv); fixed power cost and surplus compensation from tariff profile 'spanish_2_0td_example'
+Number of hours: 720
+Results saved to: reports/uci_omie_june_2026/grid_search_results.csv
+Summary saved to: reports/uci_omie_june_2026/summary.txt
+Best scenarios saved to: reports/uci_omie_june_2026/best_scenarios.csv
+Payback plot saved to: images/uci_omie_june_2026/main_payback_grid_search.png
+Self-sufficiency plot saved to: images/uci_omie_june_2026/main_self_sufficiency_grid_search.png
+Best scenarios comparison plot saved to: images/uci_omie_june_2026/best_scenarios_comparison.png
+Best scenario timeseries plot saved to: images/uci_omie_june_2026/best_scenario_timeseries.png
+Best scenario timeseries saved to: reports/uci_omie_june_2026/best_scenario_timeseries.csv
+Best scenario battery state plot saved to: images/uci_omie_june_2026/best_scenario_battery_state.png
+Best scenario cumulative energy plot saved to: images/uci_omie_june_2026/best_scenario_cumulative_energy.png
+Outputs index saved to: reports/uci_omie_june_2026/outputs_index.md
+
+Best scenario by payback:
+Solar peak power: 3.00 kW
+Battery capacity: 0.00 kWh
+Investment cost: 3500.00 EUR
+Battery replacement cost: 0.00 EUR
+Annual savings: 268.23 EUR/year
+Simple payback: 13.05 years
+Net present value: -842.80 EUR
+Discounted payback: Not achieved
+Internal rate of return: 2.55%
+Self-sufficiency: 25.21%
+Grid import: 924.32 kWh
+Solar surplus: 190.05 kWh
+
+Best scenario by self-sufficiency:
+Solar peak power: 3.00 kW
+Battery capacity: 5.00 kWh
+Investment cost: 6000.00 EUR
+Battery replacement cost: 1750.00 EUR
+Annual savings: 235.26 EUR/year
+Simple payback: 25.50 years
+Net present value: -4855.02 EUR
+Discounted payback: Not achieved
+Internal rate of return: Not available
+Self-sufficiency: 33.91%
+Grid import: 816.79 kWh
+Solar surplus: 70.57 kWh
+
+Best scenario by net present value:
+Solar peak power: 3.00 kW
+Battery capacity: 0.00 kWh
+Investment cost: 3500.00 EUR
+Battery replacement cost: 0.00 EUR
+Annual savings: 268.23 EUR/year
+Simple payback: 13.05 years
+Net present value: -842.80 EUR
+Discounted payback: Not achieved
+Internal rate of return: 2.55%
+Self-sufficiency: 25.21%
+Grid import: 924.32 kWh
+Solar surplus: 190.05 kWh
+
+Comparison:
+Best payback scenario: 3.00 kW solar, 0.00 kWh battery
+Best self-sufficiency scenario: 3.00 kW solar, 5.00 kWh battery
+The economically optimal scenario and the energy optimal scenario are different.
+
+Best scenarios comparison data:
+
+Scenario: best_payback
+Investment cost: 3500.00 EUR
+Annual savings: 268.23 EUR/year
+Payback: 13.05 years
+Self-sufficiency: 25.21%
+
+Scenario: best_self_sufficiency
+Investment cost: 6000.00 EUR
+Annual savings: 235.26 EUR/year
+Payback: 25.50 years
+Self-sufficiency: 33.91%
+
+Scenario: best_net_present_value
+Investment cost: 3500.00 EUR
+Annual savings: 268.23 EUR/year
+Payback: 13.05 years
+Self-sufficiency: 25.21%
+
+Electricity price mode comparison
+   price_mode  variable_grid_cost_eur  difference_vs_flat_eur  difference_vs_2_0td_eur
+   flat_fixed              184.863383                0.000000                45.978575
+spanish_2_0td              138.884807              -45.978575                 0.000000
+       hourly               82.407643             -102.455740               -56.477165
+
+CSV saved to: reports/uci_omie_june_2026/electricity_price_mode_comparison.csv
+Markdown report saved to: reports/uci_omie_june_2026/electricity_price_mode_comparison.md
+Comparison plot saved to: images/uci_omie_june_2026/electricity_price_mode_comparison.png
+
+Forecast results saved to: reports/uci_omie_june_2026/forecast_results.csv
+
+Consumption forecast results:
+MAE: 0.5437 kWh
+RMSE: 0.7471 kWh
+
+First predictions:
+ actual_consumption_kwh  predicted_consumption_kwh
+               3.292467                   2.601113
+               1.291267                   3.285047
+               1.635633                   0.853389
+               0.517900                   1.853340
+               0.653900                   0.710750
+               0.340367                   0.676256
+               0.269367                   0.409790
+               0.346900                   0.489149
+               0.267967                   0.389849
+               0.897600                   0.648390
+               2.362900                   1.616224
+               2.972933                   2.233676
+               1.995233                   2.355726
+               1.427100                   2.438890
+               3.970767                   1.370118
+               1.430767                   2.434374
+               0.553767                   1.408941
+               1.695400                   1.690278
+               1.291233                   1.524390
+               0.683533                   1.026339
+
+Feature importance:
+               feature  importance
+ consumption_kwh_lag_1    0.733362
+                  hour    0.093571
+consumption_kwh_lag_24    0.077230
+                   day    0.056669
+               weekday    0.035622
+            is_weekend    0.003546
+                 month    0.000000
+Feature importance report saved to: reports/uci_omie_june_2026/forecast_feature_importance.csv
+
+Model comparison:
+            model      mae     rmse
+    Random Forest 0.543666 0.747085
+Linear_Regression 0.592100 0.764403
+Model comparison report saved to: reports/uci_omie_june_2026/forecast_model_comparison.csv
+Model comparison plot saved to: images/uci_omie_june_2026/forecast_model_comparison.png
+
+Forecast plot saved to: images/uci_omie_june_2026/consumption_forecast_actual_vs_predicted.png
+Feature importance plot saved to: images/uci_omie_june_2026/forecast_feature_importance.png
+Hourly electricity price data loaded: 720 rows
+
+Forecast-based optimization
+Input file: data/processed/uci_consumption_omie_scenario.csv
+Electricity price mode: Hourly wholesale electricity prices (data/processed/omie_hourly_prices.csv); fixed power cost and surplus compensation from tariff profile 'spanish_2_0td_example'
+Forecasted consumption saved to: reports/uci_omie_june_2026/forecasted_consumption_for_optimization.csv
+Optimization results saved to: reports/uci_omie_june_2026/forecast_optimization_results.csv
+Best scenarios saved to: reports/uci_omie_june_2026/forecast_optimization_best_scenarios.csv
+
+Best forecast-based scenario by payback:
+Solar peak power: 3.00 kW
+Battery capacity: 0.00 kWh
+Annual savings: 315.50 EUR/year
+Payback: 11.09 years
+Self-sufficiency: 25.77%
+
+Best forecast-based scenario by self-sufficiency:
+Solar peak power: 3.00 kW
+Battery capacity: 5.00 kWh
+Annual savings: 259.71 EUR/year
+
+Best forecast-based scenario by payback:
+Solar peak power: 3.00 kW
+Battery capacity: 0.00 kWh
+Investment cost: 3500.00 EUR
+Battery replacement cost: 0.00 EUR
+Annual savings: 315.50 EUR/year
+Simple payback: 11.09 years
+Net present value: -71.72 EUR
+Discounted payback: Not achieved
+Internal rate of return: 4.81%
+Self-sufficiency: 25.77%
+Grid import: 168.97 kWh
+Solar surplus: 42.02 kWh
+
+Best forecast-based scenario by self-sufficiency:
+Solar peak power: 3.00 kW
+Battery capacity: 5.00 kWh
+Investment cost: 6000.00 EUR
+Battery replacement cost: 1750.00 EUR
+Annual savings: 259.71 EUR/year
+Simple payback: 23.10 years
+Net present value: -4456.21 EUR
+Discounted payback: Not achieved
+Internal rate of return: Not available
+Self-sufficiency: 37.83%
+Grid import: 141.51 kWh
+Solar surplus: 11.51 kWh
+
+Best forecast-based scenario by net present value:
+Solar peak power: 3.00 kW
+Battery capacity: 0.00 kWh
+Investment cost: 3500.00 EUR
+Battery replacement cost: 0.00 EUR
+Annual savings: 315.50 EUR/year
+Simple payback: 11.09 years
+Net present value: -71.72 EUR
+Discounted payback: Not achieved
+Internal rate of return: 4.81%
+Self-sufficiency: 25.77%
+Grid import: 168.97 kWh
+Solar surplus: 42.02 kWh
+
+Historical vs forecast-based optimization comparison
+Historical results: reports/uci_omie_june_2026/best_scenarios.csv
+Forecast-based results: reports/uci_omie_june_2026/forecast_optimization_best_scenarios.csv
+Comparison saved to: reports/uci_omie_june_2026/historical_vs_forecast_optimization.csv
+Payback plot saved to: images/uci_omie_june_2026/historical_vs_forecast_payback.png
+Savings plot saved to: images/uci_omie_june_2026/historical_vs_forecast_savings.png
+Self-sufficiency plot saved to: images/uci_omie_june_2026/historical_vs_forecast_self_sufficiency.png
+Investment cost plot saved to: images/uci_omie_june_2026/historical_vs_forecast_investment_cost.png
+Grid import plot saved to: images/uci_omie_june_2026/historical_vs_forecast_grid_import.png
+
+Comparison:
+optimization_type               scenario  solar_peak_power_kw  battery_capacity_kwh  investment_cost_eur  base_variable_energy_cost_eur  base_fixed_power_cost_eur  base_surplus_compensation_eur  base_net_cost_eur  scenario_variable_energy_cost_eur  scenario_fixed_power_cost_eur  scenario_surplus_compensation_eur  scenario_net_cost_eur  annual_savings_eur  payback_years  self_sufficiency  grid_import_kwh  annual_grid_import_kwh  solar_surplus_kwh  battery_replacement_cost_eur  net_present_value_eur  discounted_payback_years  internal_rate_of_return
+       historical           best_payback                  3.0                   0.0               3500.0                      91.150591                  13.232877                            0.0         104.383468                          82.407643                      13.232877                          13.303257              82.337262          268.228840      13.048560          0.252131       924.316913            11245.855779         190.046530                           0.0            -842.800936                       NaN                 0.025535
+       historical  best_self_sufficiency                  3.0                   5.0               6000.0                      91.150591                  13.232877                            0.0         104.383468                          76.754036                      13.232877                           4.940201              85.046711          235.263873      25.503278          0.339130       816.791910             9937.634909          70.574304                        1750.0           -4855.023552                       NaN                      NaN
+       historical best_net_present_value                  3.0                   0.0               3500.0                      91.150591                  13.232877                            0.0         104.383468                          82.407643                      13.232877                          13.303257              82.337262          268.228840      13.048560          0.252131       924.316913            11245.855779         190.046530                           0.0            -842.800936                       NaN                 0.025535
+   forecast_based           best_payback                  3.0                   0.0               3500.0                      19.430493                   2.646575                            0.0          22.077068                          17.185544                       2.646575                           2.941304              16.890816          315.497024      11.093607          0.257681       168.969209            10278.960214          42.018627                           0.0             -71.715577                       NaN                 0.048056
+   forecast_based  best_self_sufficiency                  3.0                   5.0               6000.0                      19.430493                   2.646575                            0.0          22.077068                          15.967231                       2.646575                           0.805966              17.807840          259.711356      23.102571          0.378294       141.514869             8608.821204          11.513805                        1750.0           -4456.212025                       NaN                      NaN
+   forecast_based best_net_present_value                  3.0                   0.0               3500.0                      19.430493                   2.646575                            0.0          22.077068                          17.185544                       2.646575                           2.941304              16.890816          315.497024      11.093607          0.257681       168.969209            10278.960214          42.018627                           0.0             -71.715577                       NaN                 0.048056
+
+Final results summary generated
+Input file: reports/uci_omie_june_2026/historical_vs_forecast_optimization.csv
+Output file: reports/uci_omie_june_2026/final_results_summary.md
+
+Run manifest generated
+Output file: reports/uci_omie_june_2026/run_manifest.json
+
+Electricity Consumption Solar Optimizer
+Running full project pipeline...
+
+Running command:
+/home/juan/Escritorio/electricity-consumption-solar-optimizer/venv/bin/python scripts/validate_scenario.py
+
+Running command:
+/home/juan/Escritorio/electricity-consumption-solar-optimizer/venv/bin/python scripts/generate_config_summary.py
+
+Running command:
+/home/juan/Escritorio/electricity-consumption-solar-optimizer/venv/bin/python src/main.py
+
+Running command:
+/home/juan/Escritorio/electricity-consumption-solar-optimizer/venv/bin/python scripts/generate_price_mode_comparison.py
+
+Running command:
+/home/juan/Escritorio/electricity-consumption-solar-optimizer/venv/bin/python scripts/run_forecasting.py
+
+Running command:
+/home/juan/Escritorio/electricity-consumption-solar-optimizer/venv/bin/python scripts/run_forecast_optimization.py
+
+Running command:
+/home/juan/Escritorio/electricity-consumption-solar-optimizer/venv/bin/python scripts/compare_optimization_results.py
+
+Running command:
+/home/juan/Escritorio/electricity-consumption-solar-optimizer/venv/bin/python scripts/generate_final_results_summary.py
+
+Running command:
+/home/juan/Escritorio/electricity-consumption-solar-optimizer/venv/bin/python scripts/generate_run_manifest.py
+
+Full pipeline completed successfully.
