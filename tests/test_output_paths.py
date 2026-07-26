@@ -14,13 +14,21 @@ def test_build_scenario_output_paths_uses_scenario_directories() -> None:
         Path("reports/example_scenario/grid_search_results.csv")
     )
     assert paths.financial_sensitivity_results == str(
-        Path(
-            "reports/example_scenario/"
-            "financial_sensitivity_results.csv"
-        )
+        Path("reports/example_scenario/financial_sensitivity_results.csv")
     )
     assert paths.payback_plot == str(
         Path("images/example_scenario/main_payback_grid_search.png")
+    )
+    assert paths.financial_sensitivity_npv_plot == str(
+        Path("images/example_scenario/financial_sensitivity_npv.png")
+    )
+
+    assert paths.financial_sensitivity_payback_plot == str(
+        Path("images/example_scenario/financial_sensitivity_payback.png")
+    )
+
+    assert paths.financial_sensitivity_irr_plot == str(
+        Path("images/example_scenario/financial_sensitivity_irr.png")
     )
 
 

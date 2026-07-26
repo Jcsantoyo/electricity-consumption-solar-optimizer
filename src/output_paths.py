@@ -10,6 +10,9 @@ class ScenarioOutputPaths:
     grid_search_results: str
     best_scenarios: str
     financial_sensitivity_results: str
+    financial_sensitivity_npv_plot: str
+    financial_sensitivity_payback_plot: str
+    financial_sensitivity_irr_plot: str
     summary_report: str
     outputs_index: str
     configuration_summary: str
@@ -51,6 +54,9 @@ class ScenarioOutputPaths:
             self.best_scenarios,
             self.summary_report,
             self.financial_sensitivity_results,
+            self.financial_sensitivity_npv_plot,
+            self.financial_sensitivity_payback_plot,
+            self.financial_sensitivity_irr_plot,
             self.outputs_index,
             self.configuration_summary,
             self.run_manifest,
@@ -101,6 +107,11 @@ def build_scenario_output_paths(scenario_name: str) -> ScenarioOutputPaths:
         financial_sensitivity_results=str(
             reports / "financial_sensitivity_results.csv"
         ),
+        financial_sensitivity_npv_plot=str(images / "financial_sensitivity_npv.png"),
+        financial_sensitivity_payback_plot=str(
+            images / "financial_sensitivity_payback.png"
+        ),
+        financial_sensitivity_irr_plot=str(images / "financial_sensitivity_irr.png"),
         summary_report=str(reports / "summary.txt"),
         outputs_index=str(reports / "outputs_index.md"),
         configuration_summary=str(reports / "configuration_summary.md"),

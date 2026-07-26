@@ -38,6 +38,14 @@ BEST_SCENARIOS_PATH = OUTPUT_PATHS.best_scenarios
 
 FINANCIAL_SENSITIVITY_RESULTS_PATH = OUTPUT_PATHS.financial_sensitivity_results
 
+FINANCIAL_SENSITIVITY_NPV_PLOT_PATH = OUTPUT_PATHS.financial_sensitivity_npv_plot
+
+FINANCIAL_SENSITIVITY_PAYBACK_PLOT_PATH = (
+    OUTPUT_PATHS.financial_sensitivity_payback_plot
+)
+
+FINANCIAL_SENSITIVITY_IRR_PLOT_PATH = OUTPUT_PATHS.financial_sensitivity_irr_plot
+
 SUMMARY_REPORT_PATH = OUTPUT_PATHS.summary_report
 
 PAYBACK_PLOT_PATH = OUTPUT_PATHS.payback_plot

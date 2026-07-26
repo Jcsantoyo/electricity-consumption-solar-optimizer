@@ -525,3 +525,127 @@ def generate_scenario_metric_plots(
             generated_paths.append(output_path)
 
     return generated_paths
+
+
+def plot_financial_sensitivity_metric(
+    sensitivity_df: pd.DataFrame,
+    metric_column: str,
+    title: str,
+    axis_label: str,
+    output_path: str,
+    percentage: bool = False,
+) -> bool:
+    required_columns = {
+        "case_name",
+        metric_column,
+    }
+
+    missing_columns = required_columns - set(sensitivity_df.columns)
+
+    if missing_columns:
+        missing_text = ", ".join(sorted(missing_columns))
+
+        raise ValueError(
+            f"Missing required financial sensitivity columns: {missing_text}"
+        )
+
+    plotting_df = sensitivity_df[
+        [
+            "case_name",
+            metric_column,
+        ]
+    ].dropna(subset=[metric_column])
+
+    if plotting_df.empty:
+        return False
+
+    plotting_df = plotting_df.copy()
+
+    if percentage:
+        plotting_df["plot_value"] = plotting_df[metric_column] * 100.0
+    else:
+        plotting_df["plot_value"] = plotting_df[metric_column]
+
+    output_file = Path(output_path)
+
+    output_file.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    figure, axis = plt.subplots(figsize=(8, 5))
+
+    bars = axis.bar(
+        plotting_df["case_name"],
+        plotting_df["plot_value"],
+    )
+
+    axis.set_title(title)
+    axis.set_xlabel("Financial sensitivity case")
+    axis.set_ylabel(axis_label)
+    axis.grid(
+        axis="y",
+        alpha=0.3,
+    )
+
+    axis.axhline(
+        y=0.0,
+        linewidth=0.8,
+    )
+
+    axis.bar_label(
+        bars,
+        fmt="%.2f",
+        padding=3,
+    )
+
+    figure.tight_layout()
+
+    figure.savefig(
+        output_file,
+        dpi=150,
+    )
+
+    plt.close(figure)
+
+    return True
+
+
+def plot_financial_sensitivity_npv(
+    sensitivity_df: pd.DataFrame,
+    output_path: str,
+) -> bool:
+    return plot_financial_sensitivity_metric(
+        sensitivity_df=sensitivity_df,
+        metric_column="net_present_value_eur",
+        title="Financial Sensitivity: Net Present Value",
+        axis_label="Net present value (EUR)",
+        output_path=output_path,
+    )
+
+
+def plot_financial_sensitivity_payback(
+    sensitivity_df: pd.DataFrame,
+    output_path: str,
+) -> bool:
+    return plot_financial_sensitivity_metric(
+        sensitivity_df=sensitivity_df,
+        metric_column="discounted_payback_years",
+        title="Financial Sensitivity: Discounted Payback",
+        axis_label="Discounted payback (years)",
+        output_path=output_path,
+    )
+
+
+def plot_financial_sensitivity_irr(
+    sensitivity_df: pd.DataFrame,
+    output_path: str,
+) -> bool:
+    return plot_financial_sensitivity_metric(
+        sensitivity_df=sensitivity_df,
+        metric_column="internal_rate_of_return",
+        title="Financial Sensitivity: Internal Rate of Return",
+        axis_label="Internal rate of return (%)",
+        output_path=output_path,
+        percentage=True,
+    )

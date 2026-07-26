@@ -35,6 +35,9 @@ from visualization import (
     plot_cumulative_energy_flows,
     plot_payback_by_solar_and_battery,
     plot_self_sufficiency_by_solar_and_battery,
+    plot_financial_sensitivity_irr,
+    plot_financial_sensitivity_npv,
+    plot_financial_sensitivity_payback,
 )
 from financial_sensitivity import (
     financial_sensitivity_results_to_dataframe,
@@ -211,6 +214,21 @@ def main() -> None:
         index=False,
     )
 
+    financial_sensitivity_npv_created = plot_financial_sensitivity_npv(
+        sensitivity_df=financial_sensitivity_df,
+        output_path=config.FINANCIAL_SENSITIVITY_NPV_PLOT_PATH,
+    )
+
+    financial_sensitivity_payback_created = plot_financial_sensitivity_payback(
+        sensitivity_df=financial_sensitivity_df,
+        output_path=(config.FINANCIAL_SENSITIVITY_PAYBACK_PLOT_PATH),
+    )
+
+    financial_sensitivity_irr_created = plot_financial_sensitivity_irr(
+        sensitivity_df=financial_sensitivity_df,
+        output_path=config.FINANCIAL_SENSITIVITY_IRR_PLOT_PATH,
+    )
+
     if pvgis_df is None:
         solar_data_source = "Synthetic solar profile"
     else:
@@ -365,6 +383,34 @@ def main() -> None:
     print(
         f"Financial sensitivity results saved to: {config.FINANCIAL_SENSITIVITY_RESULTS_PATH}"
     )
+
+    if financial_sensitivity_npv_created:
+        print(
+            "Financial sensitivity NPV plot saved to: "
+            f"{config.FINANCIAL_SENSITIVITY_NPV_PLOT_PATH}"
+        )
+
+    if financial_sensitivity_payback_created:
+        print(
+            "Financial sensitivity payback plot saved to: "
+            f"{config.FINANCIAL_SENSITIVITY_PAYBACK_PLOT_PATH}"
+        )
+    else:
+        print(
+            "Financial sensitivity payback plot not generated: "
+            "no discounted payback values available"
+        )
+
+    if financial_sensitivity_irr_created:
+        print(
+            "Financial sensitivity IRR plot saved to: "
+            f"{config.FINANCIAL_SENSITIVITY_IRR_PLOT_PATH}"
+        )
+    else:
+        print(
+            "Financial sensitivity IRR plot not generated: "
+            "no internal rate of return values available"
+        )
 
     print(f"Outputs index saved to: {outputs_index_path}")
 
