@@ -54,3 +54,6 @@ def test_all_output_paths_contains_expected_files() -> None:
     assert paths.historical_vs_forecast_comparison in all_paths
     assert paths.run_manifest in all_paths
     assert paths.financial_sensitivity_results in all_paths
+    assert paths.financial_sensitivity_npv_plot in all_paths
+    assert paths.financial_sensitivity_payback_plot in all_paths
+    assert paths.financial_sensitivity_irr_plot in all_paths
