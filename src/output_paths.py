@@ -9,6 +9,7 @@ class ScenarioOutputPaths:
     images_directory: str
     grid_search_results: str
     best_scenarios: str
+    financial_sensitivity_results: str
     summary_report: str
     outputs_index: str
     configuration_summary: str
@@ -49,6 +50,7 @@ class ScenarioOutputPaths:
             self.grid_search_results,
             self.best_scenarios,
             self.summary_report,
+            self.financial_sensitivity_results,
             self.outputs_index,
             self.configuration_summary,
             self.run_manifest,
@@ -96,6 +98,9 @@ def build_scenario_output_paths(scenario_name: str) -> ScenarioOutputPaths:
         images_directory=str(images),
         grid_search_results=str(reports / "grid_search_results.csv"),
         best_scenarios=str(reports / "best_scenarios.csv"),
+        financial_sensitivity_results=str(
+            reports / "financial_sensitivity_results.csv"
+        ),
         summary_report=str(reports / "summary.txt"),
         outputs_index=str(reports / "outputs_index.md"),
         configuration_summary=str(reports / "configuration_summary.md"),

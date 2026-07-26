@@ -13,6 +13,12 @@ def test_build_scenario_output_paths_uses_scenario_directories() -> None:
     assert paths.grid_search_results == str(
         Path("reports/example_scenario/grid_search_results.csv")
     )
+    assert paths.financial_sensitivity_results == str(
+        Path(
+            "reports/example_scenario/"
+            "financial_sensitivity_results.csv"
+        )
+    )
     assert paths.payback_plot == str(
         Path("images/example_scenario/main_payback_grid_search.png")
     )
@@ -39,3 +45,4 @@ def test_all_output_paths_contains_expected_files() -> None:
     assert paths.forecast_results in all_paths
     assert paths.historical_vs_forecast_comparison in all_paths
     assert paths.run_manifest in all_paths
+    assert paths.financial_sensitivity_results in all_paths

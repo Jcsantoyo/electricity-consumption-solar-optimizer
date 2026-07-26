@@ -36,6 +36,10 @@ from visualization import (
     plot_payback_by_solar_and_battery,
     plot_self_sufficiency_by_solar_and_battery,
 )
+from financial_sensitivity import (
+    financial_sensitivity_results_to_dataframe,
+    run_financial_sensitivity_analysis,
+)
 
 
 def main() -> None:
@@ -159,6 +163,53 @@ def main() -> None:
     best_self_sufficiency_scenario = get_best_scenario_by_self_sufficiency(results_df)
 
     best_net_present_value_scenario = get_best_scenario_by_net_present_value(results_df)
+
+    financial_sensitivity_results = run_financial_sensitivity_analysis(
+        initial_investment_cost_eur=float(
+            best_net_present_value_scenario["investment_cost_eur"]
+        ),
+        first_year_energy_savings_eur=float(
+            best_net_present_value_scenario["annual_savings_eur"]
+        ),
+        battery_capacity_kwh=float(
+            best_net_present_value_scenario["battery_capacity_kwh"]
+        ),
+        battery_cost_per_kwh=config.BATTERY_COST_EUR_PER_KWH,
+        cases=config.get_financial_sensitivity_cases(),
+    )
+
+    financial_sensitivity_df = financial_sensitivity_results_to_dataframe(
+        financial_sensitivity_results
+    )
+
+    financial_sensitivity_df.insert(
+        0,
+        "solar_peak_power_kw",
+        float(best_net_present_value_scenario["solar_peak_power_kw"]),
+    )
+
+    financial_sensitivity_df.insert(
+        1,
+        "battery_capacity_kwh",
+        float(best_net_present_value_scenario["battery_capacity_kwh"]),
+    )
+
+    financial_sensitivity_df.insert(
+        2,
+        "initial_investment_cost_eur",
+        float(best_net_present_value_scenario["investment_cost_eur"]),
+    )
+
+    financial_sensitivity_df.insert(
+        3,
+        "first_year_energy_savings_eur",
+        float(best_net_present_value_scenario["annual_savings_eur"]),
+    )
+
+    financial_sensitivity_df.to_csv(
+        config.FINANCIAL_SENSITIVITY_RESULTS_PATH,
+        index=False,
+    )
 
     if pvgis_df is None:
         solar_data_source = "Synthetic solar profile"
@@ -309,6 +360,10 @@ def main() -> None:
         "Best scenario cumulative energy "
         "plot saved to: "
         f"{config.BEST_SCENARIO_CUMULATIVE_ENERGY_PLOT_PATH}"
+    )
+
+    print(
+        f"Financial sensitivity results saved to: {config.FINANCIAL_SENSITIVITY_RESULTS_PATH}"
     )
 
     print(f"Outputs index saved to: {outputs_index_path}")

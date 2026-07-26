@@ -487,8 +487,19 @@ def build_outputs_index_text(
 
     text += "### `best_scenarios.csv`\n\n"
     text += (
-        "Summary table with the two selected historical optimal scenarios: "
-        "one by minimum payback period and one by maximum self-sufficiency.\n\n"
+        "Summary table with the selected historical optimal scenarios: "
+        "minimum payback period, maximum self-sufficiency and maximum "
+        "net present value.\n\n"
+    )
+
+    text += "### `financial_sensitivity_results.csv`\n\n"
+    text += (
+        "Financial sensitivity analysis for the historical scenario selected "
+        "by maximum net present value. The same solar and battery configuration "
+        "is evaluated under pessimistic, base and optimistic financial "
+        "assumptions, including discount rate, operating costs, electricity "
+        "price growth, battery replacement cost, net present value, discounted "
+        "payback period and internal rate of return.\n\n"
     )
 
     text += "### `best_scenario_timeseries.csv`\n\n"
