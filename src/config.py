@@ -8,7 +8,7 @@ from scenario_registry import (
     DEFAULT_PROJECT_SCENARIO_NAME,
     get_project_scenario,
 )
-
+from financial_sensitivity import FinancialSensitivityCase
 
 # Active reproducible project scenario
 ACTIVE_PROJECT_SCENARIO_NAME = os.getenv(
@@ -109,6 +109,36 @@ FINANCIAL_PROFILES = {
     ),
 }
 
+FINANCIAL_SENSITIVITY_PROFILES = {
+    "pessimistic": FinancialAssumptions(
+        project_lifetime_years=25,
+        discount_rate=0.07,
+        annual_operating_cost_eur=125.0,
+        annual_solar_degradation_rate=0.008,
+        annual_electricity_price_growth_rate=0.00,
+        annual_operating_cost_growth_rate=0.03,
+        battery_replacement_year=10,
+        battery_replacement_cost_fraction=0.85,
+    ),
+    "base": FINANCIAL_PROFILES["residential_standard"],
+    "optimistic": FinancialAssumptions(
+        project_lifetime_years=25,
+        discount_rate=0.03,
+        annual_operating_cost_eur=75.0,
+        annual_solar_degradation_rate=0.003,
+        annual_electricity_price_growth_rate=0.04,
+        annual_operating_cost_growth_rate=0.01,
+        battery_replacement_year=14,
+        battery_replacement_cost_fraction=0.55,
+    ),
+}
+
+FINANCIAL_SENSITIVITY_CASE_ORDER = (
+    "pessimistic",
+    "base",
+    "optimistic",
+)
+
 ACTIVE_FINANCIAL_PROFILE_NAME = ACTIVE_PROJECT_SCENARIO.financial_profile_name
 
 
@@ -182,3 +212,23 @@ def get_active_tariff_profile() -> dict:
             "Available profiles: "
             f"{available_profiles}"
         ) from error
+
+
+def get_financial_sensitivity_cases() -> list[FinancialSensitivityCase]:
+    missing_profiles = [
+        profile_name
+        for profile_name in FINANCIAL_SENSITIVITY_CASE_ORDER
+        if profile_name not in FINANCIAL_SENSITIVITY_PROFILES
+    ]
+
+    if missing_profiles:
+        missing_profiles = ", ".join(missing_profiles)
+
+        raise ValueError(f"Missing financial sensitivity profiles: {missing_profiles}")
+
+    return [
+        FinancialSensitivityCase(
+            name=profile_name, assumptions=FINANCIAL_SENSITIVITY_PROFILES[profile_name]
+        )
+        for profile_name in FINANCIAL_SENSITIVITY_CASE_ORDER
+    ]

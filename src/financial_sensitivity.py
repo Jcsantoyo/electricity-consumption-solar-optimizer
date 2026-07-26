@@ -1,9 +1,11 @@
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 from financial_assumptions import FinancialAssumptions
 from financial_cash_flow import ReplacementCost, build_projected_annual_cash_flows
 from financial_metrics import FinancialMetricsResult, calculate_financial_metrics
+
+import pandas as pd
 
 
 @dataclass(frozen=True)
@@ -156,3 +158,31 @@ def run_financial_sensitivity_analysis(
         )
         for case in cases
     ]
+
+
+FINANCIAL_SENSITIVITY_COLUMNS = [
+    "case_name",
+    "project_lifetime_years",
+    "discount_rate",
+    "annual_operating_cost_eur",
+    "annual_solar_degradation_rate",
+    "annual_electricity_price_growth_rate",
+    "annual_operating_cost_growth_rate",
+    "battery_replacement_year",
+    "battery_replacement_cost_fraction",
+    "battery_replacement_cost_eur",
+    "net_present_value_eur",
+    "discounted_payback_years",
+    "internal_rate_of_return",
+]
+
+
+def financial_sensitivity_results_to_dataframe(
+    results: Sequence[FinancialSensitivityResult],
+) -> pd.DataFrame:
+    rows = [asdict(result) for result in results]
+
+    return pd.DataFrame(
+        rows,
+        columns=FINANCIAL_SENSITIVITY_COLUMNS,
+    )

@@ -2,10 +2,12 @@ import pytest
 
 from financial_assumptions import FinancialAssumptions
 from financial_sensitivity import (
+    FINANCIAL_SENSITIVITY_COLUMNS,
     FinancialSensitivityCase,
     build_sensitivity_replacement_costs,
     calculate_battery_replacement_cost,
     evaluate_financial_sensitivity_case,
+    financial_sensitivity_results_to_dataframe,
     run_financial_sensitivity_analysis,
 )
 
@@ -308,3 +310,75 @@ def test_run_financial_sensitivity_analysis_rejects_duplicate_names() -> None:
             battery_cost_per_kwh=600.0,
             cases=cases,
         )
+
+
+def test_results_to_dataframe_preserves_columns_and_values() -> None:
+    results = run_financial_sensitivity_analysis(
+        initial_investment_cost_eur=6000.0,
+        first_year_energy_savings_eur=900.0,
+        battery_capacity_kwh=5.0,
+        battery_cost_per_kwh=600.0,
+        cases=[
+            FinancialSensitivityCase(
+                name="base",
+                assumptions=build_assumptions(),
+            )
+        ],
+    )
+
+    dataframe = financial_sensitivity_results_to_dataframe(results)
+
+    assert dataframe.columns.tolist() == FINANCIAL_SENSITIVITY_COLUMNS
+    assert len(dataframe) == 1
+    assert dataframe.loc[0, "case_name"] == "base"
+    assert dataframe.loc[0, "discount_rate"] == pytest.approx(0.05)
+    assert dataframe.loc[
+        0,
+        "battery_replacement_cost_eur",
+    ] == pytest.approx(2100.0)
+
+
+def test_results_to_dataframe_preserves_result_order() -> None:
+    cases = [
+        FinancialSensitivityCase(
+            name="pessimistic",
+            assumptions=build_assumptions(
+                discount_rate=0.07,
+            ),
+        ),
+        FinancialSensitivityCase(
+            name="base",
+            assumptions=build_assumptions(
+                discount_rate=0.05,
+            ),
+        ),
+        FinancialSensitivityCase(
+            name="optimistic",
+            assumptions=build_assumptions(
+                discount_rate=0.03,
+            ),
+        ),
+    ]
+
+    results = run_financial_sensitivity_analysis(
+        initial_investment_cost_eur=6000.0,
+        first_year_energy_savings_eur=900.0,
+        battery_capacity_kwh=0.0,
+        battery_cost_per_kwh=600.0,
+        cases=cases,
+    )
+
+    dataframe = financial_sensitivity_results_to_dataframe(results)
+
+    assert dataframe["case_name"].tolist() == [
+        "pessimistic",
+        "base",
+        "optimistic",
+    ]
+
+
+def test_results_to_dataframe_supports_empty_results() -> None:
+    dataframe = financial_sensitivity_results_to_dataframe([])
+
+    assert dataframe.empty
+    assert dataframe.columns.tolist() == FINANCIAL_SENSITIVITY_COLUMNS

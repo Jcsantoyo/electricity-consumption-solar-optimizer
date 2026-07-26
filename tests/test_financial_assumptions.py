@@ -187,3 +187,59 @@ def test_active_financial_assumptions_match_scenario_profile() -> None:
     ]
 
     assert assumptions == expected_assumptions
+
+
+def test_financial_sensitivity_profiles_are_valid() -> None:
+    import config
+
+    assert set(config.FINANCIAL_SENSITIVITY_PROFILES) == {
+        "pessimistic",
+        "base",
+        "optimistic",
+    }
+
+    assert all(
+        isinstance(assumptions, FinancialAssumptions)
+        for assumptions in config.FINANCIAL_SENSITIVITY_PROFILES.values()
+    )
+
+
+def test_get_financial_sensitivity_cases_preserves_expected_order() -> None:
+    import config
+
+    cases = config.get_financial_sensitivity_cases()
+
+    assert [case.name for case in cases] == [
+        "pessimistic",
+        "base",
+        "optimistic",
+    ]
+
+
+def test_base_sensitivity_profile_matches_standard_profile() -> None:
+    import config
+
+    assert (
+        config.FINANCIAL_SENSITIVITY_PROFILES["base"]
+        == config.FINANCIAL_PROFILES["residential_standard"]
+    )
+
+
+def test_sensitivity_profiles_have_expected_relative_assumptions() -> None:
+    import config
+
+    pessimistic = config.FINANCIAL_SENSITIVITY_PROFILES["pessimistic"]
+    base = config.FINANCIAL_SENSITIVITY_PROFILES["base"]
+    optimistic = config.FINANCIAL_SENSITIVITY_PROFILES["optimistic"]
+
+    assert pessimistic.discount_rate > base.discount_rate
+    assert base.discount_rate > optimistic.discount_rate
+
+    assert (
+        pessimistic.annual_electricity_price_growth_rate
+        < base.annual_electricity_price_growth_rate
+    )
+    assert (
+        base.annual_electricity_price_growth_rate
+        < optimistic.annual_electricity_price_growth_rate
+    )
