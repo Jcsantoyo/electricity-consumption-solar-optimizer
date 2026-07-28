@@ -141,6 +141,34 @@ def scenarios_use_same_configuration(
     )
 
 
+def build_financial_scenario_sections(
+    optimization_label: str,
+    payback_scenario: pd.Series,
+    npv_scenario: pd.Series,
+) -> list[str]:
+    if scenarios_use_same_configuration(
+        payback_scenario,
+        npv_scenario,
+    ):
+        return [
+            format_scenario_section(
+                (f"Best {optimization_label} payback and net present value scenario"),
+                payback_scenario,
+            )
+        ]
+
+    return [
+        format_scenario_section(
+            f"Best {optimization_label} payback scenario",
+            payback_scenario,
+        ),
+        format_scenario_section(
+            (f"Best {optimization_label} net present value scenario"),
+            npv_scenario,
+        ),
+    ]
+
+
 def build_scenario_comparison_table(
     comparison_df: pd.DataFrame,
 ) -> str:
@@ -671,6 +699,18 @@ def build_final_results_summary(
         "best_self_sufficiency",
     )
 
+    historical_financial_sections = build_financial_scenario_sections(
+        optimization_label="historical",
+        payback_scenario=historical_payback,
+        npv_scenario=historical_npv,
+    )
+
+    forecast_financial_sections = build_financial_scenario_sections(
+        optimization_label="forecast-based",
+        payback_scenario=forecast_payback,
+        npv_scenario=forecast_npv,
+    )
+
     sensitivity_section = ""
 
     if sensitivity_df is not None:
@@ -703,26 +743,12 @@ def build_final_results_summary(
         ("It compares historical optimization with forecast-based optimization."),
         "",
         comparison_section,
-        format_scenario_section(
-            "Best historical payback scenario",
-            historical_payback,
-        ),
-        format_scenario_section(
-            "Best historical net present value scenario",
-            historical_npv,
-        ),
+        *historical_financial_sections,
         format_scenario_section(
             "Best historical self-sufficiency scenario",
             historical_self_sufficiency,
         ),
-        format_scenario_section(
-            "Best forecast-based payback scenario",
-            forecast_payback,
-        ),
-        format_scenario_section(
-            "Best forecast-based net present value scenario",
-            forecast_npv,
-        ),
+        *forecast_financial_sections,
         format_scenario_section(
             "Best forecast-based self-sufficiency scenario",
             forecast_self_sufficiency,

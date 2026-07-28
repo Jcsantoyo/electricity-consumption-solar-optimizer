@@ -28,6 +28,7 @@ from scripts.generate_final_results_summary import (
     build_scenario_comparison_table,
     get_scenario_display_name,
     validate_scenario_comparison_dataframe,
+    build_financial_scenario_sections,
 )
 
 
@@ -197,12 +198,17 @@ def test_build_final_results_summary_contains_main_sections():
     summary = build_final_results_summary(comparison_df)
 
     assert "# Final Results Summary" in summary
-    assert "## Best historical payback scenario" in summary
-    assert "## Best historical net present value scenario" in summary
+
+    assert "## Best historical payback and net present value scenario" in summary
+
     assert "## Best historical self-sufficiency scenario" in summary
+
     assert "## Best forecast-based payback scenario" in summary
+
     assert "## Best forecast-based net present value scenario" in summary
+
     assert "## Best forecast-based self-sufficiency scenario" in summary
+
     assert "## Main conclusion" in summary
 
 
@@ -645,3 +651,66 @@ def test_final_summary_contains_scenario_comparison_table() -> None:
     assert "## Scenario comparison" in summary
     assert "Historical · Best NPV" in summary
     assert "Forecast · Best NPV" in summary
+
+
+def test_financial_scenario_sections_combines_matching_scenarios() -> None:
+    comparison_df = build_sample_comparison_df()
+
+    sections = build_financial_scenario_sections(
+        optimization_label="historical",
+        payback_scenario=get_scenario(
+            comparison_df,
+            "historical",
+            "best_payback",
+        ),
+        npv_scenario=get_scenario(
+            comparison_df,
+            "historical",
+            "best_net_present_value",
+        ),
+    )
+
+    assert len(sections) == 1
+
+    assert "Best historical payback and net present value scenario" in sections[0]
+
+
+def test_financial_scenario_sections_keeps_distinct_scenarios() -> None:
+    comparison_df = build_sample_comparison_df()
+
+    sections = build_financial_scenario_sections(
+        optimization_label="forecast-based",
+        payback_scenario=get_scenario(
+            comparison_df,
+            "forecast_based",
+            "best_payback",
+        ),
+        npv_scenario=get_scenario(
+            comparison_df,
+            "forecast_based",
+            "best_net_present_value",
+        ),
+    )
+
+    assert len(sections) == 2
+    assert "Best forecast-based payback scenario" in sections[0]
+
+    assert "Best forecast-based net present value scenario" in sections[1]
+
+
+def test_final_summary_avoids_duplicate_historical_financial_block() -> None:
+    summary = build_final_results_summary(build_sample_comparison_df())
+
+    assert summary.count("Best historical payback and net present value scenario") == 1
+
+    assert "Best historical payback scenario" not in summary
+
+    assert "Best historical net present value scenario" not in summary
+
+
+def test_final_summary_keeps_distinct_forecast_financial_blocks() -> None:
+    summary = build_final_results_summary(build_sample_comparison_df())
+
+    assert summary.count("Best forecast-based payback scenario") == 1
+
+    assert summary.count("Best forecast-based net present value scenario") == 1
