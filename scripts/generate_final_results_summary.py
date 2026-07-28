@@ -61,6 +61,76 @@ def get_scenario(
     return filtered_df.iloc[0]
 
 
+SCENARIO_DISPLAY_NAMES = {
+    ("historical", "best_payback"): "Historical · Best payback",
+    (
+        "historical",
+        "best_net_present_value",
+    ): "Historical · Best NPV",
+    (
+        "historical",
+        "best_self_sufficiency",
+    ): "Historical · Best self-sufficiency",
+    (
+        "forecast_based",
+        "best_payback",
+    ): "Forecast · Best payback",
+    (
+        "forecast_based",
+        "best_net_present_value",
+    ): "Forecast · Best NPV",
+    (
+        "forecast_based",
+        "best_self_sufficiency",
+    ): "Forecast · Best self-sufficiency",
+}
+
+
+def get_scenario_display_name(
+    optimization_type: str,
+    scenario: str,
+) -> str:
+    key = (
+        optimization_type,
+        scenario,
+    )
+
+    if key not in SCENARIO_DISPLAY_NAMES:
+        raise ValueError(
+            f"Unknown scenario display name: {optimization_type} / {scenario}"
+        )
+
+    return SCENARIO_DISPLAY_NAMES[key]
+
+
+SCENARIO_COMPARISON_TABLE_COLUMNS = {
+    "optimization_type",
+    "scenario",
+    "solar_peak_power_kw",
+    "battery_capacity_kwh",
+    "investment_cost_eur",
+    "annual_savings_eur",
+    "payback_years",
+    "net_present_value_eur",
+    "discounted_payback_years",
+    "internal_rate_of_return",
+    "self_sufficiency",
+}
+
+
+def validate_scenario_comparison_dataframe(
+    comparison_df: pd.DataFrame,
+) -> None:
+    missing_columns = SCENARIO_COMPARISON_TABLE_COLUMNS - set(comparison_df.columns)
+
+    if missing_columns:
+        missing_text = ", ".join(sorted(missing_columns))
+
+        raise ValueError(
+            f"Scenario comparison data is missing required columns: {missing_text}"
+        )
+
+
 def scenarios_use_same_configuration(
     first_scenario: pd.DataFrame, second_scenario: pd.Series
 ) -> bool:
@@ -69,6 +139,94 @@ def scenarios_use_same_configuration(
     ) and float(first_scenario["battery_capacity_kwh"]) == float(
         second_scenario["battery_capacity_kwh"]
     )
+
+
+def build_scenario_comparison_table(
+    comparison_df: pd.DataFrame,
+) -> str:
+    validate_scenario_comparison_dataframe(comparison_df)
+
+    scenario_order = [
+        (
+            "historical",
+            "best_payback",
+        ),
+        (
+            "historical",
+            "best_net_present_value",
+        ),
+        (
+            "historical",
+            "best_self_sufficiency",
+        ),
+        (
+            "forecast_based",
+            "best_payback",
+        ),
+        (
+            "forecast_based",
+            "best_net_present_value",
+        ),
+        (
+            "forecast_based",
+            "best_self_sufficiency",
+        ),
+    ]
+
+    lines = [
+        "| Scenario | Solar | Battery | Investment | "
+        "Annual savings | Simple payback | NPV | "
+        "Discounted payback | IRR | Self-sufficiency |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+    ]
+
+    for optimization_type, scenario_name in scenario_order:
+        scenario = get_scenario(
+            comparison_df,
+            optimization_type,
+            scenario_name,
+        )
+
+        display_name = get_scenario_display_name(
+            optimization_type,
+            scenario_name,
+        )
+
+        lines.append(
+            "| "
+            f"{display_name} | "
+            f"{scenario['solar_peak_power_kw']:.2f} kW | "
+            f"{scenario['battery_capacity_kwh']:.2f} kWh | "
+            f"{format_eur(scenario['investment_cost_eur'])} | "
+            f"{format_eur_per_year(scenario['annual_savings_eur'])} | "
+            f"{format_years(scenario['payback_years'])} | "
+            f"{format_eur(scenario['net_present_value_eur'])} | "
+            f"{format_optional_years(scenario['discounted_payback_years'])} | "
+            f"{format_optional_percent(scenario['internal_rate_of_return'])} | "
+            f"{format_percent(scenario['self_sufficiency'])} |"
+        )
+
+    return "\n".join(lines)
+
+
+def build_scenario_comparison_section(
+    comparison_df: pd.DataFrame,
+) -> str:
+    table = build_scenario_comparison_table(comparison_df)
+
+    lines = [
+        "## Scenario comparison",
+        "",
+        (
+            "The following table compares the main technical and "
+            "financial metrics of the six selected scenarios."
+        ),
+        "",
+        table,
+        "",
+    ]
+
+    return "\n".join(lines)
 
 
 def build_optimization_conclusion(
@@ -532,6 +690,8 @@ def build_final_results_summary(
         forecast_self_sufficiency=forecast_self_sufficiency,
     )
 
+    comparison_section = build_scenario_comparison_section(comparison_df)
+
     lines = [
         "# Final Results Summary",
         "",
@@ -542,6 +702,7 @@ def build_final_results_summary(
         "",
         ("It compares historical optimization with forecast-based optimization."),
         "",
+        comparison_section,
         format_scenario_section(
             "Best historical payback scenario",
             historical_payback,

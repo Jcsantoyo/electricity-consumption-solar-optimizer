@@ -24,6 +24,10 @@ from scripts.generate_final_results_summary import (
     has_extended_financial_metrics,
     scenarios_use_same_configuration,
     validate_financial_sensitivity_dataframe,
+    build_scenario_comparison_section,
+    build_scenario_comparison_table,
+    get_scenario_display_name,
+    validate_scenario_comparison_dataframe,
 )
 
 
@@ -563,3 +567,81 @@ def test_format_scenario_section_contains_extended_financial_metrics() -> None:
     assert "Net present value" in section
     assert "Discounted payback" in section
     assert "Internal rate of return" in section
+
+
+def test_get_scenario_display_name_returns_expected_name() -> None:
+    result = get_scenario_display_name(
+        "forecast_based",
+        "best_net_present_value",
+    )
+
+    assert result == "Forecast · Best NPV"
+
+
+def test_get_scenario_display_name_rejects_unknown_scenario() -> None:
+    with pytest.raises(
+        ValueError,
+        match="Unknown scenario display name",
+    ):
+        get_scenario_display_name(
+            "historical",
+            "missing",
+        )
+
+
+def test_validate_scenario_comparison_dataframe_accepts_valid_data() -> None:
+    validate_scenario_comparison_dataframe(build_sample_comparison_df())
+
+
+def test_validate_scenario_comparison_dataframe_rejects_missing_columns() -> None:
+    dataframe = pd.DataFrame(
+        {
+            "optimization_type": ["historical"],
+            "scenario": ["best_payback"],
+        }
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="missing required columns",
+    ):
+        validate_scenario_comparison_dataframe(dataframe)
+
+
+def test_scenario_comparison_table_contains_six_scenarios() -> None:
+    table = build_scenario_comparison_table(build_sample_comparison_df())
+
+    assert table.count("Historical · Best payback") == 1
+    assert table.count("Historical · Best NPV") == 1
+    assert table.count("Historical · Best self-sufficiency") == 1
+    assert table.count("Forecast · Best payback") == 1
+    assert table.count("Forecast · Best NPV") == 1
+    assert table.count("Forecast · Best self-sufficiency") == 1
+
+
+def test_scenario_comparison_table_contains_key_metrics() -> None:
+    table = build_scenario_comparison_table(build_sample_comparison_df())
+
+    assert "5000.00 EUR" in table
+    assert "7100.00 EUR" in table
+    assert "7.25 years" in table
+    assert "15.40%" in table
+    assert "49.96%" in table
+    assert "Not available" in table
+
+
+def test_scenario_comparison_section_contains_heading_and_table() -> None:
+    section = build_scenario_comparison_section(build_sample_comparison_df())
+
+    assert "## Scenario comparison" in section
+    assert "| Scenario | Solar | Battery |" in section
+    assert "Historical · Best payback" in section
+    assert "Forecast · Best NPV" in section
+
+
+def test_final_summary_contains_scenario_comparison_table() -> None:
+    summary = build_final_results_summary(build_sample_comparison_df())
+
+    assert "## Scenario comparison" in summary
+    assert "Historical · Best NPV" in summary
+    assert "Forecast · Best NPV" in summary
