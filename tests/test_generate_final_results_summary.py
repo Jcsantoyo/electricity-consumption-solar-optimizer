@@ -11,6 +11,7 @@ from scripts.generate_final_results_summary import (
     format_cost_breakdown_lines,
     format_eur,
     format_eur_per_year,
+    format_extended_financial_lines,
     format_kwh_per_year,
     format_optional_percent,
     format_optional_years,
@@ -20,6 +21,7 @@ from scripts.generate_final_results_summary import (
     get_scenario,
     get_sensitivity_case,
     has_cost_breakdown,
+    has_extended_financial_metrics,
     scenarios_use_same_configuration,
     validate_financial_sensitivity_dataframe,
 )
@@ -36,6 +38,10 @@ def build_sample_comparison_df() -> pd.DataFrame:
                 "investment_cost_eur": 3500.0,
                 "annual_savings_eur": 684.83,
                 "payback_years": 5.11,
+                "battery_replacement_cost_eur": 0.0,
+                "net_present_value_eur": 5000.0,
+                "discounted_payback_years": 6.0,
+                "internal_rate_of_return": 0.18,
                 "self_sufficiency": 0.3158,
                 "annual_grid_import_kwh": 6457.20,
             },
@@ -47,6 +53,10 @@ def build_sample_comparison_df() -> pd.DataFrame:
                 "investment_cost_eur": 3500.0,
                 "annual_savings_eur": 684.83,
                 "payback_years": 5.11,
+                "battery_replacement_cost_eur": 0.0,
+                "net_present_value_eur": 5200.0,
+                "discounted_payback_years": 5.8,
+                "internal_rate_of_return": 0.19,
                 "self_sufficiency": 0.3158,
                 "annual_grid_import_kwh": 6457.20,
             },
@@ -58,6 +68,10 @@ def build_sample_comparison_df() -> pd.DataFrame:
                 "investment_cost_eur": 6000.0,
                 "annual_savings_eur": 819.44,
                 "payback_years": 7.32,
+                "battery_replacement_cost_eur": 1750.0,
+                "net_present_value_eur": 4200.0,
+                "discounted_payback_years": 8.5,
+                "internal_rate_of_return": None,
                 "self_sufficiency": 0.4398,
                 "annual_grid_import_kwh": 5286.51,
             },
@@ -69,6 +83,10 @@ def build_sample_comparison_df() -> pd.DataFrame:
                 "investment_cost_eur": 2600.0,
                 "annual_savings_eur": 551.64,
                 "payback_years": 4.71,
+                "battery_replacement_cost_eur": 0.0,
+                "net_present_value_eur": 6100.0,
+                "discounted_payback_years": 5.4,
+                "internal_rate_of_return": 0.21,
                 "self_sufficiency": 0.3046,
                 "annual_grid_import_kwh": 6160.30,
             },
@@ -80,6 +98,10 @@ def build_sample_comparison_df() -> pd.DataFrame:
                 "investment_cost_eur": 5000.0,
                 "annual_savings_eur": 720.00,
                 "payback_years": 6.94,
+                "battery_replacement_cost_eur": 1050.0,
+                "net_present_value_eur": 7100.0,
+                "discounted_payback_years": 7.25,
+                "internal_rate_of_return": 0.154,
                 "self_sufficiency": 0.4020,
                 "annual_grid_import_kwh": 5100.00,
             },
@@ -91,6 +113,10 @@ def build_sample_comparison_df() -> pd.DataFrame:
                 "investment_cost_eur": 6000.0,
                 "annual_savings_eur": 865.36,
                 "payback_years": 6.93,
+                "battery_replacement_cost_eur": 1750.0,
+                "net_present_value_eur": 6800.0,
+                "discounted_payback_years": 8.10,
+                "internal_rate_of_return": None,
                 "self_sufficiency": 0.4996,
                 "annual_grid_import_kwh": 4432.61,
             },
@@ -190,6 +216,10 @@ def test_build_final_results_summary_contains_key_values():
     assert "865.36 EUR/year" in summary
     assert "31.58%" in summary
     assert "49.96%" in summary
+    assert "Net present value" in summary
+    assert "Discounted payback" in summary
+    assert "Internal rate of return" in summary
+    assert "Battery replacement cost" in summary
 
 
 def test_has_cost_breakdown_detects_complete_breakdown() -> None:
@@ -456,3 +486,80 @@ def test_final_summary_contains_distinct_npv_scenario_values() -> None:
     assert "5000.00 EUR" in summary
     assert "3.00 kWh" in summary
     assert "720.00 EUR/year" in summary
+
+
+def test_has_extended_financial_metrics_accepts_complete_row() -> None:
+    scenario = pd.Series(
+        {
+            "battery_replacement_cost_eur": 1000.0,
+            "net_present_value_eur": 5000.0,
+            "discounted_payback_years": 7.5,
+            "internal_rate_of_return": 0.15,
+        }
+    )
+
+    assert has_extended_financial_metrics(scenario)
+
+
+def test_has_extended_financial_metrics_rejects_incomplete_row() -> None:
+    scenario = pd.Series(
+        {
+            "net_present_value_eur": 5000.0,
+        }
+    )
+
+    assert not has_extended_financial_metrics(scenario)
+
+
+def test_format_extended_financial_lines_contains_metrics() -> None:
+    scenario = pd.Series(
+        {
+            "battery_replacement_cost_eur": 1050.0,
+            "net_present_value_eur": 7100.0,
+            "discounted_payback_years": 7.25,
+            "internal_rate_of_return": 0.154,
+        }
+    )
+
+    lines = format_extended_financial_lines(scenario)
+    text = "\n".join(lines)
+
+    assert "Battery replacement cost" in text
+    assert "1050.00 EUR" in text
+    assert "Net present value" in text
+    assert "7100.00 EUR" in text
+    assert "Discounted payback" in text
+    assert "7.25 years" in text
+    assert "Internal rate of return" in text
+    assert "15.40%" in text
+
+
+def test_format_extended_financial_lines_handles_missing_values() -> None:
+    scenario = pd.Series(
+        {
+            "battery_replacement_cost_eur": 1750.0,
+            "net_present_value_eur": -800.0,
+            "discounted_payback_years": None,
+            "internal_rate_of_return": None,
+        }
+    )
+
+    text = "\n".join(format_extended_financial_lines(scenario))
+
+    assert "Not achieved" in text
+    assert "Not available" in text
+
+
+def test_format_scenario_section_contains_extended_financial_metrics() -> None:
+    scenario = build_sample_comparison_df().iloc[0]
+
+    section = format_scenario_section(
+        "Extended scenario",
+        scenario,
+    )
+
+    assert "Simple payback" in section
+    assert "Battery replacement cost" in section
+    assert "Net present value" in section
+    assert "Discounted payback" in section
+    assert "Internal rate of return" in section

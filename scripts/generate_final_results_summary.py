@@ -232,6 +232,41 @@ def format_cost_breakdown_lines(
     ]
 
 
+SCENARIO_FINANCIAL_COLUMNS = {
+    "battery_replacement_cost_eur",
+    "net_present_value_eur",
+    "discounted_payback_years",
+    "internal_rate_of_return",
+}
+
+
+def has_extended_financial_metrics(scenario_row: pd.Series) -> bool:
+    return SCENARIO_FINANCIAL_COLUMNS.issubset(scenario_row.index)
+
+
+def format_extended_financial_lines(
+    scenario_row: pd.Series,
+) -> list[str]:
+    if not has_extended_financial_metrics(scenario_row):
+        return []
+
+    return [
+        (
+            "- Battery replacement cost: "
+            f"`{format_eur(scenario_row['battery_replacement_cost_eur'])}`"
+        ),
+        (f"- Net present value: `{format_eur(scenario_row['net_present_value_eur'])}`"),
+        (
+            "- Discounted payback: "
+            f"`{format_optional_years(scenario_row['discounted_payback_years'])}`"
+        ),
+        (
+            "- Internal rate of return: "
+            f"`{format_optional_percent(scenario_row['internal_rate_of_return'])}`"
+        ),
+    ]
+
+
 def format_scenario_section(
     title: str,
     scenario_row: pd.Series,
@@ -246,13 +281,26 @@ def format_scenario_section(
             "- Annual savings: "
             f"`{format_eur_per_year(scenario_row['annual_savings_eur'])}`"
         ),
-        (f"- Payback period: `{format_years(scenario_row['payback_years'])}`"),
-        (f"- Self-sufficiency: `{format_percent(scenario_row['self_sufficiency'])}`"),
-        (
-            "- Annual grid import: "
-            f"`{format_kwh_per_year(scenario_row['annual_grid_import_kwh'])}`"
-        ),
+        (f"- Simple payback: `{format_years(scenario_row['payback_years'])}`"),
     ]
+
+    extended_financial_lines = format_extended_financial_lines(scenario_row)
+
+    if extended_financial_lines:
+        lines.extend(extended_financial_lines)
+
+    lines.extend(
+        [
+            (
+                "- Self-sufficiency: "
+                f"`{format_percent(scenario_row['self_sufficiency'])}`"
+            ),
+            (
+                "- Annual grid import: "
+                f"`{format_kwh_per_year(scenario_row['annual_grid_import_kwh'])}`"
+            ),
+        ]
+    )
 
     cost_breakdown_lines = format_cost_breakdown_lines(scenario_row)
 
