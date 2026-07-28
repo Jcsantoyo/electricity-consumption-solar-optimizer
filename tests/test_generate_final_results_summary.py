@@ -7,6 +7,7 @@ from scripts.generate_final_results_summary import (
     build_financial_sensitivity_interpretation,
     build_financial_sensitivity_section,
     build_financial_sensitivity_table,
+    build_optimization_conclusion,
     format_cost_breakdown_lines,
     format_eur,
     format_eur_per_year,
@@ -19,6 +20,7 @@ from scripts.generate_final_results_summary import (
     get_scenario,
     get_sensitivity_case,
     has_cost_breakdown,
+    scenarios_use_same_configuration,
     validate_financial_sensitivity_dataframe,
 )
 
@@ -29,6 +31,17 @@ def build_sample_comparison_df() -> pd.DataFrame:
             {
                 "optimization_type": "historical",
                 "scenario": "best_payback",
+                "solar_peak_power_kw": 3.0,
+                "battery_capacity_kwh": 0.0,
+                "investment_cost_eur": 3500.0,
+                "annual_savings_eur": 684.83,
+                "payback_years": 5.11,
+                "self_sufficiency": 0.3158,
+                "annual_grid_import_kwh": 6457.20,
+            },
+            {
+                "optimization_type": "historical",
+                "scenario": "best_net_present_value",
                 "solar_peak_power_kw": 3.0,
                 "battery_capacity_kwh": 0.0,
                 "investment_cost_eur": 3500.0,
@@ -58,6 +71,17 @@ def build_sample_comparison_df() -> pd.DataFrame:
                 "payback_years": 4.71,
                 "self_sufficiency": 0.3046,
                 "annual_grid_import_kwh": 6160.30,
+            },
+            {
+                "optimization_type": "forecast_based",
+                "scenario": "best_net_present_value",
+                "solar_peak_power_kw": 3.0,
+                "battery_capacity_kwh": 3.0,
+                "investment_cost_eur": 5000.0,
+                "annual_savings_eur": 720.00,
+                "payback_years": 6.94,
+                "self_sufficiency": 0.4020,
+                "annual_grid_import_kwh": 5100.00,
             },
             {
                 "optimization_type": "forecast_based",
@@ -143,9 +167,11 @@ def test_build_final_results_summary_contains_main_sections():
     summary = build_final_results_summary(comparison_df)
 
     assert "# Final Results Summary" in summary
-    assert "## Best historical economic scenario" in summary
+    assert "## Best historical payback scenario" in summary
+    assert "## Best historical net present value scenario" in summary
     assert "## Best historical self-sufficiency scenario" in summary
-    assert "## Best forecast-based economic scenario" in summary
+    assert "## Best forecast-based payback scenario" in summary
+    assert "## Best forecast-based net present value scenario" in summary
     assert "## Best forecast-based self-sufficiency scenario" in summary
     assert "## Main conclusion" in summary
 
@@ -338,3 +364,95 @@ def test_final_summary_includes_financial_sensitivity_section() -> None:
     assert "| base |" in summary
     assert "| optimistic |" in summary
     assert "only achieves a positive NPV" in summary
+
+
+def test_scenarios_use_same_configuration_returns_true() -> None:
+    first = pd.Series(
+        {
+            "solar_peak_power_kw": 3.0,
+            "battery_capacity_kwh": 0.0,
+        }
+    )
+    second = pd.Series(
+        {
+            "solar_peak_power_kw": 3.0,
+            "battery_capacity_kwh": 0.0,
+        }
+    )
+
+    assert scenarios_use_same_configuration(first, second)
+
+
+def test_scenarios_use_same_configuration_returns_false() -> None:
+    first = pd.Series(
+        {
+            "solar_peak_power_kw": 3.0,
+            "battery_capacity_kwh": 0.0,
+        }
+    )
+    second = pd.Series(
+        {
+            "solar_peak_power_kw": 3.0,
+            "battery_capacity_kwh": 3.0,
+        }
+    )
+
+    assert not scenarios_use_same_configuration(first, second)
+
+
+def test_optimization_conclusion_detects_matching_historical_scenarios() -> None:
+    comparison_df = build_sample_comparison_df()
+
+    conclusion = build_optimization_conclusion(
+        historical_payback=get_scenario(
+            comparison_df,
+            "historical",
+            "best_payback",
+        ),
+        historical_npv=get_scenario(
+            comparison_df,
+            "historical",
+            "best_net_present_value",
+        ),
+        historical_self_sufficiency=get_scenario(
+            comparison_df,
+            "historical",
+            "best_self_sufficiency",
+        ),
+        forecast_payback=get_scenario(
+            comparison_df,
+            "forecast_based",
+            "best_payback",
+        ),
+        forecast_npv=get_scenario(
+            comparison_df,
+            "forecast_based",
+            "best_net_present_value",
+        ),
+        forecast_self_sufficiency=get_scenario(
+            comparison_df,
+            "forecast_based",
+            "best_self_sufficiency",
+        ),
+    )
+
+    assert (
+        "historical optimization, the configuration with the "
+        "shortest payback also provides the highest net present value" in conclusion
+    )
+
+    assert (
+        "forecast-based optimization, the configuration with the "
+        "shortest payback differs" in conclusion
+    )
+
+    assert "trade-off" in conclusion
+
+
+def test_final_summary_contains_distinct_npv_scenario_values() -> None:
+    summary = build_final_results_summary(build_sample_comparison_df())
+
+    assert "## Best forecast-based net present value scenario" in summary
+    assert "5000.00 EUR" in summary
+    assert "3.00 kWh" in summary
+    assert "720.00 EUR/year" in summary

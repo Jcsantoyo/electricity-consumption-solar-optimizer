@@ -61,6 +61,116 @@ def get_scenario(
     return filtered_df.iloc[0]
 
 
+def scenarios_use_same_configuration(
+    first_scenario: pd.DataFrame, second_scenario: pd.Series
+) -> bool:
+    return float(first_scenario["solar_peak_power_kw"]) == float(
+        second_scenario["solar_peak_power_kw"]
+    ) and float(first_scenario["battery_capacity_kwh"]) == float(
+        second_scenario["battery_capacity_kwh"]
+    )
+
+
+def build_optimization_conclusion(
+    historical_payback: pd.Series,
+    historical_npv: pd.Series,
+    historical_self_sufficiency: pd.Series,
+    forecast_payback: pd.Series,
+    forecast_npv: pd.Series,
+    forecast_self_sufficiency: pd.Series,
+) -> str:
+    historical_payback_matches_npv = scenarios_use_same_configuration(
+        historical_payback,
+        historical_npv,
+    )
+    forecast_payback_matches_npv = scenarios_use_same_configuration(
+        forecast_payback,
+        forecast_npv,
+    )
+
+    historical_npv_matches_self_sufficiency = scenarios_use_same_configuration(
+        historical_npv,
+        historical_self_sufficiency,
+    )
+    forecast_npv_matches_self_sufficiency = scenarios_use_same_configuration(
+        forecast_npv,
+        forecast_self_sufficiency,
+    )
+
+    lines = [
+        "## Main conclusion",
+        "",
+    ]
+
+    if historical_payback_matches_npv:
+        lines.append(
+            "For the historical optimization, the configuration with the "
+            "shortest payback also provides the highest net present value."
+        )
+    else:
+        lines.append(
+            "For the historical optimization, the configuration with the "
+            "shortest payback differs from the configuration with the "
+            "highest net present value."
+        )
+
+    lines.append("")
+
+    if forecast_payback_matches_npv:
+        lines.append(
+            "For the forecast-based optimization, the configuration with "
+            "the shortest payback also provides the highest net present "
+            "value."
+        )
+    else:
+        lines.append(
+            "For the forecast-based optimization, the configuration with "
+            "the shortest payback differs from the configuration with the "
+            "highest net present value."
+        )
+
+    lines.append("")
+
+    if (
+        historical_npv_matches_self_sufficiency
+        and forecast_npv_matches_self_sufficiency
+    ):
+        lines.append(
+            "In both optimization approaches, the financially preferred "
+            "configuration also maximizes self-sufficiency."
+        )
+    elif (
+        not historical_npv_matches_self_sufficiency
+        and not forecast_npv_matches_self_sufficiency
+    ):
+        lines.append(
+            "In both optimization approaches, the configuration with the "
+            "highest net present value differs from the configuration with "
+            "the highest self-sufficiency. This reflects a clear trade-off "
+            "between financial performance and energy independence."
+        )
+    else:
+        lines.append(
+            "The relationship between financial performance and "
+            "self-sufficiency changes between the historical and "
+            "forecast-based optimizations."
+        )
+
+    lines.extend(
+        [
+            "",
+            (
+                "Forecasted consumption can therefore change not only the "
+                "expected savings, but also the preferred solar and battery "
+                "configuration."
+            ),
+            "",
+        ]
+    )
+
+    return "\n".join(lines)
+
+
 COST_BREAKDOWN_COLUMNS = {
     "base_variable_energy_cost_eur",
     "base_fixed_power_cost_eur",
@@ -328,15 +438,26 @@ def build_final_results_summary(
         "historical",
         "best_payback",
     )
+    historical_npv = get_scenario(
+        comparison_df,
+        "historical",
+        "best_net_present_value",
+    )
     historical_self_sufficiency = get_scenario(
         comparison_df,
         "historical",
         "best_self_sufficiency",
     )
+
     forecast_payback = get_scenario(
         comparison_df,
         "forecast_based",
         "best_payback",
+    )
+    forecast_npv = get_scenario(
+        comparison_df,
+        "forecast_based",
+        "best_net_present_value",
     )
     forecast_self_sufficiency = get_scenario(
         comparison_df,
@@ -348,8 +469,20 @@ def build_final_results_summary(
 
     if sensitivity_df is not None:
         sensitivity_section = build_financial_sensitivity_section(
-            sensitivity_df, npv_plot_path, payback_plot_path, irr_plot_path
+            sensitivity_df=sensitivity_df,
+            npv_plot_path=npv_plot_path,
+            payback_plot_path=payback_plot_path,
+            irr_plot_path=irr_plot_path,
         )
+
+    conclusion = build_optimization_conclusion(
+        historical_payback=historical_payback,
+        historical_npv=historical_npv,
+        historical_self_sufficiency=historical_self_sufficiency,
+        forecast_payback=forecast_payback,
+        forecast_npv=forecast_npv,
+        forecast_self_sufficiency=forecast_self_sufficiency,
+    )
 
     lines = [
         "# Final Results Summary",
@@ -359,41 +492,34 @@ def build_final_results_summary(
             "project pipeline."
         ),
         "",
-        "It compares historical optimization with forecast-based optimization.",
+        ("It compares historical optimization with forecast-based optimization."),
         "",
         format_scenario_section(
-            "Best historical economic scenario",
+            "Best historical payback scenario",
             historical_payback,
+        ),
+        format_scenario_section(
+            "Best historical net present value scenario",
+            historical_npv,
         ),
         format_scenario_section(
             "Best historical self-sufficiency scenario",
             historical_self_sufficiency,
         ),
         format_scenario_section(
-            "Best forecast-based economic scenario",
+            "Best forecast-based payback scenario",
             forecast_payback,
+        ),
+        format_scenario_section(
+            "Best forecast-based net present value scenario",
+            forecast_npv,
         ),
         format_scenario_section(
             "Best forecast-based self-sufficiency scenario",
             forecast_self_sufficiency,
         ),
         sensitivity_section,
-        "## Main conclusion",
-        "",
-        (
-            "The best economic scenario and the best self-sufficiency scenario "
-            "are not necessarily the same."
-        ),
-        "",
-        (
-            "In the current results, the forecast-based economic optimum can "
-            "differ from the historical economic optimum."
-        ),
-        (
-            "This means that using predicted future consumption may change the "
-            "recommended solar and battery configuration."
-        ),
-        "",
+        conclusion,
     ]
 
     return "\n".join(lines)
